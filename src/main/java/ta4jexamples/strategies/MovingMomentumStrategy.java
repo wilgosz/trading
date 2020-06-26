@@ -90,7 +90,8 @@ public class MovingMomentumStrategy {
 
         // Getting the bar series
         //BarSeries series = CsvTradesLoader.loadBitstampSeries();
-        BarSeries series = CsvBarsLoader.loadAppleIncSeries();
+        BarSeries series = CsvTradesLoader.loadBitstampSeries();
+        //BarSeries series = CsvBarsLoader.loadAppleIncSeries();
 
         // Building the trading strategy
         Strategy strategy = buildStrategy(series);

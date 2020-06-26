@@ -15,6 +15,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  *
@@ -24,7 +25,7 @@ public class FileDownloader {
     
     private static String PROJECT_PATH;
     
-    public static void downloadFile() throws IOException, ParseException {
+    public static void downloadFile(HttpServletRequest request) throws IOException, ParseException {
         
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date date2 = new Date();
@@ -36,10 +37,10 @@ public class FileDownloader {
         
         if (PROJECT_PATH != null) {
         } else {
-            PROJECT_PATH = Paths.get(".").toUri().normalize().getPath();
+            PROJECT_PATH = request.getServletContext().getRealPath("/WEB-INF/download/")+"/";
         }
         System.out.print(PROJECT_PATH);
-        File f = new File(PROJECT_PATH + "target/classes/download/"+"AAPL.csv");
+        File f = new File(PROJECT_PATH +"AAPL.csv");
         if (!f.exists()) {
             f.createNewFile();
         }

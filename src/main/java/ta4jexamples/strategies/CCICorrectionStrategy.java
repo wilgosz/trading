@@ -34,6 +34,7 @@ import org.ta4j.core.indicators.CCIIndicator;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
 import org.ta4j.core.trading.rules.UnderIndicatorRule;
+import ta4jexamples.loaders.CsvBarsLoader;
 import ta4jexamples.loaders.CsvTradesLoader;
 
 /**
@@ -74,6 +75,7 @@ public class CCICorrectionStrategy {
 
         // Getting the bar series
         BarSeries series = CsvTradesLoader.loadBitstampSeries();
+        //BarSeries series = CsvBarsLoader.loadAppleIncSeries();
 
         // Building the trading strategy
         Strategy strategy = buildStrategy(series);

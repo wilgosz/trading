@@ -38,6 +38,7 @@ import org.ta4j.core.indicators.helpers.LowestValueIndicator;
 import org.ta4j.core.indicators.helpers.MultiplierIndicator;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
 import org.ta4j.core.trading.rules.UnderIndicatorRule;
+import ta4jexamples.loaders.CsvBarsLoader;
 import ta4jexamples.loaders.CsvTradesLoader;
 
 /**
@@ -82,6 +83,7 @@ public class GlobalExtremaStrategy {
 
         // Getting the bar series
         BarSeries series = CsvTradesLoader.loadBitstampSeries();
+        //BarSeries series = CsvBarsLoader.loadAppleIncSeries();
 
         // Building the trading strategy
         Strategy strategy = buildStrategy(series);

@@ -40,11 +40,14 @@ import ta4jexamples.loaders.CsvBarsLoader;
 
 import java.util.ArrayList;
 import java.util.List;
+import ta4jexamples.loaders.CsvTradesLoader;
 
 public class SimpleMovingAverageRangeBacktest {
 
     public static void main(String[] args) {
-        BarSeries series = CsvBarsLoader.loadAppleIncSeries();
+        
+        BarSeries series = CsvTradesLoader.loadBitstampSeries();
+        //BarSeries series = CsvBarsLoader.loadAppleIncSeries();
 
         int start = 3;
         int stop = 50;

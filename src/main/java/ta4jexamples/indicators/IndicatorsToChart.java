@@ -23,6 +23,7 @@
  */
 package ta4jexamples.indicators;
 
+import java.awt.Color;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -46,6 +47,11 @@ import ta4jexamples.loaders.CsvBarsLoader;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import org.jfree.chart.plot.ValueMarker;
+import org.ta4j.core.indicators.MACDIndicator;
+import org.ta4j.core.indicators.RSIIndicator;
+import org.ta4j.core.indicators.SMAIndicator;
+import ta4jexamples.loaders.CsvTradesLoader;
 
 /**
  * This class builds a graphical chart showing values from indicators.
@@ -57,7 +63,7 @@ public class IndicatorsToChart {
      *
      * @param barSeries the ta4j bar series
      * @param indicator the indicator
-     * @param name      the name of the chart time series
+     * @param name the name of the chart time series
      * @return the JFreeChart time series
      */
     private static org.jfree.data.time.TimeSeries buildChartBarSeries(BarSeries barSeries, Indicator<Num> indicator,
@@ -80,7 +86,7 @@ public class IndicatorsToChart {
         ChartPanel panel = new ChartPanel(chart);
         panel.setFillZoomRectangle(true);
         panel.setMouseWheelEnabled(true);
-        panel.setPreferredSize(new java.awt.Dimension(500, 270));
+        panel.setPreferredSize(new java.awt.Dimension(1200, 500));
         // Application frame
         ApplicationFrame frame = new ApplicationFrame("Ta4j example - Indicators to chart");
         frame.setContentPane(panel);
@@ -94,7 +100,8 @@ public class IndicatorsToChart {
         /*
          * Getting bar series
          */
-        BarSeries series = CsvBarsLoader.loadAppleIncSeries();
+        BarSeries series = CsvTradesLoader.loadBitstampSeries();
+        //BarSeries series = CsvBarsLoader.loadAppleIncSeries();
 
         /*
          * Creating indicators
@@ -109,14 +116,36 @@ public class IndicatorsToChart {
         BollingerBandsLowerIndicator lowBBand = new BollingerBandsLowerIndicator(middleBBand, sd14);
         BollingerBandsUpperIndicator upBBand = new BollingerBandsUpperIndicator(middleBBand, sd14);
 
+        SMAIndicator shortSma = new SMAIndicator(closePrice, 9);
+        SMAIndicator longSma = new SMAIndicator(closePrice, 26);
+        
+        
+        RSIIndicator rsi = new RSIIndicator(closePrice, 14);
+        
+        
+        EMAIndicator shortTermEma = new EMAIndicator(closePrice, 9);
+        EMAIndicator longTermEma = new EMAIndicator(closePrice, 26);
+        MACDIndicator macd = new MACDIndicator(closePrice, 9, 26);
+
         /*
          * Building chart dataset
          */
         TimeSeriesCollection dataset = new TimeSeriesCollection();
-        dataset.addSeries(buildChartBarSeries(series, closePrice, "Apple Inc. (AAPL) - NASDAQ GS"));
-        dataset.addSeries(buildChartBarSeries(series, lowBBand, "Low Bollinger Band"));
-        dataset.addSeries(buildChartBarSeries(series, upBBand, "High Bollinger Band"));
-
+        //dataset.addSeries(buildChartBarSeries(series, closePrice, "Apple Inc. (AAPL) - NASDAQ GS"));
+        //dataset.addSeries(buildChartBarSeries(series, lowBBand, "Low Bollinger Band"));
+        //dataset.addSeries(buildChartBarSeries(series, upBBand, "High Bollinger Band"));
+        
+        //dataset.addSeries(buildChartBarSeries(series, shortSma, "SMA short"));
+        //dataset.addSeries(buildChartBarSeries(series, longSma, "SMA long"));
+        
+        dataset.addSeries(buildChartBarSeries(series, rsi, "RSI"));
+        
+        //dataset.addSeries(buildChartBarSeries(series, shortTermEma, "MACD short"));
+        //dataset.addSeries(buildChartBarSeries(series, longTermEma, "MACD long"));
+        //dataset.addSeries(buildChartBarSeries(series, macd, "MACD"));
+        
+        
+        
         /*
          * Creating the chart
          */
@@ -131,7 +160,14 @@ public class IndicatorsToChart {
         XYPlot plot = (XYPlot) chart.getPlot();
         DateAxis axis = (DateAxis) plot.getDomainAxis();
         axis.setDateFormatOverride(new SimpleDateFormat("yyyy-MM-dd"));
-
+        
+        ValueMarker marker = new ValueMarker(30);  // position is the value on the axis
+        marker.setPaint(Color.black);
+        plot.addRangeMarker(marker);
+        
+        ValueMarker marker2 = new ValueMarker(70);  // position is the value on the axis
+        marker2.setPaint(Color.black);
+        plot.addRangeMarker(marker2);
         /*
          * Displaying the chart
          */

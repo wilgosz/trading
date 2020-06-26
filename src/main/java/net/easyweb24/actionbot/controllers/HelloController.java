@@ -18,7 +18,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.http.HttpServletRequest;
+import net.easyweb24.actionbot.entity.User;
+import net.easyweb24.actionbot.repository.UserRepository;
 import net.easyweb24.actionbot.utils.FileDownloader;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,20 +33,39 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
+@RequestMapping("/hello")
 public class HelloController {
+    
+    @Autowired
+    private UserRepository userRepository;
 
     @RequestMapping("/")
     @ResponseBody
-    public String index() throws ParseException {
+    public String index(HttpServletRequest request) throws ParseException {
         
         try {
-            FileDownloader.downloadFile();
+            FileDownloader.downloadFile(request);
         } catch (IOException ex) {
             Logger.getLogger(HelloController.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println(ex.getMessage());
         }
         return "Greetings Man";
     }
-
+    
+    @GetMapping("/save")
+    @ResponseBody
+    public String save(@RequestParam(name = "name", required = false, defaultValue = "World") String name, Model model) {
+        User user = new User();
+        user.setActiv(1);
+        user.setUsername("wladek");
+        user.setEmail("wladimir.putin@gmaol.com");
+        user.setFirst_name("Władimir");
+        user.setLast_name("Putin");
+        user.setPassword("BlaBlaBla");
+        userRepository.save(user);
+        return "saved";
+    }
+    
     @GetMapping("/greeting")
     public String greeting(@RequestParam(name = "name", required = false, defaultValue = "World") String name, Model model) {
         model.addAttribute("name", name);
@@ -51,7 +74,7 @@ public class HelloController {
 
     @GetMapping("/test")
     @ResponseBody
-    public ResponseEntity<List<Integer>> test() {
+    public ResponseEntity<Iterable<User>> test() {
         List<Integer> l = new ArrayList();
         l.add(1);
         l.add(2);
@@ -59,8 +82,10 @@ public class HelloController {
         l.add(4);
         l.add(5);
         l.add(6);
+        
+        System.err.println(userRepository.findAll());
 
-        return ResponseEntity.ok().body(l);
+        return ResponseEntity.ok().body(userRepository.findAll());
     }
 
 }

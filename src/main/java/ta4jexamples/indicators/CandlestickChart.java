@@ -44,6 +44,7 @@ import ta4jexamples.loaders.CsvTradesLoader;
 
 import java.awt.*;
 import java.util.Date;
+import ta4jexamples.loaders.CsvBarsLoader;
 
 /**
  * This class builds a traditional candlestick chart.
@@ -122,6 +123,7 @@ public class CandlestickChart {
          * Getting bar series
          */
         BarSeries series = CsvTradesLoader.loadBitstampSeries();
+        //BarSeries series = CsvBarsLoader.loadAppleIncSeries();
 
         /*
          * Creating the OHLC dataset
@@ -147,7 +149,7 @@ public class CandlestickChart {
         plot.setDataset(index, xyDataset);
         plot.mapDatasetToRangeAxis(index, 0);
         XYLineAndShapeRenderer renderer2 = new XYLineAndShapeRenderer(true, false);
-        renderer2.setSeriesPaint(index, Color.blue);
+        renderer2.setSeriesPaint(index, Color.gray);
         plot.setRenderer(index, renderer2);
         // Misc
         plot.setRangeGridlinePaint(Color.lightGray);
