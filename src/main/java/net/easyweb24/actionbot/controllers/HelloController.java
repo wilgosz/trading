@@ -55,14 +55,7 @@ public class HelloController {
     @GetMapping("/save")
     @ResponseBody
     public String save(@RequestParam(name = "name", required = false, defaultValue = "World") String name, Model model) {
-        User user = new User();
-        user.setActiv(1);
-        user.setUsername("wladek");
-        user.setEmail("wladimir.putin@gmaol.com");
-        user.setFirst_name("Władimir");
-        user.setLast_name("Putin");
-        user.setPassword("BlaBlaBla");
-        userRepository.save(user);
+        
         return "saved";
     }
     

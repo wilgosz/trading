@@ -5,8 +5,11 @@
  */
 package net.easyweb24.actionbot.controllers;
 
+import java.security.Principal;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 
 /**
  *
@@ -14,8 +17,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 public class HomeController {
-    @RequestMapping("/")
-    public String index(){
+    
+    @GetMapping("/")
+    public String root(Principal principal) {
+        System.out.println( principal.getName() );
         return "index";
+    }
+
+    @GetMapping("/login")
+    public String login(Model model, HttpServletRequest request) {
+        if(request.isUserInRole("ROLE_USER")){
+            return "redirect:/";
+        }
+        return "login";
+    }
+
+    @GetMapping("/user")
+    public String userIndex() {
+        return "user/index";
     }
 }

@@ -3,18 +3,21 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.easyweb24.actionbot.repository;
+package net.easyweb24.actionbot.service;
 
 /**
  *
  * @author zbigniewwilgosz
  */
+import net.easyweb24.actionbot.dto.UserRegistrationDto;
 import net.easyweb24.actionbot.entity.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 
-@Repository
-public interface UserRepository extends JpaRepository < User, Long > {
+
+public interface UserService extends UserDetailsService {
+
     User findByEmail(String email);
+
+    User save(UserRegistrationDto registration);
 }
