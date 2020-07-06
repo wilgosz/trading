@@ -7,6 +7,8 @@ package net.easyweb24.actionbot.controllers;
 
 import java.security.Principal;
 import javax.servlet.http.HttpServletRequest;
+import net.easyweb24.actionbot.utils.CustomUser;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,8 +21,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class HomeController {
     
     @GetMapping("/")
-    public String root(Principal principal) {
-        System.out.println( principal.getName() );
+    public String root(Authentication authentication) {
+        
+        CustomUser user = (CustomUser) authentication.getPrincipal();
+        System.out.println( user.getId());
+        System.out.println( user.getUsername());
         return "index";
     }
 

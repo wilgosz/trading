@@ -12,31 +12,29 @@ package net.easyweb24.actionbot.controllers;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import net.easyweb24.actionbot.dto.UserRegistrationDto;
-import net.easyweb24.actionbot.entity.User;
-import net.easyweb24.actionbot.service.UserService;
+import net.easyweb24.actionbot.service.UserServiceImpl;
+import net.easyweb24.actionbot.validator.UserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/registration")
 public class UserRegistrationController {
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userService;
 
-    @ModelAttribute("user")
-    public UserRegistrationDto userRegistrationDto() {
-        return new UserRegistrationDto();
-    }
+    @Autowired
+    private UserValidator userValidator;
 
     @GetMapping
-    public String showRegistrationForm(Model model, HttpServletRequest request) {
+    public String showRegistrationForm(UserRegistrationDto userRegistrationDto, HttpServletRequest request) {
         if (request.isUserInRole("ROLE_USER")) {
             return "redirect:/";
         }
@@ -44,19 +42,16 @@ public class UserRegistrationController {
     }
 
     @PostMapping
-    public String registerUserAccount(@ModelAttribute("user") @Valid UserRegistrationDto userDto,
-            BindingResult result) {
-
-        User existing = userService.findByEmail(userDto.getEmail());
-        if (existing != null) {
-            result.rejectValue("email", null, "There is already an account registered with that email");
-        }
-
-        if (result.hasErrors()) {
+    public String registerUserAccount(@Valid @ModelAttribute("userRegistrationDto") UserRegistrationDto userRegistrationDto, BindingResult errors, RedirectAttributes redirectAttributes) {
+        
+        userValidator.validate(userRegistrationDto, errors);
+        
+        if (errors.hasErrors()) {
             return "registration";
         }
 
-        userService.save(userDto);
+        userService.save(userRegistrationDto);
         return "redirect:/login";
+        //return "registration2";
     }
 }

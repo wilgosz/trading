@@ -8,14 +8,7 @@ package net.easyweb24.actionbot.dto;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
-import net.easyweb24.actionbot.constraint.FieldMatch;
 
-
-
-@FieldMatch.List({
-    @FieldMatch(first = "password", second = "confirmPassword", message = "The password fields must match"),
-    @FieldMatch(first = "email", second = "confirmEmail", message = "The email fields must match")
-})
 public class UserRegistrationDto {
 
     @NotEmpty
@@ -96,4 +89,8 @@ public class UserRegistrationDto {
     public void setTerms(Boolean terms) {
         this.terms = terms;
     }
+    
+    public String toString() {
+		return "Person(Name: " + this.firstName + " " +this.lastName+ ", email: " + this.email + ")";
+	}
 }
