@@ -73,6 +73,7 @@ public class CsvBarsLoader {
 
         try (CSVReader csvReader = new CSVReader(new InputStreamReader(stream, Charset.forName("UTF-8")), ',', '"', 1)) {
             String[] line;
+            int counter = 0;
             while ((line = csvReader.readNext()) != null) {
                 ZonedDateTime date = LocalDate.parse(line[0], DATE_FORMAT).atStartOfDay(ZoneId.systemDefault());
                 double open = Double.parseDouble(line[1]);
@@ -80,8 +81,10 @@ public class CsvBarsLoader {
                 double low = Double.parseDouble(line[3]);
                 double close = Double.parseDouble(line[4]);
                 double volume = Double.parseDouble(line[5]);
-
+                if(counter > 160){
                 series.addBar(date, open, high, low, close, volume);
+                }
+                counter++;
             }
         } catch (IOException ioe) {
             Logger.getLogger(CsvBarsLoader.class.getName()).log(Level.SEVERE, "Unable to load bars from CSV", ioe);

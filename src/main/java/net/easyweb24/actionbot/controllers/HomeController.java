@@ -5,7 +5,6 @@
  */
 package net.easyweb24.actionbot.controllers;
 
-import java.security.Principal;
 import javax.servlet.http.HttpServletRequest;
 import net.easyweb24.actionbot.utils.CustomUser;
 import org.springframework.security.core.Authentication;
@@ -21,11 +20,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class HomeController {
     
     @GetMapping("/")
-    public String root(Authentication authentication) {
+    public String root(Authentication authentication, Model model) {
         
         CustomUser user = (CustomUser) authentication.getPrincipal();
         System.out.println( user.getId());
         System.out.println( user.getUsername());
+        model.addAttribute("title", "Dashboard");
         return "index";
     }
 

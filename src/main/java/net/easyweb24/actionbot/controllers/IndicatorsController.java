@@ -21,10 +21,15 @@ import net.easyweb24.actionbot.utils.TradingChart;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.DatasetRenderingOrder;
 import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.CandlestickRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.data.xy.OHLCDataset;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,6 +53,7 @@ import org.ta4j.core.indicators.helpers.VolumeIndicator;
 import org.ta4j.core.indicators.statistics.StandardDeviationIndicator;
 import org.ta4j.core.num.Num;
 import ta4jexamples.loaders.CsvBarsLoader;
+import ta4jexamples.loaders.CsvTradesLoader;
 
 /**
  *
@@ -91,6 +97,7 @@ public class IndicatorsController {
         TimeSeriesCollection dataset = new TimeSeriesCollection();
         dataset.addSeries(BarsBuilder.buildChartBarSeries(series, shortSma, "short SMA"));
         dataset.addSeries(BarsBuilder.buildChartBarSeries(series, longSma, "long SMA"));
+        dataset.addSeries(BarsBuilder.buildChartBarSeries(series, closePrice, "price"));
         
         TradingChart chart = new TradingChart();
         chart.drawChart(dataset, "SMA", Boolean.FALSE).createImage(outputStream, 1200, 200);
@@ -167,6 +174,51 @@ public class IndicatorsController {
         
         TradingChart chart = new TradingChart();
         chart.drawChart(dataset, 80, 20, "MoneyFlow", Boolean.FALSE).createImage(outputStream, 1200, 200);
+        //return outputStream;
+    }
+    
+    @ResponseBody
+    @GetMapping("/candle")
+    public void CandleStick(HttpServletRequest request, HttpServletResponse response) throws IOException{
+        response.setContentType("image/png");
+        OutputStream outputStream = response.getOutputStream();
+        BarSeries series = CsvBarsLoader.loadAppleIncSeries(request);
+
+        /*
+         * Creating the OHLC dataset
+         */
+        OHLCDataset ohlcDataset = BarsBuilder.createOHLCDataset(series, "AAPL");
+
+        /*
+         * Creating the additional dataset
+         */
+        TimeSeriesCollection xyDataset = BarsBuilder.createAdditionalDataset(series, "AAPL");
+
+        /*
+         * Creating the chart
+         */
+        JFreeChart chart = ChartFactory.createCandlestickChart("AAPL", "Time", "USD", ohlcDataset, true);
+        // Candlestick rendering
+        CandlestickRenderer renderer = new CandlestickRenderer();
+        //renderer.setAutoWidthMethod(CandlestickRenderer.WIDTHMETHOD_SMALLEST);
+        XYPlot plot = chart.getXYPlot();
+        plot.setRenderer(renderer);
+        // Additional dataset
+        int index = 1;
+        /*plot.setDataset(index, xyDataset);
+        plot.mapDatasetToRangeAxis(index, 0);
+        XYLineAndShapeRenderer renderer2 = new XYLineAndShapeRenderer(true, false);
+        renderer2.setSeriesPaint(index, Color.gray);
+        plot.setRenderer(index, renderer2);*/
+        // Misc
+        plot.setRangeGridlinePaint(Color.WHITE);
+        //plot.setBackgroundPaint(Color.white);
+        NumberAxis numberAxis = (NumberAxis) plot.getRangeAxis();
+        numberAxis.setAutoRangeIncludesZero(false);
+        plot.setDatasetRenderingOrder(DatasetRenderingOrder.FORWARD);
+        
+        BufferedImage image = chart.createBufferedImage(2000, 400, BufferedImage.TYPE_INT_RGB, null);
+        ImageIO.write(image, "PNG", outputStream);
         //return outputStream;
     }
     
