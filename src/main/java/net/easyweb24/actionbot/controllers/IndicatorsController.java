@@ -78,7 +78,7 @@ public class IndicatorsController {
         dataset.addSeries(BarsBuilder.buildChartBarSeries(series, rsi, "RSI"));
         
         TradingChart chart = new TradingChart();
-        chart.drawChart(dataset, 70, 30, "RSI", Boolean.FALSE).createImage(outputStream, 1200, 200);
+        chart.drawChart(dataset, 70, 30, "RSI", Boolean.FALSE).createImage(outputStream, 1000, 167);
         //return outputStream;
         
     }
@@ -100,7 +100,7 @@ public class IndicatorsController {
         dataset.addSeries(BarsBuilder.buildChartBarSeries(series, closePrice, "price"));
         
         TradingChart chart = new TradingChart();
-        chart.drawChart(dataset, "SMA", Boolean.FALSE).createImage(outputStream, 1200, 200);
+        chart.drawChart(dataset, "SMA", Boolean.FALSE).createImage(outputStream, 1000, 167);
         //return outputStream;
         
     }
@@ -126,7 +126,7 @@ public class IndicatorsController {
         //dataset.addSeries(BarsBuilder.buildChartBarSeries(series, macd, "macd"));
         
         TradingChart chart = new TradingChart();
-        chart.drawChart(dataset, "MACD", Boolean.FALSE).createImage(outputStream, 1200, 200);
+        chart.drawChart(dataset, "MACD", Boolean.FALSE).createImage(outputStream, 1000, 167);
         //return outputStream;
     }
     
@@ -151,7 +151,7 @@ public class IndicatorsController {
         //dataset.addSeries(BarsBuilder.buildChartBarSeries(series, macd, "macd"));
         
         TradingChart chart = new TradingChart();
-        chart.drawChart(dataset, 80, 20, "Stochastic", Boolean.FALSE).createImage(outputStream, 1200, 200);
+        chart.drawChart(dataset, 80, 20, "Stochastic", Boolean.FALSE).createImage(outputStream, 1000, 167);
         //return outputStream;
     }
     
@@ -173,7 +173,7 @@ public class IndicatorsController {
         //dataset.addSeries(BarsBuilder.buildChartBarSeries(series, macd, "macd"));
         
         TradingChart chart = new TradingChart();
-        chart.drawChart(dataset, 80, 20, "MoneyFlow", Boolean.FALSE).createImage(outputStream, 1200, 200);
+        chart.drawChart(dataset, 80, 20, "MoneyFlow", Boolean.FALSE).createImage(outputStream, 1000, 167);
         //return outputStream;
     }
     
@@ -197,7 +197,7 @@ public class IndicatorsController {
         /*
          * Creating the chart
          */
-        JFreeChart chart = ChartFactory.createCandlestickChart("AAPL", "Time", "USD", ohlcDataset, true);
+        JFreeChart chart = ChartFactory.createCandlestickChart(null, null, "OHLC", ohlcDataset, false);
         // Candlestick rendering
         CandlestickRenderer renderer = new CandlestickRenderer();
         //renderer.setAutoWidthMethod(CandlestickRenderer.WIDTHMETHOD_SMALLEST);
@@ -217,7 +217,7 @@ public class IndicatorsController {
         numberAxis.setAutoRangeIncludesZero(false);
         plot.setDatasetRenderingOrder(DatasetRenderingOrder.FORWARD);
         
-        BufferedImage image = chart.createBufferedImage(2000, 400, BufferedImage.TYPE_INT_RGB, null);
+        BufferedImage image = chart.createBufferedImage(1000, 1000, BufferedImage.TYPE_INT_RGB, null);
         ImageIO.write(image, "PNG", outputStream);
         //return outputStream;
     }
@@ -243,7 +243,7 @@ public class IndicatorsController {
         dataset.addSeries(BarsBuilder.buildChartBarSeries(series, upBBand, "up"));
         dataset.addSeries(BarsBuilder.buildChartBarSeries(series, closePrice, "price"));
         TradingChart chart = new TradingChart();
-        chart.drawChart(dataset, "BollingerBand", Boolean.FALSE).createImage(outputStream, 1200, 200);
+        chart.drawChart(dataset, "BollingerBand", Boolean.FALSE).createImage(outputStream, 1000, 167);
         //return outputStream;
         
     }
