@@ -1,0 +1,63 @@
+code,currency,name,mic,timezone,hour,close_date,source
+US,USD,US exchanges,"XASE,XNAS",America/New_York,09:30-16:00,,https://www.tradinghours.com/exchanges/nyse
+CN,CAD,CANADIAN NATIONAL STOCK EXCHANGE,XCNQ,America/New_York,08:00-17:00,,https://www.tradinghours.com/exchanges/cnsx
+VN,VND,"Vietnam exchanges including HOSE, HNX and UPCOM","HSTC, XSTC",Asia/Bangkok,09:00-15:00,,https://www.tradinghours.com/exchanges/hose
+SS,CNY,SHANGHAI STOCK EXCHANGE,XSHG,Asia/Brunei,09:15-15:30,,https://www.tradinghours.com/exchanges/sse
+SG,EUR,BOERSE STUTTGART,XSTU,Asia/Amman,08:00-20:00,,https://www.tradinghours.com/exchanges/xstu
+BO,INR,BSE LTD,XBOM,Asia/Kolkata,09:00-16:00,,https://www.tradinghours.com/exchanges/bse-bombay
+HE,EUR,NASDAQ OMX HELSINKI LTD.,XHEL,Europe/Helsinki,10:00-18:30,,https://www.tradinghours.com/exchanges/omxh-helsinki
+BC,COP,BOLSA DE VALORES DE COLOMBIA,XBOG,America/Cuiaba,09:15-16:00,,https://www.tradinghours.com/exchanges/bvc
+OL,NOK,OSLO BORS ASA,OSE,Europe/Oslo,08:15-17:30,,https://www.tradinghours.com/exchanges/ose
+ME,RUB,MOSCOW EXCHANGE,MISX,Europe/Moscow,09:30-19:00,,https://www.tradinghours.com/exchanges/moex
+BR,EUR,NYSE EURONEXT - EURONEXT BRUSSELS,XBRU,Europe/Brussels,09:00-17:30,,https://www.tradinghours.com/exchanges/euronext-brussels
+NZ,NZD,NEW ZEALAND EXCHANGE LTD,XNZE,Pacific/Auckland,10:00-16:45,,https://www.tradinghours.com/exchanges/nzx
+SI,SGD,SINGAPORE EXCHANGE,XSES,Asia/Singapore,08:30-17:16,,https://www.tradinghours.com/exchanges/sgx
+MX,MXN,BOLSA MEXICANA DE VALORES (MEXICAN STOCK EXCHANGE),XMEX,America/Mexico_City,08:00-15:10,,https://www.tradinghours.com/exchanges/bmv
+CR,,CARACAS STOCK EXCHANGE,BVCA,America/Caracas,08:30-13:30,,https://www.tradinghours.com/exchanges/bvcc
+T,JPY,TOKYO STOCK EXCHANGE-TOKYO PRO MARKET,XJPX,Asia/Tokyo,09:00-15:00,,https://www.tradinghours.com/exchanges/jpx
+JK,IDR,INDONESIA STOCK EXCHANGE,XIDX,Asia/Jakarta,08:45-15:15,,https://www.tradinghours.com/exchanges/idx
+TO,CAD,TORONTO STOCK EXCHANGE,XTSE,America/Toronto,09:30-16:00,,https://www.tradinghours.com/exchanges/tsx
+AS,EUR,NYSE EURONEXT - EURONEXT AMSTERDAM,XAMS,Europe/Amsterdam,09:00-17:40,,https://www.tradinghours.com/exchanges/euronext
+WA,PLN,WARSAW STOCK EXCHANGE/EQUITIES/MAIN MARKET,XWAR,Europe/Warsaw,08:30-17:05,,https://www.tradinghours.com/exchanges/gpw
+BE,EUR,BOERSE BERLIN,XBER,Europe/Berlin,08:00-20:00,,https://www.tradinghours.com/exchanges/xber
+DU,EUR,BOERSE DUESSELDORF,XDUS,Europe/Berlin,08:00:20:00,,https://www.tradinghours.com/exchanges/xdus
+AX,AUD,ASX - ALL MARKETS,XASX,Australia/Sydney,10:00-16:00,,https://www.tradinghours.com/exchanges/asx
+SA,BRL,Brazil Bolsa - Sao Paolo,BVMF,America/Sao_Paulo,09:45-18:45,,https://www.tradinghours.com/exchanges/bovespa
+JO,ZAc,JOHANNESBURG STOCK EXCHANGE,XJSE,Africa/Johannesburg,09:00-17:00,,https://www.tradinghours.com/exchanges/jse
+IR,EUR,IRISH STOCK EXCHANGE - ALL MARKET,XDUB,Europe/Dublin,09:00-17:30,,https://www.tradinghours.com/exchanges/ise
+VI,EUR,Vienna Stock Exchange,XWBO,Europe/Vienna,09:04-17:30,,https://www.tradinghours.com/exchanges/vse
+KS,KRW,KOREA EXCHANGE (STOCK MARKET),XKRX,Asia/Seoul,08:00-18:00,,https://www.tradinghours.com/exchanges/krx
+ST,SEK,NASDAQ OMX NORDIC,XNGM,Europe/Stockholm,08:00-18:00,,https://www.tradinghours.com/exchanges/xngm
+F,EUR,DEUTSCHE BOERSE AG,XFRA,Europe/Berlin,08:00-20:00,,https://www.tradinghours.com/exchanges/fsx
+DB,AED,DUBAI FINANCIAL MARKET,XDFM,Asia/Dubai,09:30-14:00,,https://www.tradinghours.com/exchanges/dfm
+PR,CZK,PRAGUE STOCK EXCHANGE,XPRA,Europe/Prague,08:00-17:00,,https://www.tradinghours.com/exchanges/xpra
+LS,EUR,NYSE EURONEXT - EURONEXT LISBON,XLIS,Europe/Lisbon,09:00-17:30,,https://www.tradinghours.com/exchanges/euronext-lisbon
+RG,EUR,NASDAQ OMX RIGA,XRIS,Europe/Riga,09:00-16:30,,https://www.tradinghours.com/exchanges/omxr-riga
+KQ,KRW,KOREA EXCHANGE (KOSDAQ),XKOS,Asia/Seoul,09:00-15:30,,https://www.tradinghours.com/exchanges/kosdaq
+SW,USD,SWISS EXCHANGE,XSWX,Europe/Zurich,09:30-17:00,,https://www.tradinghours.com/exchanges/six
+KL,MYR,BURSA MALAYSIA,XKLS,Asia/Kuala_Lumpur,08:30-17:00,,https://www.tradinghours.com/exchanges/myx
+MU,EUR,BOERSE MUENCHEN,XMUN,Europe/Berlin,08:00-20:00,,https://www.tradinghours.com/exchanges/xmun
+PA,EUR,NYSE EURONEXT - MARCHE LIBRE PARIS,XPAR,Europe/Paris,09:00-17:30,,https://www.tradinghours.com/exchanges/euronext-paris
+VS,EUR,NASDAQ OMX VILNIUS,XLIT,Europe/Vilnius,09:00-16:30,,https://www.tradinghours.com/exchanges/omxv-vilnius
+V,CAD,TSX VENTURE EXCHANGE - NEX,XTSX,America/Toronto,09:30-16:15,,https://www.tradinghours.com/exchanges/xtsx
+HK,HKD,HONG KONG EXCHANGES AND CLEARING LTD,XHKG,Asia/Hong_Kong,09:00-16:10,,https://www.tradinghours.com/exchanges/hkex
+SZ,CNY,SHENZHEN STOCK EXCHANGE,XSHE,Asia/Shanghai,09:15-15:00,,https://www.tradinghours.com/exchanges/szse
+TA,ILa,TEL AVIV STOCK EXCHANGE,XTAE,Asia/Jerusalem,09:45-17:14,"6,7",https://www.tradinghours.com/exchanges/tase
+SR,SAR,SAUDI STOCK EXCHANGE,XSAU,Asia/Riyadh,10:00-15:10,"6,7",https://www.tradinghours.com/exchanges/tadawul
+NE,CAD,AEQUITAS NEO EXCHANGE,NEOE,America/Toronto,09:30-16:00,,https://www.tradinghours.com/exchanges/neo
+HM,EUR,HANSEATISCHE WERTPAPIERBOERSE HAMBURG,XHAM,Europe/Berlin,08:00-20:00,,https://www.tradinghours.com/exchanges/xham
+BK,THB,STOCK EXCHANGE OF THAILAND,XBKK,Asia/Bangkok,09:30-17:00,,https://www.tradinghours.com/exchanges/set
+NS,INR,NATIONAL STOCK EXCHANGE OF INDIA,XNSE,Asia/Kolkata,09:00-16:00,,https://www.tradinghours.com/exchanges/nse-india
+TL,EUR,NASDAQ OMX TALLINN,XTAL,Europe/Tallinn,09:00-16:30,,https://www.tradinghours.com/exchanges/omxt-tallinn
+QA,QAR,QATAR EXCHANGE,DSMD,Asia/Qatar,09:00-13:15,,https://www.tradinghours.com/exchanges/qe
+IS,TRY,BORSA ISTANBUL,XIST,Europe/Istanbul,09:40-18:10,,https://www.tradinghours.com/exchanges/bist
+SN,CLP,SANTIAGO STOCK EXCHANGE,XSGO,America/Santiago,09:30-16:00,,https://www.tradinghours.com/exchanges/bvs
+TW,TWD,TAIWAN STOCK EXCHANGE,XTAI,Asia/Taipei,09:00-17:00,,https://www.tradinghours.com/exchanges/twse
+L,GBP,LONDON STOCK EXCHANGE,XLON,Europe/London,08:00-16:30,,https://www.tradinghours.com/exchanges/lse
+BA,ARS,BOLSA DE COMERCIO DE BUENOS AIRES,XBUE,America/Argentina/Buenos_Aires,10:30-17:15,,https://www.tradinghours.com/exchanges/bcba
+MC,EUR,BOLSA DE MADRID,XMAD,Europe/Madrid,09:00-17:30,,https://www.tradinghours.com/exchanges/bme
+IC,ISK,NASDAQ OMX ICELAND,XICE,Atlantic/Reykjavik,09:30-15:30,,https://www.tradinghours.com/exchanges/xice
+AT,EUR,ATHENS EXCHANGE S.A. CASH MARKET,ASEX,Europe/Athens,10:15-17:20,,https://www.tradinghours.com/exchanges/ase-athens
+BD,HUF,BUDAPEST STOCK EXCHANGE,XBUD,Europe/Budapest,08:15-17:20,,https://www.tradinghours.com/exchanges/bse-budapest
+CO,DKK,OMX NORDIC EXCHANGE COPENHAGEN A/S,XCSE,Europe/Copenhagen,09:00-17:00,,https://www.tradinghours.com/exchanges/omxc-copenhagen
+DE,EUR,XETRA,XETR,Europe/Berlin,09:00-17:30,,https://www.tradinghours.com/exchanges/xetr

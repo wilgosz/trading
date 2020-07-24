@@ -5,8 +5,10 @@
  */
 package net.easyweb24.actionbot.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = "email"))
@@ -29,6 +31,10 @@ public class User {
         inverseJoinColumns = @JoinColumn(
             name = "role_id", referencedColumnName = "id"))
     private Collection < Role > roles;
+    
+    @JsonIgnoreProperties
+    @OneToMany(mappedBy = "userId")
+    private List<Alerts> alertsList;
 
     public User() {}
 
@@ -93,6 +99,14 @@ public class User {
 
     public void setRoles(Collection < Role > roles) {
         this.roles = roles;
+    }
+    
+    public List<Alerts> getAlertsList() {
+        return alertsList;
+    }
+
+    public void setAlertsList(List<Alerts> alertsList) {
+        this.alertsList = alertsList;
     }
 
     @Override

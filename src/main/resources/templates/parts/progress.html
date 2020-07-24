@@ -9,50 +9,51 @@ and open the template in the editor.
     </head>
     <body>
         <div class="card" th:fragment="progress">
-            <div class="card-body">
-                <h4 class="card-title m-b-0">Progress Box</h4>
+            <div class="card-body" style="height: 282px;">
+                <h5 class="card-title m-b-0">Aggregate Indicators</h5>
+                <p>Get aggregate signal of multiple technical indicators such as MACD, RSI, Moving Average v.v.</p>
                 <div class="m-t-20">
                     <div class="d-flex no-block align-items-center">
-                        <span>81% Clicks</span>
+                        <span th:text="${100/17*aggregate.buy + '% Buy'}"></span>
                         <div class="ml-auto">
-                            <span>125</span>
+                            <span th:text="${aggregate.buy} + ' indicators'"></span>
                         </div>
                     </div>
                     <div class="progress">
-                        <div class="progress-bar progress-bar-striped" role="progressbar" style="width: 81%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="progress-bar progress-bar-striped bg-success" role="progressbar" th:style="${'width:' + (100/17*aggregate.buy) + '%'}"></div>
                     </div>
                 </div>
                 <div>
                     <div class="d-flex no-block align-items-center m-t-25">
-                        <span>72% Uniquie Clicks</span>
+                        <span th:text="${100/17*aggregate.neutral + '% Neutral'}"></span>
                         <div class="ml-auto">
-                            <span>120</span>
+                            <span th:text="${aggregate.neutral} + ' indicators'"></span>
                         </div>
                     </div>
                     <div class="progress">
-                        <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 72%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="progress-bar progress-bar-striped bg-warning" role="progressbar"  th:style="${'width:' + (100/17*aggregate.neutral) + '%'}"></div>
                     </div>
                 </div>
                 <div>
                     <div class="d-flex no-block align-items-center m-t-25">
-                        <span>53% Impressions</span>
+                        <span th:text="${100/17*aggregate.sell + '% Sell'}"></span>
                         <div class="ml-auto">
-                            <span>785</span>
+                            <span th:text="${aggregate.sell} + ' indicators'"></span>
                         </div>
                     </div>
                     <div class="progress">
-                        <div class="progress-bar progress-bar-striped bg-info" role="progressbar" style="width: 53%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="progress-bar progress-bar-striped bg-danger" role="progressbar"  th:style="${'width:' + (100/17*aggregate.sell) + '%'}"></div>
                     </div>
                 </div>
                 <div>
                     <div class="d-flex no-block align-items-center m-t-25">
-                        <span>3% Online Users</span>
+                        <span th:text="${'ADX ' + #numbers.formatDecimal(aggregate.adx == null ? 0 : aggregate.adx, 2, 2)}"></span>
                         <div class="ml-auto">
-                            <span>8</span>
+                            <span th:text="${'Tranding ' + (aggregate.trending?'YES':'NO')}"></span>
                         </div>
                     </div>
                     <div class="progress">
-                        <div class="progress-bar progress-bar-striped bg-danger" role="progressbar" style="width: 3%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="progress-bar progress-bar-striped bg-info" role="progressbar"  th:style="${'width:' + (aggregate.adx) + '%'}"></div>
                     </div>
                 </div>
             </div>

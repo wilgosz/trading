@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html dir="ltr"  xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+    <div th:replace="parts/head :: head"></div>
+
+    <body>
+        <div  th:replace="parts/preloader :: preloader"></div>
+        <div class="main-wrapper" id="main-wrapper">
+            <div  th:replace="parts/topbar :: topbar"></div>
+            <div  th:replace="parts/left-sidebar :: left-sidebar"></div>
+            <div class="page-wrapper">
+                <div  th:replace="parts/breadcrumb :: breadcrumb"></div>
+                <div class="container-fluid text-center">
+                    <h3>Something went wrong</h3>
+                    <p th:text="${error}"></p>
+                </div>
+                <div  th:replace="parts/footer :: footer"></div>
+            </div>
+        </div>
+        <div  th:replace="parts/requiredjs :: requiredjs"></div>
+    </body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html dir="ltr"  xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+    <div th:replace="parts/head :: head"></div>
+
+    <body>
+        <div  th:replace="parts/preloader :: preloader"></div>
+        <div class="main-wrapper" id="main-wrapper">
+            <div  th:replace="parts/topbar :: topbar"></div>
+            <div  th:replace="parts/left-sidebar :: left-sidebar"></div>
+            <div class="page-wrapper">
+                <div  th:replace="parts/breadcrumb :: breadcrumb"></div>
+                <div class="container-fluid">
+                    <table class="table table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Abbreviation</th>
+                                <th scope="col">Detail</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="company: ${companies}">
+                                <th scope="row" th:text="${company.id}"></th>
+                                <td th:text="${company.desription}"></td>
+                                <td th:text="${company.abbreviation}"></td>
+                                <td><a th:href="@{/companies/{abbreviation}(abbreviation = ${company.abbreviation})}">Show detail</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div  th:replace="parts/pagination_company :: pagination"></div>
+                    <div th:replace="parts/pagination_company :: alphabet"> </div>
+                </div>
+                <div  th:replace="parts/footer :: footer"></div>
+            </div>
+        </div>
+        <div  th:replace="parts/requiredjs :: requiredjs"></div>
+        <script type="text/javascript">
+            var createArrayAtoZ = () => {
+                return Array
+                        .apply(null, {length: 26})
+                        .map((x, i) => String.fromCharCode(65 + i));
+            }
+            var createNavigationList = () => {
+                const abcChars = createArrayAtoZ();
+                const navigationEntries = abcChars.reduce(createDivForCharElement, '');
+                $('#alphabet').append(navigationEntries);
+                changeItemState('[[${param.letter}]]');
+            }
+            let createDivForCharElement = (block, charToAdd) => {
+                return block + "<li class='page-item'  data-filter='" + charToAdd + "'><a id='" + charToAdd + "' class='page-link' href='/companies?letter="+charToAdd+"'>" + charToAdd + "</a></li>";
+            }
+            
+            let changeItemState = character => {
+            const characterElement = $('#alphabet').find('.page-item[data-filter="' + character + '"]');
+            characterElement.addClass('active');
+        }
+
+            createNavigationList();
+        </script>
+    </body>
+</html>
