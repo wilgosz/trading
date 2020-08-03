@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html dir="ltr"  xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+    <div th:replace="parts/head :: head"></div>
+
+    <body>
+        <div  th:replace="parts/preloader :: preloader"></div>
+        <div class="main-wrapper" id="main-wrapper">
+            <div  th:replace="parts/topbar :: topbar"></div>
+            <div  th:replace="parts/left-sidebar :: left-sidebar"></div>
+            <div class="page-wrapper">
+                <!-- ============================================================== -->
+                <!-- Bread crumb and right sidebar toggle -->
+                <!-- ============================================================== -->
+                <div  th:replace="parts/breadcrumb :: breadcrumb"></div>
+                <!-- ============================================================== -->
+                <!-- End Bread crumb and right sidebar toggle -->
+                <!-- ============================================================== -->
+                <!-- ============================================================== -->
+                <!-- Container fluid  -->
+                <!-- ============================================================== -->
+                <div class="container-fluid">
+                    <!-- ============================================================== -->
+                    <!-- Start Page Content -->
+                    <!-- ============================================================== -->
+                    <div class="row">
+                        <!-- Column -->
+                        <div class="col-md-6 col-lg-3">
+                            <a href="/" class="text-white">
+                                <div class="card card-hover">
+                                    <div class="box bg-cyan text-center">
+                                        <h1 class="font-light text-white"><i class="mdi mdi-view-dashboard"></i></h1>
+                                        <h6 class="text-white">Dashboard</h6>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <!-- Column -->
+                        <div class="col-md-6 col-lg-3">
+                            <a th:href="@{/strategies}">
+                                <div class="card card-hover">
+                                    <div class="box bg-success text-center">
+                                        <h1 class="font-light text-white"><i class="mdi mdi-chart-areaspline"></i></h1>
+                                        <h6 class="text-white">Strategies</h6>
+                                    </div>
+                                </div>
+                            </a>    
+                        </div>
+                        <!-- Column -->
+
+                        <div class="col-md-6 col-lg-3">
+                            <a th:href="@{/companies}">
+                                <div class="card card-hover">
+                                    <div class="box bg-warning text-center">
+                                        <h1 class="font-light text-white"><i class="mdi mdi-collage"></i></h1>
+                                        <h6 class="text-white">Companies</h6>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- Column -->
+
+                        <div class="col-md-6 col-lg-3">
+                            <a th:href="@{/actions}">
+                                <div class="card card-hover">
+                                    <div class="box bg-danger text-center">
+                                        <h1 class="font-light text-white"><i class="mdi mdi-border-outside"></i></h1>
+                                        <h6 class="text-white">Actions</h6>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-9">
+                            <div class="card p-t-20"  style="height: 320px" id="ohlc"></div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card" id="company" style="height: 320px">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-sm-9">
+                                            <h5 class="card-title m-b-20" th:text="${'Company ' + company.name}"></h5>
+                                            <p class="card-text  mt-4">
+                                                <span style="display: inline-block; width: 100px">Exchange</span><span th:text="${company.exchange}"></span><br>
+                                                <span style="display: inline-block; width: 100px">Currency</span><span th:text="${company.currency}"></span><br>
+                                                <span style="display: inline-block; width: 100px">Web url</span><a th:href="${company.weburl}" target="_blank" th:text="${company.weburl}"></a><br>
+                                                <span style="display: inline-block; width: 100px">Industry</span><span th:text="${company.finnhubIndustry}"></span><br>
+                                                <span style="display: inline-block; width: 100px">Capitalization</span><span th:text="${company.marketCapitalization}"></span><br>
+                                                <span style="display: inline-block; width: 100px">Outstanding</span><span th:text="${company.shareOutstanding}"></span><br>
+                                            </p>
+                                        </div>
+                                        <div class="col-sm-3"><img class="card-img" th:src="${company.logo}"></div>
+                                    </div>
+                                </div>
+
+                                <!--<img src="/indicator/macd" alt="" class="img-fluid">
+                                <img src="/indicator/sma" alt="" class="img-fluid">
+                                <img src="/indicator/bollinger" alt="" class="img-fluid">
+                                <img src="/indicator/rsi" alt="" class="img-fluid">
+                                <img src="/indicator/stochastic" alt="" class="img-fluid">
+                                <img src="/indicator/moneyflow" alt="" class="img-fluid">-->
+                            </div>
+                            <!-- Card -->
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div th:replace="parts/progress :: progress"></div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card">
+                                <div class="card-body" style="height: 282px;">
+                                    <div class="card-title">
+                                        <h5>Current trade signals:</h5>
+                                        <h2 th:text="${aggregate.signal}"></h2>
+                                    </div>
+                                    <div class="card-text">
+                                        <strong>Available trading signals: </strong>
+                                        <ol>
+                                            <li>Strong buy</li>
+                                            <li>Buy</li>
+                                            <li>Hold</li>
+                                            <li>Sell</li>
+                                            <li>Strong sell</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card">
+                                <div class="card-body" style="height: 282px;">
+                                    <div class="card-title">
+                                        <h5>Company news</h5>
+                                    </div>
+                                    <div class="card-text">
+                                        <ul style="padding: 0; margin: 0; list-style: none">
+                                            <li th:each="n : ${news}" style="clear: both">
+                                                <strong style="margin-top: 0px; display: block; white-space: nowrap;overflow: hidden;text-overflow: ellipsis;" th:text="${n.headline}"></strong>
+                                                <p style="margin-bottom: 0px; display: block; white-space: nowrap;overflow: hidden;text-overflow: ellipsis;" th:text="${n.summary}"></p>
+                                                <a href="#" class="float-right btn btn-sm btn-info">more..</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <iframe th:src="${'https://widget.finnhub.io/widgets/recommendation?symbol=' + symbol}" style="width: 100%; height: 300px"></iframe>
+                        </div>
+                        <div class="col-md-6">
+                            <iframe th:src="${'https://widget.finnhub.io/widgets/historical-eps?symbol=' + symbol}" style="width: 100%; height: 300px"></iframe>
+                        </div>
+                    </div>
+
+
+
+                    <!-- ============================================================== -->
+                    <!-- End PAge Content -->
+                    <!-- ============================================================== -->
+                    <!-- ============================================================== -->
+                    <!-- Right sidebar -->
+                    <!-- ============================================================== -->
+                    <!-- .right-sidebar -->
+                    <!-- ============================================================== -->
+                    <!-- End Right sidebar -->
+                    <!-- ============================================================== -->
+                </div>
+                <!-- ============================================================== -->
+                <!-- End Container fluid  -->
+                <!-- ============================================================== -->
+                <!-- ============================================================== -->
+                <!-- footer -->
+                <!-- ============================================================== -->
+                <footer class="footer text-center">
+                    All Rights Reserved by Matrix-admin. Designed and Developed by <a href="https://wrappixel.com">WrapPixel</a>.
+                </footer>
+                <!-- ============================================================== -->
+                <!-- End footer -->
+                <!-- ============================================================== -->
+            </div>
+        </div>
+        <div  th:replace="parts/requiredjs :: requiredjs"></div>
+        <script>
+            $(document).ready(function () {
+                var chart = LightweightCharts.createChart(document.getElementById('ohlc'), {
+                    height: 300,
+                    width: $('#ohlc').innerWidth()
+                });
+                var candleSeries = chart.addCandlestickSeries();
+                var volumeSeries = chart.addHistogramSeries({
+                    color: '#26a69a',
+                    lineWidth: 2,
+                    priceFormat: {
+                        type: 'volume',
+                    },
+                    overlay: true,
+                    scaleMargins: {
+                        top: 0.8,
+                        bottom: 0,
+                    },
+                });
+                $.ajax({
+                    url: "/finnhub/ohlc/[[${symbol}]]",
+                    success: function (json) {
+                        candleSeries.setData(json);
+                        volumeSeries.setData(json);
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>

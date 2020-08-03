@@ -3,25 +3,53 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.easyweb24.actionbot.dto;
+package net.easyweb24.actionbot.entity;
 
-/**
- *
- * @author zbigniewwilgosz
- */
-public class CompanyNews {
+import java.io.Serializable;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "company_news", indexes = {
+    @Index(name = "finnhub_company_news_abbreviation_idx", columnList = "abbreviation", unique = false),
+    @Index(name = "finnhub_company_news_news_id_idx", columnList = "news_id", unique = false)
+})
+@NamedQueries({
+    @NamedQuery(name = "CompanyNews.findAll", query = "SELECT c FROM CompanyNews c")})
+
+public class CompanyNews implements Serializable {
     
-    private Long news_id;
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id", nullable = false)
+    private Integer id;
+    
+    @Column(name = "news_id", nullable = false)
+    private Long newsId;
+    
     private Long datetime;
+    
     private String headline;
+    
     private String image;
+    
     private String abbreviation;
+    
     private String source;
+    
     private String summary;
+    
     private String url;
-
-    
-    
 
     /**
      * @return the datetime
@@ -124,16 +152,39 @@ public class CompanyNews {
     /**
      * @return the news_id
      */
-    public Long getNews_id() {
-        return news_id;
+    public Long getNewsId() {
+        return newsId;
     }
 
     /**
      * @param news_id the news_id to set
      */
-    public void setNews_id(Long news_id) {
-        this.news_id = news_id;
+    public void setNewsId(Long newsId) {
+        this.newsId = newsId;
     }
     
-    
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof CompanyNews)) {
+            return false;
+        }
+        CompanyNews other = (CompanyNews) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "net.easyweb24.actionbot.entity.CompanyNews[ id=" + id + " ]";
+    }
 }

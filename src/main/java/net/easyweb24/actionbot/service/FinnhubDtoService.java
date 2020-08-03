@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import net.easyweb24.actionbot.dto.AggregateIndicators;
-import net.easyweb24.actionbot.dto.CompanyNews;
+import net.easyweb24.actionbot.entity.CompanyNews;
 import net.easyweb24.actionbot.dto.CompanyProfile;
 import net.easyweb24.actionbot.dto.OHLC;
 import net.easyweb24.actionbot.entity.Symbols;
@@ -129,7 +129,7 @@ public class FinnhubDtoService {
             news.setAbbreviation(((JSONObject)newsArray.get(i)).getString("related"));
             news.setDatetime(((JSONObject)newsArray.get(i)).getLong("datetime"));
             news.setHeadline(((JSONObject)newsArray.get(i)).getString("headline"));
-            news.setNews_id(((JSONObject)newsArray.get(i)).getLong("id"));
+            news.setNewsId(((JSONObject)newsArray.get(i)).getLong("id"));
             news.setImage(((JSONObject)newsArray.get(i)).getString("image"));
             news.setSource(((JSONObject)newsArray.get(i)).getString("source"));
             news.setSummary(((JSONObject)newsArray.get(i)).getString("summary"));

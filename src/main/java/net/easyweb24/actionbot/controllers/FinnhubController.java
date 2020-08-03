@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.easyweb24.actionbot.dto.AggregateIndicators;
-import net.easyweb24.actionbot.dto.CompanyNews;
+import net.easyweb24.actionbot.entity.CompanyNews;
 import net.easyweb24.actionbot.dto.CompanyProfile;
 import net.easyweb24.actionbot.dto.OHLC;
 import net.easyweb24.actionbot.entity.FinnhubSignals;
@@ -126,7 +126,7 @@ public class FinnhubController {
 
         List<FinnhubSignals> fnsignals_list = new ArrayList<>();
 
-        Page<Symbols> page = symbolsRepository.findAll(PageRequest.of(1, 4000));
+        Page<Symbols> page = symbolsRepository.findAll(PageRequest.of(0, 1000));
         List<Symbols> symbols = page.getContent();
         Iterator itr = symbols.iterator();
         String abbreviation;

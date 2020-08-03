@@ -14,9 +14,12 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import net.easyweb24.actionbot.components.FinnhubComponent;
 import net.easyweb24.actionbot.dto.AggregateIndicators;
-import net.easyweb24.actionbot.dto.CompanyNews;
+import net.easyweb24.actionbot.entity.CompanyNews;
 import net.easyweb24.actionbot.dto.CompanyProfile;
+import net.easyweb24.actionbot.dto.FinnhubSignalsDTO;
+import net.easyweb24.actionbot.entity.FinnhubSignals;
 import net.easyweb24.actionbot.entity.Symbols;
+import net.easyweb24.actionbot.repository.FinnhubSignalsRepository;
 import net.easyweb24.actionbot.repository.SymbolsRepository;
 import net.easyweb24.actionbot.service.FinnhubDtoService;
 import net.easyweb24.actionbot.service.FinnhubService;
@@ -32,6 +35,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -46,14 +50,22 @@ public class HomeController {
     private final FinnhubService finnhubService;
     private final FinnhubDtoService finnhubDtoService;
     private final FinnhubComponent finnhubComponent;
+    private final FinnhubSignalsRepository finnhubSignalsRepository;
     private final SymbolsRepository symbolsRepository;
 
-    public HomeController(FinnhubService finnhubService, FinnhubDtoService finnhubDtoService, SymbolsRepository symbolsRepository, FinnhubComponent finnhubComponent) {
+    public HomeController(
+            FinnhubService finnhubService, 
+            FinnhubDtoService finnhubDtoService, 
+            SymbolsRepository symbolsRepository, 
+            FinnhubComponent finnhubComponent,
+            FinnhubSignalsRepository finnhubSignalsRepository
+    ) {
 
         this.finnhubService = finnhubService;
         this.finnhubDtoService = finnhubDtoService;
         this.symbolsRepository = symbolsRepository;
         this.finnhubComponent = finnhubComponent;
+        this.finnhubSignalsRepository = finnhubSignalsRepository;
     }
 
     @GetMapping("/")
@@ -63,17 +75,9 @@ public class HomeController {
         System.out.println( user.getId());
         System.out.println( user.getUsername());
         model.addAttribute("title", "Dashboard");*/
-        String jsonstring;
-        try {
-
-            jsonstring = finnhubService.companyProfile("BPMC");
-            CompanyProfile company = finnhubDtoService.convertToCompanyProfile(jsonstring);
-            model.addAttribute("company", company);
-
-        } catch (IOException ex) {
-            Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
+        
+        List<FinnhubSignalsDTO> signalslist = finnhubSignalsRepository.strongBuyQuery();
+        model.addAttribute("signals", signalslist);
         return "index";
     }
 
@@ -144,7 +148,7 @@ public class HomeController {
             return "someerror";
         }
 
-        return "index";
+        return "company";
     }
 
     @GetMapping("/login")
