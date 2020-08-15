@@ -23,7 +23,13 @@ import org.springframework.stereotype.Repository;
 public interface FinnhubSignalsRepository extends JpaRepository < FinnhubSignals, Long > {
     FinnhubSignals findByAbbreviation(String abbreviation);
     
-    @Query(value = "SELECT f.*, s.desription as description FROM symbols s, finnhub_signals f WHERE s.abbreviation = f.abbreviation AND f.signals = 'strong buy' ORDER BY buy DESC, sell ASC LIMIT 60", nativeQuery = true)
+    @Query(value = ""
+            + " SELECT f.*, s.description as description FROM symbols s, finnhub_signals f, company_profile cp "
+            + " WHERE s.abbreviation = f.abbreviation "
+            + " AND cp.abbreviation = f.abbreviation "
+            + " AND  f.signals = 'strong buy' "
+            + " AND trending = 1"
+            + " ORDER BY sell ASC, buy DESC  LIMIT 40", nativeQuery = true)
     List<FinnhubSignalsDTO> strongBuyQuery();
-    //Page<FinnhubSignals> findByDesriptionStartingWith(String letter, Pageable pglb);
+    //Page<FinnhubSignals> findByDescriptionStartingWith(String letter, Pageable pglb);
 }

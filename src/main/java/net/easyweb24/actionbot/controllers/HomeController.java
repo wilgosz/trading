@@ -7,6 +7,9 @@ package net.easyweb24.actionbot.controllers;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,10 +18,12 @@ import javax.servlet.http.HttpServletRequest;
 import net.easyweb24.actionbot.components.FinnhubComponent;
 import net.easyweb24.actionbot.dto.AggregateIndicators;
 import net.easyweb24.actionbot.entity.CompanyNews;
-import net.easyweb24.actionbot.dto.CompanyProfile;
+import net.easyweb24.actionbot.entity.CompanyProfile;
 import net.easyweb24.actionbot.dto.FinnhubSignalsDTO;
 import net.easyweb24.actionbot.entity.FinnhubSignals;
 import net.easyweb24.actionbot.entity.Symbols;
+import net.easyweb24.actionbot.repository.CompanyNewsRepository;
+import net.easyweb24.actionbot.repository.CompanyProfileRepository;
 import net.easyweb24.actionbot.repository.FinnhubSignalsRepository;
 import net.easyweb24.actionbot.repository.SymbolsRepository;
 import net.easyweb24.actionbot.service.FinnhubDtoService;
@@ -52,13 +57,17 @@ public class HomeController {
     private final FinnhubComponent finnhubComponent;
     private final FinnhubSignalsRepository finnhubSignalsRepository;
     private final SymbolsRepository symbolsRepository;
+    private final CompanyProfileRepository companyProfileRepository;
+    private final CompanyNewsRepository companyNewsRepository;
 
     public HomeController(
-            FinnhubService finnhubService, 
-            FinnhubDtoService finnhubDtoService, 
-            SymbolsRepository symbolsRepository, 
+            FinnhubService finnhubService,
+            FinnhubDtoService finnhubDtoService,
+            SymbolsRepository symbolsRepository,
             FinnhubComponent finnhubComponent,
-            FinnhubSignalsRepository finnhubSignalsRepository
+            FinnhubSignalsRepository finnhubSignalsRepository,
+            CompanyProfileRepository companyProfileRepository,
+            CompanyNewsRepository companyNewsRepository
     ) {
 
         this.finnhubService = finnhubService;
@@ -66,6 +75,8 @@ public class HomeController {
         this.symbolsRepository = symbolsRepository;
         this.finnhubComponent = finnhubComponent;
         this.finnhubSignalsRepository = finnhubSignalsRepository;
+        this.companyProfileRepository = companyProfileRepository;
+        this.companyNewsRepository = companyNewsRepository;
     }
 
     @GetMapping("/")
@@ -75,7 +86,7 @@ public class HomeController {
         System.out.println( user.getId());
         System.out.println( user.getUsername());
         model.addAttribute("title", "Dashboard");*/
-        
+        model.addAttribute("title", "Dashboard");
         List<FinnhubSignalsDTO> signalslist = finnhubSignalsRepository.strongBuyQuery();
         model.addAttribute("signals", signalslist);
         return "index";
@@ -96,9 +107,9 @@ public class HomeController {
             pagesize = Integer.parseInt(request.getParameter("size"));
         }
 
-        Pageable pgbl = PageRequest.of(pagenumber, pagesize, Sort.by("desription"));
+        Pageable pgbl = PageRequest.of(pagenumber, pagesize, Sort.by("description"));
         if (request.getParameter("letter") != null) {
-            page = symbolsRepository.findByDesriptionStartingWith(request.getParameter("letter"), pgbl);
+            page = symbolsRepository.findByDescriptionStartingWith(request.getParameter("letter"), pgbl);
         } else {
             page = symbolsRepository.findAll(pgbl);
         }
@@ -116,32 +127,46 @@ public class HomeController {
             String companyjson;
             String aggregatejson;
             try {
-
-                companyjson = finnhubService.companyProfile(symbol);
-                CompanyProfile company = finnhubDtoService.convertToCompanyProfile(companyjson);
+                CompanyProfile company = companyProfileRepository.findByAbbreviation(symbol);
+                if (company == null) {
+                    company = new CompanyProfile();
+                }
+                /*if (company == null) {
+                    companyjson = finnhubService.companyProfile(symbol);
+                    company = finnhubDtoService.convertToCompanyProfile(companyjson, symbol);
+                    if (company == null) {
+                        company = new CompanyProfile();
+                    } else {
+                        companyProfileRepository.save(company);
+                    }
+                }*/
                 model.addAttribute("company", company);
                 model.addAttribute("symbol", symbol);
-                
 
             } catch (Exception ex) {
                 model.addAttribute("company", finnhubComponent.dummyCompany(symbols));
 
             }
-            
-            try{
+
+            try {
                 aggregatejson = finnhubService.aggregateIndicatorsPerDay(symbol);
                 AggregateIndicators aggregate = finnhubDtoService.convertToAggregateIdicators(aggregatejson);
                 model.addAttribute("aggregate", aggregate);
-            }catch(Exception ex){
-                
+            } catch (Exception ex) {
+                AggregateIndicators aggregate = new AggregateIndicators();
+                aggregate.setAdx(0);
+                aggregate.setBuy(0);
+                aggregate.setNeutral(0);
+                aggregate.setSignal("No data");
+                aggregate.setTrending(false);
+                model.addAttribute("aggregate", aggregate);
             }
-            
-            try{
-                aggregatejson = finnhubService.companyNews(symbol);
-                List<CompanyNews> news = finnhubDtoService.companyNews(aggregatejson, true);
+
+            try {
+                List<CompanyNews> news = finnhubDtoService.saveAndReadNews(symbol, companyNewsRepository, true);
                 model.addAttribute("news", news);
-            }catch(Exception ex){
-                
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
             }
         } else {
             model.addAttribute("error", "Symbol does not exists !");
@@ -149,6 +174,26 @@ public class HomeController {
         }
 
         return "company";
+    }
+
+    @GetMapping("/news/{symbol}")
+    public String companyNews(@PathVariable(name = "symbol") String symbol, Model model) {
+
+        model.addAttribute("title", "News");
+        Symbols symbols = symbolsRepository.findByAbbreviation(symbol);
+        if (symbols == null) {
+            model.addAttribute("error", "Symbol does not exists !");
+            return "someerror";
+        } else {
+            try {
+                List<CompanyNews> news = finnhubDtoService.saveAndReadNews(symbol, companyNewsRepository, false);
+                model.addAttribute("news", news);
+            } catch (Exception ex) {
+                model.addAttribute("error", "JSON parsing error !");
+                return "someerror";
+            }
+        }
+        return "company_news";
     }
 
     @GetMapping("/login")

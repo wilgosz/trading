@@ -83,7 +83,7 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-sm-9">
-                                            <h5 class="card-title m-b-20" th:text="${'Company ' + company.name}"></h5>
+                                            <h5 class="card-title m-b-20" th:text="${'Company ' + (company.name == null?'N/A':company.name)}"></h5>
                                             <p class="card-text  mt-4">
                                                 <span style="display: inline-block; width: 100px">Exchange</span><span th:text="${company.exchange}"></span><br>
                                                 <span style="display: inline-block; width: 100px">Currency</span><span th:text="${company.currency}"></span><br>
@@ -139,10 +139,13 @@
                                     </div>
                                     <div class="card-text">
                                         <ul style="padding: 0; margin: 0; list-style: none">
-                                            <li th:each="n : ${news}" style="clear: both">
+                                            <li th:each="n : ${news}" style="clear: both; padding-bottom: 6px; margin-bottom: 14px; border-bottom: 1px dotted #ccc; position: relative">
+                                                <small th:text="${n.datestring}" style="position: absolute; right: 10px; top: -12px"></small>
                                                 <strong style="margin-top: 0px; display: block; white-space: nowrap;overflow: hidden;text-overflow: ellipsis;" th:text="${n.headline}"></strong>
                                                 <p style="margin-bottom: 0px; display: block; white-space: nowrap;overflow: hidden;text-overflow: ellipsis;" th:text="${n.summary}"></p>
-                                                <a href="#" class="float-right btn btn-sm btn-info">more..</a>
+                                            </li>
+                                            <li>
+                                                <a th:if="${news.size()>0}" th:href="${'/news/' + symbol}" class="float-right btn btn-sm btn-info">more..</a>
                                             </li>
                                         </ul>
                                     </div>

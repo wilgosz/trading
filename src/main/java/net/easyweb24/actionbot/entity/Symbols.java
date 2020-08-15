@@ -32,7 +32,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Symbols.findById", query = "SELECT s FROM Symbols s WHERE s.id = :id"),
     @NamedQuery(name = "Symbols.findByAbbreviation", query = "SELECT s FROM Symbols s WHERE s.abbreviation = :abbreviation"),
     @NamedQuery(name = "Symbols.findByDisplayName", query = "SELECT s FROM Symbols s WHERE s.displayName = :displayName"),
-    @NamedQuery(name = "Symbols.findByDesription", query = "SELECT s FROM Symbols s WHERE s.desription = :desription"),
+    @NamedQuery(name = "Symbols.findByDescription", query = "SELECT s FROM Symbols s WHERE s.description = :description"),
     @NamedQuery(name = "Symbols.findByExchangeAbbreviation", query = "SELECT s FROM Symbols s WHERE s.exchangeAbbreviation = :exchangeAbbreviation")
 })
 
@@ -52,7 +52,7 @@ public class Symbols implements Serializable {
     private String displayName;
     @Size(max = 255)
     @Column(length = 255)
-    private String desription;
+    private String description;
     @Size(max = 16)
     @Column(name = "exchange_abbreviation", length = 16)
     private String exchangeAbbreviation;
@@ -88,12 +88,12 @@ public class Symbols implements Serializable {
         this.displayName = displayName;
     }
 
-    public String getDesription() {
-        return desription;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDesription(String desription) {
-        this.desription = desription;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     /**

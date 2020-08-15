@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import net.easyweb24.actionbot.components.utils.BEFORE;
-import net.easyweb24.actionbot.dto.CompanyProfile;
+import net.easyweb24.actionbot.entity.CompanyProfile;
 import net.easyweb24.actionbot.entity.Symbols;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -98,7 +98,7 @@ public class FinnhubComponent {
                 company.setWeburl("Unknow");
                 company.setFinnhubIndustry("Unknow");
                 company.setMarketCapitalization(0);
-                company.setName(symbols.getDesription());
+                company.setName(symbols.getDescription());
                 return company;
     }
 }

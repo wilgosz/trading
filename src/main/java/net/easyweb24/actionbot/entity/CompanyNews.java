@@ -16,11 +16,13 @@ import javax.persistence.Index;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "company_news", indexes = {
     @Index(name = "finnhub_company_news_abbreviation_idx", columnList = "abbreviation", unique = false),
-    @Index(name = "finnhub_company_news_news_id_idx", columnList = "news_id", unique = false)
+    @Index(name = "finnhub_company_news_news_id_idx", columnList = "news_id", unique = false),
+    @Index(name = "finnhub_company_news_datetime_idx", columnList = "datetime", unique = false)
 })
 @NamedQueries({
     @NamedQuery(name = "CompanyNews.findAll", query = "SELECT c FROM CompanyNews c")})
@@ -39,17 +41,24 @@ public class CompanyNews implements Serializable {
     
     private Long datetime;
     
+    @Transient
+    private String datestring;
+    
     private String headline;
     
+    @Column(name="image", columnDefinition = "VARCHAR(512)")
     private String image;
     
     private String abbreviation;
     
     private String source;
     
+    @Column(columnDefinition = "TEXT")
     private String summary;
     
     private String url;
+    
+    private Long lastupdate;
 
     /**
      * @return the datetime
@@ -186,5 +195,33 @@ public class CompanyNews implements Serializable {
     @Override
     public String toString() {
         return "net.easyweb24.actionbot.entity.CompanyNews[ id=" + id + " ]";
+    }
+
+    /**
+     * @return the datestring
+     */
+    public String getDatestring() {
+        return datestring;
+    }
+
+    /**
+     * @param datestring the datestring to set
+     */
+    public void setDatestring(String datestring) {
+        this.datestring = datestring;
+    }
+
+    /**
+     * @return the lastupdate
+     */
+    public Long getLastupdate() {
+        return lastupdate;
+    }
+
+    /**
+     * @param lastupdate the lastupdate to set
+     */
+    public void setLastupdate(Long lastupdate) {
+        this.lastupdate = lastupdate;
     }
 }

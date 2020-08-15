@@ -23,25 +23,25 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "companies", catalog = "trading", schema = "")
 @NamedQueries({
-    @NamedQuery(name = "Companies.findAll", query = "SELECT c FROM Companies c"),
-    @NamedQuery(name = "Companies.findById", query = "SELECT c FROM Companies c WHERE c.id = :id"),
-    @NamedQuery(name = "Companies.findByAbbreviation", query = "SELECT c FROM Companies c WHERE c.abbreviation = :abbreviation"),
-    @NamedQuery(name = "Companies.findByName", query = "SELECT c FROM Companies c WHERE c.name = :name"),
-    @NamedQuery(name = "Companies.findByDecription", query = "SELECT c FROM Companies c WHERE c.decription = :decription")})
+    @NamedQuery(name = "Companies.findAll", query = "SELECT c FROM Companies c")})
 public class Companies implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id", nullable = false)
     private Integer id;
+    
     @Column(name = "abbreviation")
     private Integer abbreviation;
+    
     @Column(name = "name", length = 255)
     private String name;
-    @Column(name = "decription", length = 255)
-    private String decription;
+    
+    @Column(name = "description", length = 255)
+    private String description;
 
     public Companies() {
     }
@@ -74,12 +74,12 @@ public class Companies implements Serializable {
         this.name = name;
     }
 
-    public String getDecription() {
-        return decription;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDecription(String decription) {
-        this.decription = decription;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override

@@ -24,7 +24,7 @@
                         <tbody>
                             <tr th:each="company: ${companies}">
                                 <th scope="row" th:text="${company.id}"></th>
-                                <td th:text="${company.desription}"></td>
+                                <td th:text="${company.description}"></td>
                                 <td th:text="${company.abbreviation}"></td>
                                 <td><a th:href="@{/companies/{abbreviation}(abbreviation = ${company.abbreviation})}">Show detail</a></td>
                             </tr>

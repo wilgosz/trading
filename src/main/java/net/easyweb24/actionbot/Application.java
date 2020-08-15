@@ -13,7 +13,9 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
+@EnableScheduling
 @SpringBootApplication
 public class Application extends SpringBootServletInitializer {
 
@@ -76,3 +78,4 @@ public class Application extends SpringBootServletInitializer {
                 env.getActiveProfiles());
     }
 }
+//CREATE DATABASE mydatabase CHARACTER SET utf8 COLLATE utf8_general_ci;

@@ -6,6 +6,7 @@
 package net.easyweb24.actionbot.entity;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,6 +18,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 /**
  *
@@ -65,6 +68,12 @@ public class FinnhubSignals implements Serializable {
     @Basic(optional = false)
     @Column(name = "trending")
     private boolean trending;
+    
+    @Column(name = "create_date_time", columnDefinition="DATETIME DEFAULT CURRENT_TIMESTAMP")
+    public LocalDateTime createDateTime;
+ 
+    @Column(name = "update_date_time", columnDefinition="DATETIME ON UPDATE CURRENT_TIMESTAMP")
+    public LocalDateTime updateDateTime;
 
     public FinnhubSignals() {
     }
@@ -165,6 +174,34 @@ public class FinnhubSignals implements Serializable {
     @Override
     public String toString() {
         return "net.easyweb24.actionbot.entity.FinnhubSignals[ id=" + id + " ]";
+    }
+
+    /**
+     * @return the createDateTime
+     */
+    public LocalDateTime getCreateDateTime() {
+        return createDateTime;
+    }
+
+    /**
+     * @param createDateTime the createDateTime to set
+     */
+    public void setCreateDateTime(LocalDateTime createDateTime) {
+        this.createDateTime = createDateTime;
+    }
+
+    /**
+     * @return the updateDateTime
+     */
+    public LocalDateTime getUpdateDateTime() {
+        return updateDateTime;
+    }
+
+    /**
+     * @param updateDateTime the updateDateTime to set
+     */
+    public void setUpdateDateTime(LocalDateTime updateDateTime) {
+        this.updateDateTime = updateDateTime;
     }
     
 }

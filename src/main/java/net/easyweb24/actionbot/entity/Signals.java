@@ -26,12 +26,9 @@ import javax.persistence.TemporalType;
  * @author zbigniewwilgosz
  */
 @Entity
-@Table(name = "signals", catalog = "trading", schema = "")
+@Table(name = "signals")
 @NamedQueries({
-    @NamedQuery(name = "Signals.findAll", query = "SELECT s FROM Signals s"),
-    @NamedQuery(name = "Signals.findById", query = "SELECT s FROM Signals s WHERE s.id = :id"),
-    @NamedQuery(name = "Signals.findBySignalName", query = "SELECT s FROM Signals s WHERE s.signalName = :signalName"),
-    @NamedQuery(name = "Signals.findByDatum", query = "SELECT s FROM Signals s WHERE s.datum = :datum")})
+    @NamedQuery(name = "Signals.findAll", query = "SELECT s FROM Signals s")})
 public class Signals implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -42,9 +39,8 @@ public class Signals implements Serializable {
     private Integer id;
     @Column(name = "signal_name")
     private String signalName;
-    @Column(name = "datum")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date datum;
+    @Column(name = "datetime")
+    private Long datetime;
     @JoinColumn(name = "alerts_id", referencedColumnName = "id")
     @ManyToOne
     private Alerts alertsId;
@@ -72,12 +68,12 @@ public class Signals implements Serializable {
         this.signalName = signalName;
     }
 
-    public Date getDatum() {
-        return datum;
+    public Long getDatetime() {
+        return datetime;
     }
 
-    public void setDatum(Date datum) {
-        this.datum = datum;
+    public void setDatetime(Long datetime) {
+        this.datetime = datetime;
     }
 
     public Alerts getAlertsId() {

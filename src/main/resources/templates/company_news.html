@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html dir="ltr"  xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+    <div th:replace="parts/head :: head"></div>
+
+    <body>
+        <div  th:replace="parts/preloader :: preloader"></div>
+        <div class="main-wrapper" id="main-wrapper">
+            <div  th:replace="parts/topbar :: topbar"></div>
+            <div  th:replace="parts/left-sidebar :: left-sidebar"></div>
+            <div class="page-wrapper">
+                <!-- ============================================================== -->
+                <!-- Bread crumb and right sidebar toggle -->
+                <!-- ============================================================== -->
+                <div  th:replace="parts/breadcrumb :: breadcrumb"></div>
+                <!-- ============================================================== -->
+                <!-- End Bread crumb and right sidebar toggle -->
+                <!-- ============================================================== -->
+                <!-- ============================================================== -->
+                <!-- Container fluid  -->
+                <!-- ============================================================== -->
+                <div class="container-fluid">
+                    <!-- ============================================================== -->
+                    <!-- Start Page Content -->
+                    <!-- ============================================================== -->
+                    <div class="row">
+                        <!-- Column -->
+                        <div class="col-md-6 col-lg-3">
+                            <a href="/" class="text-white">
+                                <div class="card card-hover">
+                                    <div class="box bg-cyan text-center">
+                                        <h1 class="font-light text-white"><i class="mdi mdi-view-dashboard"></i></h1>
+                                        <h6 class="text-white">Dashboard</h6>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <!-- Column -->
+                        <div class="col-md-6 col-lg-3">
+                            <a th:href="@{/strategies}">
+                                <div class="card card-hover">
+                                    <div class="box bg-success text-center">
+                                        <h1 class="font-light text-white"><i class="mdi mdi-chart-areaspline"></i></h1>
+                                        <h6 class="text-white">Strategies</h6>
+                                    </div>
+                                </div>
+                            </a>    
+                        </div>
+                        <!-- Column -->
+
+                        <div class="col-md-6 col-lg-3">
+                            <a th:href="@{/companies}">
+                                <div class="card card-hover">
+                                    <div class="box bg-warning text-center">
+                                        <h1 class="font-light text-white"><i class="mdi mdi-collage"></i></h1>
+                                        <h6 class="text-white">Companies</h6>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- Column -->
+
+                        <div class="col-md-6 col-lg-3">
+                            <a th:href="@{/actions}">
+                                <div class="card card-hover">
+                                    <div class="box bg-danger text-center">
+                                        <h1 class="font-light text-white"><i class="mdi mdi-border-outside"></i></h1>
+                                        <h6 class="text-white">Actions</h6>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2" th:each="n : ${news}">
+                            <div class="card">
+                                <div class="card-body" style="height: 450px; overflow: hidden">
+                                    <div class="card-title">
+                                        <small th:text="${n.datestring}"></small>
+                                        <h5 th:text="${n.headline}"></h5>
+                                    </div>
+                                    <div class="card-text">
+                                        <p th:text="${n.summary}"></p>
+                                        <img th:src="${n.image}" class="img-fluid" alt="">
+                                    </div>
+                                    <div style="padding: 30px 0 0 16px; position: absolute; height: 60px; width: 100%; left: 0; right: 0; bottom: 0; background: linear-gradient(0deg, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 54%, rgba(255,255,255,0) 100%);">
+                                        <a th:href="${n.url}" th:text="${n.source}" target="_blank"></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <footer class="footer text-center">
+                    All Rights Reserved by Matrix-admin. Designed and Developed by <a href="https://wrappixel.com">WrapPixel</a>.
+                </footer>
+            </div>
+        </div>
+        <div  th:replace="parts/requiredjs :: requiredjs"></div>
+        <script>
+            
+        </script>
+    </body>
+</html>
