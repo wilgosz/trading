@@ -5,6 +5,8 @@
  */
 package net.easyweb24.actionbot.dto;
 
+import java.time.LocalDateTime;
+
 
 public interface FinnhubSignalsDTO{
 
@@ -17,4 +19,5 @@ public interface FinnhubSignalsDTO{
     public Double getAdx();
     public boolean getTrending();
     public String getDescription();
+    public LocalDateTime getUpdatedatetime();
 }

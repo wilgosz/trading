@@ -24,12 +24,12 @@ public interface FinnhubSignalsRepository extends JpaRepository < FinnhubSignals
     FinnhubSignals findByAbbreviation(String abbreviation);
     
     @Query(value = ""
-            + " SELECT f.*, s.description as description FROM symbols s, finnhub_signals f, company_profile cp "
+            + " SELECT f.*, f.update_date_time as updatedatetime , s.description as description FROM symbols s, finnhub_signals f, company_profile cp "
             + " WHERE s.abbreviation = f.abbreviation "
             + " AND cp.abbreviation = f.abbreviation "
             + " AND  f.signals = 'strong buy' "
-            + " AND trending = 1"
-            + " ORDER BY sell ASC, buy DESC  LIMIT 40", nativeQuery = true)
+            //+ " AND trending = 1"
+            + " ORDER BY sell ASC, trending ASC, buy DESC  LIMIT 48", nativeQuery = true)
     List<FinnhubSignalsDTO> strongBuyQuery();
     //Page<FinnhubSignals> findByDescriptionStartingWith(String letter, Pageable pglb);
 }

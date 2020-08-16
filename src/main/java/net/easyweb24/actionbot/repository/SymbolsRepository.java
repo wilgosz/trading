@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import net.easyweb24.actionbot.dto.CompanyProfileDTO;
 
 /**
  *
@@ -17,6 +18,6 @@ public interface SymbolsRepository extends JpaRepository < Symbols, Long > {
     Symbols findByAbbreviation(String abbreviation);
     Page<Symbols> findByDescriptionStartingWith(String letter, Pageable pglb);
     
-    @Query(value = "SELECT s.* FROM symbols s, company_profile c WHERE s.abbreviation = c.abbreviation LIMIT 10", nativeQuery = true)
+    @Query(value = "SELECT s.* FROM symbols s, company_profile c WHERE s.abbreviation = c.abbreviation LIMIT 3000, 3000", nativeQuery = true)
     List<Symbols> findAllOnlyWithExistingComany();
 }

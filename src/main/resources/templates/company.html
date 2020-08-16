@@ -21,58 +21,7 @@
                 <!-- Container fluid  -->
                 <!-- ============================================================== -->
                 <div class="container-fluid">
-                    <!-- ============================================================== -->
-                    <!-- Start Page Content -->
-                    <!-- ============================================================== -->
-                    <div class="row">
-                        <!-- Column -->
-                        <div class="col-md-6 col-lg-3">
-                            <a href="/" class="text-white">
-                                <div class="card card-hover">
-                                    <div class="box bg-cyan text-center">
-                                        <h1 class="font-light text-white"><i class="mdi mdi-view-dashboard"></i></h1>
-                                        <h6 class="text-white">Dashboard</h6>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        <!-- Column -->
-                        <div class="col-md-6 col-lg-3">
-                            <a th:href="@{/strategies}">
-                                <div class="card card-hover">
-                                    <div class="box bg-success text-center">
-                                        <h1 class="font-light text-white"><i class="mdi mdi-chart-areaspline"></i></h1>
-                                        <h6 class="text-white">Strategies</h6>
-                                    </div>
-                                </div>
-                            </a>    
-                        </div>
-                        <!-- Column -->
-
-                        <div class="col-md-6 col-lg-3">
-                            <a th:href="@{/companies}">
-                                <div class="card card-hover">
-                                    <div class="box bg-warning text-center">
-                                        <h1 class="font-light text-white"><i class="mdi mdi-collage"></i></h1>
-                                        <h6 class="text-white">Companies</h6>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-
-                        <!-- Column -->
-
-                        <div class="col-md-6 col-lg-3">
-                            <a th:href="@{/actions}">
-                                <div class="card card-hover">
-                                    <div class="box bg-danger text-center">
-                                        <h1 class="font-light text-white"><i class="mdi mdi-border-outside"></i></h1>
-                                        <h6 class="text-white">Actions</h6>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
+                    <div th:replace="parts/topmenu :: topmenu"></div>
                     <div class="row">
                         <div class="col-md-9">
                             <div class="card p-t-20"  style="height: 320px" id="ohlc"></div>
@@ -141,8 +90,8 @@
                                         <ul style="padding: 0; margin: 0; list-style: none">
                                             <li th:each="n : ${news}" style="clear: both; padding-bottom: 6px; margin-bottom: 14px; border-bottom: 1px dotted #ccc; position: relative">
                                                 <small th:text="${n.datestring}" style="position: absolute; right: 10px; top: -12px"></small>
-                                                <strong style="margin-top: 0px; display: block; white-space: nowrap;overflow: hidden;text-overflow: ellipsis;" th:text="${n.headline}"></strong>
-                                                <p style="margin-bottom: 0px; display: block; white-space: nowrap;overflow: hidden;text-overflow: ellipsis;" th:text="${n.summary}"></p>
+                                                <strong style="margin-top: 0px; display: block; white-space: nowrap;overflow: hidden;text-overflow: ellipsis;" th:utext="${n.headline}"></strong>
+                                                <p style="margin-bottom: 0px; display: block; white-space: nowrap;overflow: hidden;text-overflow: ellipsis;" th:utext="${n.summary}"></p>
                                             </li>
                                             <li>
                                                 <a th:if="${news.size()>0}" th:href="${'/news/' + symbol}" class="float-right btn btn-sm btn-info">more..</a>

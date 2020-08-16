@@ -44,6 +44,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import net.easyweb24.actionbot.dto.CompanyProfileDTO;
 
 /**
  *
@@ -88,6 +89,8 @@ public class HomeController {
         model.addAttribute("title", "Dashboard");*/
         model.addAttribute("title", "Dashboard");
         List<FinnhubSignalsDTO> signalslist = finnhubSignalsRepository.strongBuyQuery();
+        System.out.println(signalslist.get(0).getUpdatedatetime());
+        
         model.addAttribute("signals", signalslist);
         return "index";
     }
@@ -95,27 +98,28 @@ public class HomeController {
     @RequestMapping(value = "/companies", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public String symbols_from_db(Model model, ServletRequest request) throws ParseException, IOException {
 
-        Page<Symbols> page;
+        Page<CompanyProfileDTO> page;
         int pagenumber = 0;
         int pagesize = 20;
 
-        if (request.getParameter("page") != null) {
+        if (request.getParameter("page") != null && !request.getParameter("page").equals("")) {
             pagenumber = Integer.parseInt(request.getParameter("page"));
         }
 
-        if (request.getParameter("size") != null) {
+        if (request.getParameter("size") != null && !request.getParameter("size").equals("")) {
             pagesize = Integer.parseInt(request.getParameter("size"));
         }
-
-        Pageable pgbl = PageRequest.of(pagenumber, pagesize, Sort.by("description"));
-        if (request.getParameter("letter") != null) {
-            page = symbolsRepository.findByDescriptionStartingWith(request.getParameter("letter"), pgbl);
+        
+        Pageable pgbl = PageRequest.of(pagenumber, pagesize, Sort.by("name"));
+        if (request.getParameter("letter") != null && !request.getParameter("letter").equals("")) {
+            page = companyProfileRepository.getAllCompaniesDescriptionStartingWith(request.getParameter("letter"), pgbl);
         } else {
-            page = symbolsRepository.findAll(pgbl);
+            page = companyProfileRepository.getAllCompanies(pgbl);
         }
 
         model.addAttribute("companies", page.getContent());
         model.addAttribute("page", page);
+        model.addAttribute("title", "Companies");
         return "companies";
     }
 
@@ -141,6 +145,7 @@ public class HomeController {
                     }
                 }*/
                 model.addAttribute("company", company);
+                model.addAttribute("title", company.getName());
                 model.addAttribute("symbol", symbol);
 
             } catch (Exception ex) {
@@ -194,6 +199,17 @@ public class HomeController {
             }
         }
         return "company_news";
+    }
+    
+    @GetMapping("/strategies")
+    public String strategies(Model model){
+        model.addAttribute("title", "User Strategies");
+        return "strategies";
+    }
+    @GetMapping("/actions")
+    public String actions(Model model){
+        model.addAttribute("title", "Current Actions");
+        return "actions";
     }
 
     @GetMapping("/login")

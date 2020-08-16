@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+    </head>
+    <body>
+        <div th:fragment="topmenu" class="row">
+            <!-- Column -->
+            <div class="col-md-6 col-lg-3">
+                <a href="/" class="text-white">
+                    <div class="card card-hover">
+                        <div class="box bg-cyan text-center">
+                            <h1 class="font-light text-white"><i class="mdi mdi-view-dashboard"></i></h1>
+                            <h6 class="text-white">Strong Buy</h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!-- Column -->
+            <div class="col-md-6 col-lg-3">
+                <a th:href="@{/companies}">
+                    <div class="card card-hover">
+                        <div class="box bg-warning text-center">
+                            <h1 class="font-light text-white"><i class="mdi mdi-collage"></i></h1>
+                            <h6 class="text-white">Companies</h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!-- Column -->
+            <div class="col-md-6 col-lg-3">
+                <a th:href="@{/strategies}">
+                    <div class="card card-hover">
+                        <div class="box bg-success text-center">
+                            <h1 class="font-light text-white"><i class="mdi mdi-chart-areaspline"></i></h1>
+                            <h6 class="text-white">User Strategies</h6>
+                        </div>
+                    </div>
+                </a>    
+            </div>
+            <!-- Column -->
+            <div class="col-md-6 col-lg-3">
+                <a th:href="@{/actions}">
+                    <div class="card card-hover">
+                        <div class="box bg-danger text-center">
+                            <h1 class="font-light text-white"><i class="mdi mdi-border-outside"></i></h1>
+                            <h6 class="text-white">Current Actions</h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </body>
+</html>
