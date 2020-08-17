@@ -160,7 +160,7 @@ public class FinnhubDtoService {
         Long currentTime = Instant.now().getEpochSecond();
         List<CompanyNews> news = new ArrayList<>();
         if (lastUpdatetime != null && Instant.now().getEpochSecond() - companyNewsRepository.getLastNewsDateTime(symbol) > (5 * 3600)) {
-            news = companyNewsRepository.getNewsFromLastDay(symbol, (currentTime - (24 * 3600)));
+            news = companyNewsRepository.getNewsFromLastDay(symbol, (currentTime - (72 * 3600)));
             news = this.companyNews(news, only3);
             System.out.println("READ NEWS");
         } else {
@@ -179,7 +179,7 @@ public class FinnhubDtoService {
                     System.out.println("Can't save news");
                 }
             }
-            news = companyNewsRepository.getNewsFromLastDay(symbol, (currentTime - (24 * 3600)));
+            news = companyNewsRepository.getNewsFromLastDay(symbol, (currentTime - (72 * 3600)));
             news = this.companyNews(news, only3);
             System.out.println("ADD NEWS");
         }
