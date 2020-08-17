@@ -18,6 +18,6 @@ public interface SymbolsRepository extends JpaRepository < Symbols, Long > {
     Symbols findByAbbreviation(String abbreviation);
     Page<Symbols> findByDescriptionStartingWith(String letter, Pageable pglb);
     
-    @Query(value = "SELECT s.* FROM symbols s, company_profile c WHERE s.abbreviation = c.abbreviation LIMIT 3000, 3000", nativeQuery = true)
+    @Query(value = "SELECT s.* FROM symbols s, company_profile c WHERE s.abbreviation = c.abbreviation", nativeQuery = true)
     List<Symbols> findAllOnlyWithExistingComany();
 }
