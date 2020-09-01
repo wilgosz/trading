@@ -1,15 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.easyweb24.actionbot.dto;
 
 /**
  *
  * @author zbigniewwilgosz
  */
-public class OHLC {
+public class OHLCDTO {
     
     private String time;
     private Double open;

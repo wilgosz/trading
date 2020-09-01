@@ -89,7 +89,7 @@ public class HomeController {
         model.addAttribute("title", "Dashboard");*/
         model.addAttribute("title", "Dashboard");
         List<FinnhubSignalsDTO> signalslist = finnhubSignalsRepository.strongBuyQuery();
-        System.out.println(signalslist.get(0).getUpdatedatetime());
+        //System.out.println(signalslist.get(0).getUpdatedatetime());
         
         model.addAttribute("signals", signalslist);
         return "index";

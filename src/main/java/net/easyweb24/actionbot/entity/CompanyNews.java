@@ -20,7 +20,7 @@ import javax.persistence.Transient;
 
 @Entity
 @Table(name = "company_news", indexes = {
-    @Index(name = "finnhub_company_news_abbreviation_idx", columnList = "abbreviation", unique = false),
+    @Index(name = "finnhub_company_news_abbr_idx", columnList = "abbreviation", unique = false),
     @Index(name = "finnhub_company_news_news_id_idx", columnList = "news_id", unique = false),
     @Index(name = "finnhub_company_news_datetime_idx", columnList = "datetime", unique = false)
 })

@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 import net.easyweb24.actionbot.dto.AggregateIndicators;
 import net.easyweb24.actionbot.entity.CompanyNews;
 import net.easyweb24.actionbot.entity.CompanyProfile;
-import net.easyweb24.actionbot.dto.OHLC;
+import net.easyweb24.actionbot.dto.OHLCDTO;
 import net.easyweb24.actionbot.entity.FinnhubSignals;
 import net.easyweb24.actionbot.entity.Symbols;
 import net.easyweb24.actionbot.repository.CompanyProfileRepository;
@@ -65,10 +65,10 @@ public class FinnhubController {
 
     @RequestMapping(value = "/ohlc/{symbol}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<List<OHLC>> index(@PathVariable(name = "symbol") String symbol) throws ParseException, IOException {
+    public ResponseEntity<List<OHLCDTO>> index(@PathVariable(name = "symbol") String symbol) throws ParseException, IOException {
 
         String jsonstring = finnhubService.stockCandlesFromLastYear(symbol);
-        List<OHLC> OhlcList = finnhubDtoService.convertToOhlcList(jsonstring);
+        List<OHLCDTO> OhlcList = finnhubDtoService.convertToOhlcList(jsonstring);
 
         return ResponseEntity.ok().body(OhlcList);
     }
@@ -113,7 +113,7 @@ public class FinnhubController {
     @RequestMapping(value = "/symbols", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<List<Symbols>> symbols() throws ParseException, IOException {
-        
+
         String jsonstring = finnhubService.companySymbols("US");
         List<Symbols> symbolsList = finnhubDtoService.convertToSymbolList(jsonstring, true);
         //DELETE FROM `symbols` WHERE `description` LIKE '';
@@ -176,6 +176,40 @@ public class FinnhubController {
         return ResponseEntity.ok().body(companies);
     }
 
+    @RequestMapping(value = "/fnohlc", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<List<String>> getOhlc() {
+
+        List<String> ohlcSymbols = new ArrayList<>();
+        List<Symbols> symbols = symbolsRepository.findAllOnlyWithExistingComany();
+        String abbreviation;
+        int counter = 0;
+        Iterator itr = symbols.iterator();
+        while (itr.hasNext()) {
+            Symbols next = (Symbols) itr.next();
+            abbreviation = next.getAbbreviation();
+            try {
+                String jsonstring = finnhubService.stockCandlesFromLastYear(abbreviation);
+                finnhubDtoService.initSaveOHLC(jsonstring, abbreviation);
+                
+                ohlcSymbols.add(abbreviation);
+            } catch (Exception e) {
+                Logger.getLogger(FinnhubController.class.getName()).log(Level.SEVERE, null, e);
+            }
+            counter++;
+            if (counter > 10) {
+                break;
+            }
+            try {
+                TimeUnit.MILLISECONDS.sleep(1500);
+            } catch (Exception e) {
+
+            }
+        }
+
+        return ResponseEntity.ok().body(ohlcSymbols);
+    }
+
     /**
      * TODO duplicate this method and find all simbols with connection to
      * company and signals Start duplicated method one time per 4 hours Strat
@@ -195,7 +229,6 @@ public class FinnhubController {
         String jsonstring;
         AggregateIndicators aggregate;
         FinnhubSignals fnsignals;
-        System.out.println(symbols.size());
         while (itr.hasNext()) {
             try {
                 Symbols next = (Symbols) itr.next();

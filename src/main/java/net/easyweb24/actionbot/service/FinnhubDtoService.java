@@ -8,6 +8,7 @@ package net.easyweb24.actionbot.service;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -15,9 +16,11 @@ import java.util.List;
 import net.easyweb24.actionbot.dto.AggregateIndicators;
 import net.easyweb24.actionbot.entity.CompanyNews;
 import net.easyweb24.actionbot.entity.CompanyProfile;
-import net.easyweb24.actionbot.dto.OHLC;
+import net.easyweb24.actionbot.dto.OHLCDTO;
+import net.easyweb24.actionbot.entity.OHLC;
 import net.easyweb24.actionbot.entity.Symbols;
 import net.easyweb24.actionbot.repository.CompanyNewsRepository;
+import net.easyweb24.actionbot.repository.OHLCRepository;
 import net.easyweb24.actionbot.repository.SymbolsRepository;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -36,6 +39,9 @@ public class FinnhubDtoService {
 
     @Autowired
     private SymbolsRepository symbolsRepository;
+    
+    @Autowired
+    private OHLCRepository ohlcRepository;
 
     public CompanyProfile convertToCompanyProfile(String jsonstring, String abbreviation) {
         JSONObject jsonObject = new JSONObject(jsonstring);
@@ -64,9 +70,9 @@ public class FinnhubDtoService {
         return company;
     }
 
-    public List<OHLC> convertToOhlcList(String jsonstring) {
+    public List<OHLCDTO> convertToOhlcList(String jsonstring) {
         JSONObject jsonObject = new JSONObject(jsonstring);
-        List<OHLC> OhlcList = new ArrayList();
+        List<OHLCDTO> OhlcList = new ArrayList();
         if (jsonObject.getString("s").equals("ok")) {
             JSONArray close = jsonObject.getJSONArray("c");
             JSONArray high = jsonObject.getJSONArray("h");
@@ -80,7 +86,7 @@ public class FinnhubDtoService {
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
             for (int i = 0; i < size; i++) {
-                OHLC ohlc = new OHLC();
+                OHLCDTO ohlc = new OHLCDTO();
                 ohlc.setClose(close.getDouble(i));
                 ohlc.setHigh(high.getDouble(i));
                 ohlc.setLow(low.getDouble(i));
@@ -213,4 +219,29 @@ public class FinnhubDtoService {
         return companyNews;
 
     }
+    
+    public boolean initSaveOHLC(String jsonstring, String abbreviation){
+        int counter = ohlcRepository.getSymbolExists(abbreviation);
+        
+        if(counter == 0 ){
+            
+            List<OHLCDTO> ohlcList = this.convertToOhlcList(jsonstring);
+            Iterator itr = ohlcList.iterator();
+            while(itr.hasNext()){
+                OHLCDTO ohlcdto = (OHLCDTO) itr.next();
+                OHLC ohlc = new OHLC();
+                ohlc.setAbbreviation(abbreviation);
+                ohlc.setC(ohlcdto.getClose());
+                ohlc.setH(ohlcdto.getHigh());
+                ohlc.setL(ohlcdto.getLow());
+                ohlc.setO(ohlcdto.getOpen());
+                ohlc.setV(ohlcdto.getValue());
+                ohlc.setDate(LocalDate.parse(ohlcdto.getTime()));
+                ohlcRepository.save(ohlc);
+            } 
+        }
+        
+        return true;
+    }
+    
 }
