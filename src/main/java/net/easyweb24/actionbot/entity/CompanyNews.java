@@ -17,6 +17,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "company_news", indexes = {
@@ -49,6 +50,8 @@ public class CompanyNews implements Serializable {
     @Column(name="image", columnDefinition = "VARCHAR(512)")
     private String image;
     
+    @Size(max = 16)
+    @Column(name = "abbreviation")
     private String abbreviation;
     
     private String source;
