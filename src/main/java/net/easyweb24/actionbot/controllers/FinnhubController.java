@@ -184,16 +184,12 @@ public class FinnhubController {
         List<Symbols> symbols = symbolsRepository.findAllOnlyWithExistingComany();
         String abbreviation;
         int counter = 0;
-        Iterator itr = symbols.iterator();
-        while (itr.hasNext()) {
-            Symbols next = (Symbols) itr.next();
+        for (Symbols next : symbols) {
             abbreviation = next.getAbbreviation();
             try {
-                String jsonstring = finnhubService.stockCandlesFromLastYear(abbreviation);
-                finnhubDtoService.initSaveOHLC(jsonstring, abbreviation);
-                
+                finnhubDtoService.saveOHLC(abbreviation);
                 ohlcSymbols.add(abbreviation);
-            } catch (Exception e) {
+            } catch (IOException e) {
                 Logger.getLogger(FinnhubController.class.getName()).log(Level.SEVERE, null, e);
             }
             counter++;

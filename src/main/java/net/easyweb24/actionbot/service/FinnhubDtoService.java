@@ -39,7 +39,7 @@ public class FinnhubDtoService {
 
     @Autowired
     private SymbolsRepository symbolsRepository;
-    
+
     @Autowired
     private OHLCRepository ohlcRepository;
 
@@ -178,7 +178,7 @@ public class FinnhubDtoService {
                 CompanyNews n = (CompanyNews) it.next();
                 n.setLastupdate(currentTime);
                 try {
-                    if(lastUpdatetime == null || n.getDatetime()>lastDateTime){
+                    if (lastUpdatetime == null || n.getDatetime() > lastDateTime) {
                         companyNewsRepository.save(n);
                     }
                 } catch (Exception e) {
@@ -219,17 +219,18 @@ public class FinnhubDtoService {
         return companyNews;
 
     }
-    
-    public boolean initSaveOHLC(String jsonstring, String abbreviation){
-        int counter = ohlcRepository.getSymbolExists(abbreviation);
+
+    public boolean saveOHLC(String abbreviation) throws IOException {
         
-        if(counter == 0 ){
-            
-            List<OHLCDTO> ohlcList = this.convertToOhlcList(jsonstring);
-            Iterator itr = ohlcList.iterator();
-            while(itr.hasNext()){
-                OHLCDTO ohlcdto = (OHLCDTO) itr.next();
-                OHLC ohlc = new OHLC();
+        String jsonstring;
+        List<OHLCDTO> ohlcList;
+        int counter = ohlcRepository.getSymbolExists(abbreviation);
+        if (counter == 0) {
+            jsonstring = finnhubService.stockCandlesFromLastYear(abbreviation);
+            ohlcList = this.convertToOhlcList(jsonstring);
+            OHLC ohlc;
+            for (OHLCDTO ohlcdto : ohlcList) {
+                ohlc = new OHLC();
                 ohlc.setAbbreviation(abbreviation);
                 ohlc.setC(ohlcdto.getClose());
                 ohlc.setH(ohlcdto.getHigh());
@@ -238,10 +239,32 @@ public class FinnhubDtoService {
                 ohlc.setV(ohlcdto.getValue());
                 ohlc.setDate(LocalDate.parse(ohlcdto.getTime()));
                 ohlcRepository.save(ohlc);
-            } 
+                ohlc = null;
+            }
+            return true;
+        }else{
+            jsonstring = finnhubService.stockCandlesFromLastWeek(abbreviation);
+            ohlcList = this.convertToOhlcList(jsonstring);
+            OHLC ohlc;
+            for (OHLCDTO ohlcdto : ohlcList) {
+                LocalDate date = LocalDate.parse(ohlcdto.getTime());
+                ohlc = ohlcRepository.findByDateAndAbbreviation(date, abbreviation);
+                
+                if(ohlc == null){
+                    ohlc = new OHLC();
+                }
+                ohlc.setAbbreviation(abbreviation);
+                ohlc.setC(ohlcdto.getClose());
+                ohlc.setH(ohlcdto.getHigh());
+                ohlc.setL(ohlcdto.getLow());
+                ohlc.setO(ohlcdto.getOpen());
+                ohlc.setV(ohlcdto.getValue());
+                ohlc.setDate(LocalDate.parse(ohlcdto.getTime()));
+                ohlcRepository.save(ohlc);
+                ohlc = null;
+            }
         }
-        
-        return true;
+        return false;
     }
-    
+
 }

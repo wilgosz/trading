@@ -5,6 +5,7 @@
  */
 package net.easyweb24.actionbot.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import net.easyweb24.actionbot.entity.CompanyNews;
 import net.easyweb24.actionbot.entity.OHLC;
@@ -22,4 +23,6 @@ public interface OHLCRepository extends JpaRepository < OHLC, Long > {
     
     @Query(value = "SELECT COUNT(*) FROM ohlc WHERE abbreviation = ?1", nativeQuery = true)
     Integer getSymbolExists(String abbreviation);
+    
+    OHLC findByDateAndAbbreviation(LocalDate date, String abbreviation);
 }

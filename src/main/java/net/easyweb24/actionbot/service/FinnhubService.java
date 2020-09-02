@@ -78,6 +78,10 @@ public class FinnhubService {
         return stockCandles(abbreviation, "D", BEFORE.Year);
     }
     
+    public String stockCandlesFromLastWeek(String abbreviation) throws IOException{
+        return stockCandles(abbreviation, "D", BEFORE.Week);
+    }
+    
     public String stockCandlesFromWeekPerHour(String abbreviation) throws IOException{
         return stockCandles(abbreviation, "60", BEFORE.Week);
     }
