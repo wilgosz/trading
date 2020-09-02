@@ -9,17 +9,21 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import net.easyweb24.actionbot.dto.AggregateIndicators;
 import net.easyweb24.actionbot.entity.CompanyNews;
 import net.easyweb24.actionbot.entity.CompanyProfile;
 import net.easyweb24.actionbot.dto.OHLCDTO;
+import net.easyweb24.actionbot.entity.FinnhubSignals;
 import net.easyweb24.actionbot.entity.OHLC;
 import net.easyweb24.actionbot.entity.Symbols;
 import net.easyweb24.actionbot.repository.CompanyNewsRepository;
+import net.easyweb24.actionbot.repository.FinnhubSignalsRepository;
 import net.easyweb24.actionbot.repository.OHLCRepository;
 import net.easyweb24.actionbot.repository.SymbolsRepository;
 import org.json.JSONArray;
@@ -42,6 +46,9 @@ public class FinnhubDtoService {
 
     @Autowired
     private OHLCRepository ohlcRepository;
+
+    @Autowired
+    private FinnhubSignalsRepository finnhubSignalsRepository;
 
     public CompanyProfile convertToCompanyProfile(String jsonstring, String abbreviation) {
         JSONObject jsonObject = new JSONObject(jsonstring);
@@ -220,8 +227,8 @@ public class FinnhubDtoService {
 
     }
 
-    public boolean saveOHLC(String abbreviation) throws IOException {
-        
+    public void saveOHLC(String abbreviation) throws IOException {
+
         String jsonstring;
         List<OHLCDTO> ohlcList;
         int counter = ohlcRepository.getSymbolExists(abbreviation);
@@ -241,16 +248,15 @@ public class FinnhubDtoService {
                 ohlcRepository.save(ohlc);
                 ohlc = null;
             }
-            return true;
-        }else{
+        } else {
             jsonstring = finnhubService.stockCandlesFromLastWeek(abbreviation);
             ohlcList = this.convertToOhlcList(jsonstring);
             OHLC ohlc;
             for (OHLCDTO ohlcdto : ohlcList) {
                 LocalDate date = LocalDate.parse(ohlcdto.getTime());
                 ohlc = ohlcRepository.findByDateAndAbbreviation(date, abbreviation);
-                
-                if(ohlc == null){
+
+                if (ohlc == null) {
                     ohlc = new OHLC();
                 }
                 ohlc.setAbbreviation(abbreviation);
@@ -264,7 +270,29 @@ public class FinnhubDtoService {
                 ohlc = null;
             }
         }
-        return false;
+    }
+
+    public void saveAgregateIndicators(String abbreviation) throws IOException, InterruptedException {
+        String jsonstring;
+        AggregateIndicators aggregate;
+        FinnhubSignals fnsignals;
+        jsonstring = finnhubService.aggregateIndicatorsPerDay(abbreviation);
+        aggregate = this.convertToAggregateIdicators(jsonstring);
+        fnsignals = finnhubSignalsRepository.findByAbbreviation(abbreviation);
+        System.out.println(fnsignals);
+        if (fnsignals == null) {
+            fnsignals = new FinnhubSignals();
+            fnsignals.setCreateDateTime(LocalDateTime.now());
+        }
+        fnsignals.setAbbreviation(abbreviation);
+        fnsignals.setAdx(aggregate.getAdx());
+        fnsignals.setBuy(aggregate.getBuy());
+        fnsignals.setNeutral(aggregate.getNeutral());
+        fnsignals.setSell(aggregate.getSell());
+        fnsignals.setSignals(aggregate.getSignal());
+        fnsignals.setTrending(aggregate.isTrending());
+        fnsignals.setUpdateDateTime(LocalDateTime.now());
+        fnsignals = finnhubSignalsRepository.save(fnsignals);
     }
 
 }
