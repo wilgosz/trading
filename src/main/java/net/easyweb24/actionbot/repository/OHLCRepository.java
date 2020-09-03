@@ -7,7 +7,6 @@ package net.easyweb24.actionbot.repository;
 
 import java.time.LocalDate;
 import java.util.List;
-import net.easyweb24.actionbot.entity.CompanyNews;
 import net.easyweb24.actionbot.entity.OHLC;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
