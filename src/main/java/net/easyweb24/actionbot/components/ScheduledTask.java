@@ -7,25 +7,17 @@ package net.easyweb24.actionbot.components;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import net.easyweb24.actionbot.controllers.FinnhubController;
-import net.easyweb24.actionbot.dto.AggregateIndicators;
 import net.easyweb24.actionbot.dto.FinnhubSignalsDTO;
-import net.easyweb24.actionbot.entity.FinnhubSignals;
 import net.easyweb24.actionbot.entity.Symbols;
 import net.easyweb24.actionbot.repository.FinnhubSignalsRepository;
 import net.easyweb24.actionbot.repository.SymbolsRepository;
 import net.easyweb24.actionbot.service.FinnhubDtoService;
 import net.easyweb24.actionbot.service.FinnhubService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -35,14 +27,14 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ScheduledTask {
-    
+
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-    
+
     private final SymbolsRepository symbolsRepository;
     private final FinnhubService finnhubService;
     private final FinnhubDtoService finnhubDtoService;
     private final FinnhubSignalsRepository finnhubSignalsRepository;
-    
+
     public ScheduledTask(
             SymbolsRepository symbolsRepository,
             FinnhubService finnhubService,
@@ -61,6 +53,8 @@ public class ScheduledTask {
         getAllIndicators();
         getCandles();
     }
+
+    
     
     //@Scheduled(cron = "0 */2 * * * *", zone = "Europe/Berlin")
     @Scheduled(cron = "0 0 14-22 ? * MON-FRI", zone = "Europe/Berlin")
@@ -68,11 +62,12 @@ public class ScheduledTask {
         getAllIndicatorsPerHour();
         getCandlesPerHour();
     }
-    
+
     private void getCandlesPerHour() {
         List<String> ohlcSymbols = new ArrayList<>();
         List<FinnhubSignalsDTO> symbols = finnhubSignalsRepository.strongBuyQueryForUpdate();
         String abbreviation;
+        int counter = 0;
         for (FinnhubSignalsDTO next : symbols) {
             abbreviation = next.getAbbreviation();
             try {
@@ -81,15 +76,19 @@ public class ScheduledTask {
             } catch (IOException e) {
                 java.util.logging.Logger.getLogger(FinnhubController.class.getName()).log(Level.SEVERE, null, e);
             }
-            
+
             try {
                 TimeUnit.MILLISECONDS.sleep(1500);
             } catch (Exception e) {
                 java.util.logging.Logger.getLogger(FinnhubController.class.getName()).log(Level.SEVERE, null, e);
             }
+            counter++;
+            if (counter > 10) {
+                //break;
+            }
         }
     }
-    
+
     private void getCandles() {
         List<String> ohlcSymbols = new ArrayList<>();
         List<Symbols> symbols = symbolsRepository.findAllOnlyWithExistingComany();
@@ -102,7 +101,7 @@ public class ScheduledTask {
             } catch (IOException e) {
                 java.util.logging.Logger.getLogger(FinnhubController.class.getName()).log(Level.SEVERE, null, e);
             }
-            
+
             try {
                 TimeUnit.MILLISECONDS.sleep(1500);
             } catch (Exception e) {
@@ -110,13 +109,12 @@ public class ScheduledTask {
             }
         }
     }
-    
+
     private void getAllIndicators() {
         List<String> fnsignals_list = new ArrayList<>();
         List<Symbols> symbols = symbolsRepository.findAllOnlyWithExistingComany();
         String abbreviation;
-        
-        
+
         for (Symbols next : symbols) {
             abbreviation = next.getAbbreviation();
             try {
@@ -131,20 +129,20 @@ public class ScheduledTask {
             } catch (Exception ex) {
                 java.util.logging.Logger.getLogger(FinnhubController.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
             try {
                 TimeUnit.MILLISECONDS.sleep(1500);
             } catch (Exception e) {
-                
+
             }
         }
     }
-    
+
     private void getAllIndicatorsPerHour() {
         List<String> fnsignals_list = new ArrayList<>();
         List<FinnhubSignalsDTO> symbols = finnhubSignalsRepository.strongBuyQueryForUpdate();
         String abbreviation;
-        
+        int counter = 0;
         for (FinnhubSignalsDTO next : symbols) {
             abbreviation = next.getAbbreviation();
             fnsignals_list.add(abbreviation);
@@ -160,11 +158,15 @@ public class ScheduledTask {
             } catch (Exception ex) {
                 java.util.logging.Logger.getLogger(FinnhubController.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
             try {
                 TimeUnit.MILLISECONDS.sleep(1500);
             } catch (Exception e) {
-                
+
+            }
+            counter++;
+            if (counter > 10) {
+                //break;
             }
         }
         System.out.println(fnsignals_list);

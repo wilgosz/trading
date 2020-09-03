@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -20,9 +21,11 @@ import net.easyweb24.actionbot.entity.CompanyNews;
 import net.easyweb24.actionbot.entity.CompanyProfile;
 import net.easyweb24.actionbot.dto.OHLCDTO;
 import net.easyweb24.actionbot.entity.FinnhubSignals;
+import net.easyweb24.actionbot.entity.FinnhubSignalsArchive;
 import net.easyweb24.actionbot.entity.OHLC;
 import net.easyweb24.actionbot.entity.Symbols;
 import net.easyweb24.actionbot.repository.CompanyNewsRepository;
+import net.easyweb24.actionbot.repository.FinnhubSignalsArchiveRepository;
 import net.easyweb24.actionbot.repository.FinnhubSignalsRepository;
 import net.easyweb24.actionbot.repository.OHLCRepository;
 import net.easyweb24.actionbot.repository.SymbolsRepository;
@@ -49,6 +52,9 @@ public class FinnhubDtoService {
 
     @Autowired
     private FinnhubSignalsRepository finnhubSignalsRepository;
+    
+    @Autowired
+    private FinnhubSignalsArchiveRepository finnhubSignalsArchiveRepository;
 
     public CompanyProfile convertToCompanyProfile(String jsonstring, String abbreviation) {
         JSONObject jsonObject = new JSONObject(jsonstring);
@@ -276,10 +282,13 @@ public class FinnhubDtoService {
         String jsonstring;
         AggregateIndicators aggregate;
         FinnhubSignals fnsignals;
+        FinnhubSignalsArchive fnsignalsArchive;
+        
         jsonstring = finnhubService.aggregateIndicatorsPerDay(abbreviation);
         aggregate = this.convertToAggregateIdicators(jsonstring);
         fnsignals = finnhubSignalsRepository.findByAbbreviation(abbreviation);
-        System.out.println(fnsignals);
+        fnsignalsArchive = finnhubSignalsArchiveRepository.findByDateAndAbbreviation(LocalDate.now(ZoneId.of("Europe/Berlin")), abbreviation);
+        
         if (fnsignals == null) {
             fnsignals = new FinnhubSignals();
             fnsignals.setCreateDateTime(LocalDateTime.now());
@@ -293,6 +302,19 @@ public class FinnhubDtoService {
         fnsignals.setTrending(aggregate.isTrending());
         fnsignals.setUpdateDateTime(LocalDateTime.now());
         fnsignals = finnhubSignalsRepository.save(fnsignals);
+        
+        if(fnsignalsArchive == null){
+            fnsignalsArchive = new FinnhubSignalsArchive();
+        }
+        fnsignalsArchive.setAbbreviation(abbreviation);
+        fnsignalsArchive.setAdx(aggregate.getAdx());
+        fnsignalsArchive.setBuy(aggregate.getBuy());
+        fnsignalsArchive.setNeutral(aggregate.getNeutral());
+        fnsignalsArchive.setSell(aggregate.getSell());
+        fnsignalsArchive.setSignals(aggregate.getSignal());
+        fnsignalsArchive.setTrending(aggregate.isTrending());
+        fnsignalsArchive.setDate(LocalDate.now(ZoneId.of("Europe/Berlin")));
+        fnsignalsArchive = finnhubSignalsArchiveRepository.save(fnsignalsArchive);
     }
 
 }
