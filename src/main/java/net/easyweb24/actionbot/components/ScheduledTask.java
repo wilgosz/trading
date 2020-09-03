@@ -73,7 +73,6 @@ public class ScheduledTask {
         List<String> ohlcSymbols = new ArrayList<>();
         List<FinnhubSignalsDTO> symbols = finnhubSignalsRepository.strongBuyQueryForUpdate();
         String abbreviation;
-        int counter = 0;
         for (FinnhubSignalsDTO next : symbols) {
             abbreviation = next.getAbbreviation();
             try {
@@ -88,11 +87,6 @@ public class ScheduledTask {
             } catch (Exception e) {
                 java.util.logging.Logger.getLogger(FinnhubController.class.getName()).log(Level.SEVERE, null, e);
             }
-            counter ++;
-            if(counter > 10){
-                break;
-            }
-            
         }
     }
     
@@ -150,7 +144,6 @@ public class ScheduledTask {
         List<String> fnsignals_list = new ArrayList<>();
         List<FinnhubSignalsDTO> symbols = finnhubSignalsRepository.strongBuyQueryForUpdate();
         String abbreviation;
-        int counter =0;
         
         for (FinnhubSignalsDTO next : symbols) {
             abbreviation = next.getAbbreviation();
@@ -172,10 +165,6 @@ public class ScheduledTask {
                 TimeUnit.MILLISECONDS.sleep(1500);
             } catch (Exception e) {
                 
-            }
-            counter ++;
-            if(counter > 10){
-                break;
             }
         }
         System.out.println(fnsignals_list);
