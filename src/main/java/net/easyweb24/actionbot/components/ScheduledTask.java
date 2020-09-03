@@ -48,7 +48,7 @@ public class ScheduledTask {
     }
 
     //@Scheduled(cron = "0 */2 * * * *", zone = "Europe/Berlin")
-    @Scheduled(cron = "0 0 23 * * *", zone = "Europe/Berlin")
+    @Scheduled(cron = "0 0 1 * * *", zone = "Europe/Berlin")
     public void getCandlesAndIndicatorsPerDay() {
         getAllIndicators();
         getCandles();
