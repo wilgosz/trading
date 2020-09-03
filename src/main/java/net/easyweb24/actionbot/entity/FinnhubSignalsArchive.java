@@ -94,7 +94,7 @@ public class FinnhubSignalsArchive implements Serializable {
     }
 
     public void setAbbreviation(String abbreviation) {
-        this.setAbbreviation(abbreviation);
+        this.abbreviation = abbreviation;
     }
 
     public Integer getBuy() {
@@ -126,7 +126,7 @@ public class FinnhubSignalsArchive implements Serializable {
     }
 
     public void setSignals(String signals) {
-        this.setSignals(signals);
+        this.signals = signals;
     }
 
     public Double getAdx() {

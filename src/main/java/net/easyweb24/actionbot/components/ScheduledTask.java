@@ -56,7 +56,7 @@ public class ScheduledTask {
 
     
     
-    //@Scheduled(cron = "0 */2 * * * *", zone = "Europe/Berlin")
+    //@Scheduled(cron = "0 */1 * * * *", zone = "Europe/Berlin")
     @Scheduled(cron = "0 0 14-22 ? * MON-FRI", zone = "Europe/Berlin")
     public void getCandlesAndIndicatorsPerHour() {
         getAllIndicatorsPerHour();
@@ -83,7 +83,7 @@ public class ScheduledTask {
                 java.util.logging.Logger.getLogger(FinnhubController.class.getName()).log(Level.SEVERE, null, e);
             }
             counter++;
-            if (counter > 10) {
+            if (counter > 5) {
                 //break;
             }
         }
@@ -165,7 +165,7 @@ public class ScheduledTask {
 
             }
             counter++;
-            if (counter > 10) {
+            if (counter > 5) {
                 //break;
             }
         }

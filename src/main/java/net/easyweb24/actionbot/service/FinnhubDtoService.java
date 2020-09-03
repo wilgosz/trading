@@ -279,15 +279,11 @@ public class FinnhubDtoService {
     }
 
     public void saveAgregateIndicators(String abbreviation) throws IOException, InterruptedException {
-        String jsonstring;
-        AggregateIndicators aggregate;
-        FinnhubSignals fnsignals;
-        FinnhubSignalsArchive fnsignalsArchive;
         
-        jsonstring = finnhubService.aggregateIndicatorsPerDay(abbreviation);
-        aggregate = this.convertToAggregateIdicators(jsonstring);
-        fnsignals = finnhubSignalsRepository.findByAbbreviation(abbreviation);
-        fnsignalsArchive = finnhubSignalsArchiveRepository.findByDateAndAbbreviation(LocalDate.now(ZoneId.of("Europe/Berlin")), abbreviation);
+        String jsonstring = finnhubService.aggregateIndicatorsPerDay(abbreviation);
+        AggregateIndicators aggregate = this.convertToAggregateIdicators(jsonstring);
+        FinnhubSignals fnsignals = finnhubSignalsRepository.findByAbbreviation(abbreviation);
+        FinnhubSignalsArchive fnsignalsArchive = finnhubSignalsArchiveRepository.findByDateAndAbbreviation(LocalDate.now(ZoneId.of("Europe/Berlin")), abbreviation);
         
         if (fnsignals == null) {
             fnsignals = new FinnhubSignals();
@@ -306,6 +302,8 @@ public class FinnhubDtoService {
         if(fnsignalsArchive == null){
             fnsignalsArchive = new FinnhubSignalsArchive();
         }
+        System.out.println(fnsignalsArchive);
+        System.out.println(abbreviation);
         fnsignalsArchive.setAbbreviation(abbreviation);
         fnsignalsArchive.setAdx(aggregate.getAdx());
         fnsignalsArchive.setBuy(aggregate.getBuy());
