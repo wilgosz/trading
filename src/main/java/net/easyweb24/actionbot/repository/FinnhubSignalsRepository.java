@@ -26,7 +26,7 @@ public interface FinnhubSignalsRepository extends JpaRepository < FinnhubSignals
             + " AND cp.abbreviation = f.abbreviation "
             + " AND  f.signals = 'strong buy' "
             //+ " AND trending = 1"
-            + " ORDER BY sell ASC, trending ASC, buy DESC  LIMIT 48", nativeQuery = true)
+            + " ORDER BY sell ASC, buy DESC  LIMIT 48", nativeQuery = true)
     List<FinnhubSignalsDTO> strongBuyQuery();
     
     @Query(value = ""
@@ -34,7 +34,7 @@ public interface FinnhubSignalsRepository extends JpaRepository < FinnhubSignals
             + " WHERE s.abbreviation = f.abbreviation "
             + " AND cp.abbreviation = f.abbreviation "
             //+ " AND trending = 1"
-            + " ORDER BY sell ASC, trending ASC, buy DESC  LIMIT 300", nativeQuery = true)
+            + " ORDER BY sell ASC, buy DESC  LIMIT 300", nativeQuery = true)
     List<FinnhubSignalsDTO> strongBuyQueryForUpdate();
     //Page<FinnhubSignals> findByDescriptionStartingWith(String letter, Pageable pglb);
 }
