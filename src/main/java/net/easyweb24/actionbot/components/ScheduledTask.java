@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import net.easyweb24.actionbot.controllers.FinnhubController;
 import net.easyweb24.actionbot.dto.AggregateIndicators;
+import net.easyweb24.actionbot.dto.FinnhubSignalsDTO;
 import net.easyweb24.actionbot.entity.FinnhubSignals;
 import net.easyweb24.actionbot.entity.Symbols;
 import net.easyweb24.actionbot.repository.FinnhubSignalsRepository;
@@ -59,6 +60,40 @@ public class ScheduledTask {
     public void getCandlesAndIndicatorsPerDay() {
         getAllIndicators();
         getCandles();
+    }
+    
+    //@Scheduled(cron = "0 */2 * * * *", zone = "Europe/Berlin")
+    @Scheduled(cron = "0 0 14-22 ? * MON-FRI", zone = "Europe/Berlin")
+    public void getCandlesAndIndicatorsPerHour() {
+        getAllIndicatorsPerHour();
+        getCandlesPerHour();
+    }
+    
+    private void getCandlesPerHour() {
+        List<String> ohlcSymbols = new ArrayList<>();
+        List<FinnhubSignalsDTO> symbols = finnhubSignalsRepository.strongBuyQueryForUpdate();
+        String abbreviation;
+        int counter = 0;
+        for (FinnhubSignalsDTO next : symbols) {
+            abbreviation = next.getAbbreviation();
+            try {
+                finnhubDtoService.saveOHLC(abbreviation);
+                ohlcSymbols.add(abbreviation);
+            } catch (IOException e) {
+                java.util.logging.Logger.getLogger(FinnhubController.class.getName()).log(Level.SEVERE, null, e);
+            }
+            
+            try {
+                TimeUnit.MILLISECONDS.sleep(1500);
+            } catch (Exception e) {
+                java.util.logging.Logger.getLogger(FinnhubController.class.getName()).log(Level.SEVERE, null, e);
+            }
+            counter ++;
+            if(counter > 10){
+                break;
+            }
+            
+        }
     }
     
     private void getCandles() {
@@ -109,5 +144,40 @@ public class ScheduledTask {
                 
             }
         }
+    }
+    
+    private void getAllIndicatorsPerHour() {
+        List<String> fnsignals_list = new ArrayList<>();
+        List<FinnhubSignalsDTO> symbols = finnhubSignalsRepository.strongBuyQueryForUpdate();
+        String abbreviation;
+        int counter =0;
+        
+        for (FinnhubSignalsDTO next : symbols) {
+            abbreviation = next.getAbbreviation();
+            fnsignals_list.add(abbreviation);
+            try {
+                finnhubDtoService.saveAgregateIndicators(abbreviation);
+                fnsignals_list.add(abbreviation);
+            } catch (IOException ex) {
+                java.util.logging.Logger.getLogger(FinnhubController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InterruptedException ex) {
+                java.util.logging.Logger.getLogger(FinnhubController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NullPointerException ex) {
+                java.util.logging.Logger.getLogger(FinnhubController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
+                java.util.logging.Logger.getLogger(FinnhubController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            try {
+                TimeUnit.MILLISECONDS.sleep(1500);
+            } catch (Exception e) {
+                
+            }
+            counter ++;
+            if(counter > 10){
+                break;
+            }
+        }
+        System.out.println(fnsignals_list);
     }
 }

@@ -31,5 +31,13 @@ public interface FinnhubSignalsRepository extends JpaRepository < FinnhubSignals
             //+ " AND trending = 1"
             + " ORDER BY sell ASC, trending ASC, buy DESC  LIMIT 48", nativeQuery = true)
     List<FinnhubSignalsDTO> strongBuyQuery();
+    
+    @Query(value = ""
+            + " SELECT f.*, f.update_date_time as updatedatetime , s.description as description FROM symbols s, finnhub_signals f, company_profile cp "
+            + " WHERE s.abbreviation = f.abbreviation "
+            + " AND cp.abbreviation = f.abbreviation "
+            //+ " AND trending = 1"
+            + " ORDER BY sell ASC, trending ASC, buy DESC  LIMIT 300", nativeQuery = true)
+    List<FinnhubSignalsDTO> strongBuyQueryForUpdate();
     //Page<FinnhubSignals> findByDescriptionStartingWith(String letter, Pageable pglb);
 }
