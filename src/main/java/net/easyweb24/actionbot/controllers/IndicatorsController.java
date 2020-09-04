@@ -16,6 +16,7 @@ import java.util.Date;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import net.easyweb24.actionbot.components.utils.DBToBarSeries;
 import net.easyweb24.actionbot.utils.BarsBuilder;
 import net.easyweb24.actionbot.utils.TradingChart;
 import org.jfree.chart.ChartFactory;
@@ -30,6 +31,7 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.OHLCDataset;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -63,7 +65,8 @@ import ta4jexamples.loaders.CsvTradesLoader;
 @RequestMapping("/indicator")
 public class IndicatorsController {
     
-    
+    @Autowired
+    DBToBarSeries dbToBarSeries;
     
     @ResponseBody
     @GetMapping("/rsi")
@@ -78,7 +81,7 @@ public class IndicatorsController {
         dataset.addSeries(BarsBuilder.buildChartBarSeries(series, rsi, "RSI"));
         
         TradingChart chart = new TradingChart();
-        chart.drawChart(dataset, 70, 30, "RSI", Boolean.FALSE).createImage(outputStream, 1000, 167);
+        chart.drawChart(dataset, 70, 30, "RSI", Boolean.FALSE).createImage(outputStream, 1000, 800);
         //return outputStream;
         
     }
@@ -94,6 +97,7 @@ public class IndicatorsController {
         SMAIndicator shortSma = new SMAIndicator(closePrice, 5);
         SMAIndicator longSma = new SMAIndicator(closePrice, 30);
         
+        
         TimeSeriesCollection dataset = new TimeSeriesCollection();
         dataset.addSeries(BarsBuilder.buildChartBarSeries(series, shortSma, "short SMA"));
         dataset.addSeries(BarsBuilder.buildChartBarSeries(series, longSma, "long SMA"));
@@ -107,9 +111,11 @@ public class IndicatorsController {
     @ResponseBody
     @GetMapping("/macd")
     public void MACD(HttpServletRequest request, HttpServletResponse response) throws IOException{
+        
         response.setContentType("image/png");
         OutputStream outputStream = response.getOutputStream();
-        BarSeries series = CsvBarsLoader.loadAppleIncSeries(request);
+        
+        BarSeries series = dbToBarSeries.getBars("AAPL");
         ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
         
         EMAIndicator shortTermEma = new EMAIndicator(closePrice, 9);
@@ -120,14 +126,12 @@ public class IndicatorsController {
         
         
         dataset.addSeries(BarsBuilder.buildChartBarSeries(series, shortTermEma, "short"));
-        
         dataset.addSeries(BarsBuilder.buildChartBarSeries(series, longTermEma, "long"));
         dataset.addSeries(BarsBuilder.buildChartBarSeries(series, closePrice, "price"));
-        //dataset.addSeries(BarsBuilder.buildChartBarSeries(series, macd, "macd"));
+        dataset.addSeries(BarsBuilder.buildChartBarSeries(series, macd, "macd"));
         
         TradingChart chart = new TradingChart();
-        chart.drawChart(dataset, "MACD", Boolean.FALSE).createImage(outputStream, 1000, 167);
-        //return outputStream;
+        chart.drawChart(dataset, "MACD", Boolean.FALSE).createImage(outputStream, 1000, 800);
     }
     
     @ResponseBody
@@ -151,7 +155,7 @@ public class IndicatorsController {
         //dataset.addSeries(BarsBuilder.buildChartBarSeries(series, macd, "macd"));
         
         TradingChart chart = new TradingChart();
-        chart.drawChart(dataset, 80, 20, "Stochastic", Boolean.FALSE).createImage(outputStream, 1000, 167);
+        chart.drawChart(dataset, 80, 20, "Stochastic", Boolean.FALSE).createImage(outputStream, 1000, 800);
         //return outputStream;
     }
     
@@ -230,20 +234,24 @@ public class IndicatorsController {
         BarSeries series = CsvBarsLoader.loadAppleIncSeries(request);
         ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
         
+        System.out.println(closePrice.getValue(0));
+         
         EMAIndicator avg14 = new EMAIndicator(closePrice, 14);
         StandardDeviationIndicator sd14 = new StandardDeviationIndicator(closePrice, 14);
         BollingerBandsMiddleIndicator middleBBand = new BollingerBandsMiddleIndicator(avg14);
         BollingerBandsLowerIndicator lowBBand = new BollingerBandsLowerIndicator(middleBBand, sd14);
         BollingerBandsUpperIndicator upBBand = new BollingerBandsUpperIndicator(middleBBand, sd14);
         
+        
+        
         TimeSeriesCollection dataset = new TimeSeriesCollection();
         
-        //dataset.addSeries(BarsBuilder.buildChartBarSeries(series, middleBBand, "middle"));
+        dataset.addSeries(BarsBuilder.buildChartBarSeries(series, middleBBand, "middle"));
         dataset.addSeries(BarsBuilder.buildChartBarSeries(series, lowBBand, "low"));
         dataset.addSeries(BarsBuilder.buildChartBarSeries(series, upBBand, "up"));
         dataset.addSeries(BarsBuilder.buildChartBarSeries(series, closePrice, "price"));
         TradingChart chart = new TradingChart();
-        chart.drawChart(dataset, "BollingerBand", Boolean.FALSE).createImage(outputStream, 1000, 167);
+        chart.drawChart(dataset, "BollingerBand", Boolean.FALSE).createImage(outputStream, 1000, 800);
         //return outputStream;
         
     }

@@ -24,4 +24,8 @@ public interface OHLCRepository extends JpaRepository < OHLC, Long > {
     Integer getSymbolExists(String abbreviation);
     
     OHLC findByDateAndAbbreviation(LocalDate date, String abbreviation);
+    
+    @Query(value = "SELECT * FROM ohlc WHERE abbreviation = ?1 AND date >?2 ORDER BY date", nativeQuery = true)
+    List<OHLC> getOHLCFromLastYear(String abbreviation, String from);
+    
 }
