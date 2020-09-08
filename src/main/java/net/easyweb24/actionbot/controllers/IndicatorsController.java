@@ -17,6 +17,8 @@ import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import net.easyweb24.actionbot.components.utils.DBToBarSeries;
+import net.easyweb24.actionbot.indicators.MACD;
+import net.easyweb24.actionbot.service.IndicatorsService;
 import net.easyweb24.actionbot.utils.BarsBuilder;
 import net.easyweb24.actionbot.utils.TradingChart;
 import org.jfree.chart.ChartFactory;
@@ -68,12 +70,15 @@ public class IndicatorsController {
     @Autowired
     DBToBarSeries dbToBarSeries;
     
+    @Autowired
+    IndicatorsService indicatorsService;
+    
     @ResponseBody
     @GetMapping("/rsi")
     public void RSI(HttpServletRequest request, HttpServletResponse response) throws IOException{
         response.setContentType("image/png");
         OutputStream outputStream = response.getOutputStream();
-        BarSeries series = CsvBarsLoader.loadAppleIncSeries(request);
+        BarSeries series = dbToBarSeries.getBars("AMZN");
         ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
         
         RSIIndicator rsi = new RSIIndicator(closePrice, 14);
@@ -81,7 +86,7 @@ public class IndicatorsController {
         dataset.addSeries(BarsBuilder.buildChartBarSeries(series, rsi, "RSI"));
         
         TradingChart chart = new TradingChart();
-        chart.drawChart(dataset, 70, 30, "RSI", Boolean.FALSE).createImage(outputStream, 1000, 800);
+        chart.drawChart(dataset, 70, 30, "RSI", Boolean.FALSE).createImage(outputStream, 1000, 300);
         //return outputStream;
         
     }
@@ -114,24 +119,9 @@ public class IndicatorsController {
         
         response.setContentType("image/png");
         OutputStream outputStream = response.getOutputStream();
-        
-        BarSeries series = dbToBarSeries.getBars("AAPL");
-        ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
-        
-        EMAIndicator shortTermEma = new EMAIndicator(closePrice, 9);
-        EMAIndicator longTermEma = new EMAIndicator(closePrice, 26);
-        MACDIndicator macd = new MACDIndicator(closePrice, 9, 26);
-        
-        TimeSeriesCollection dataset = new TimeSeriesCollection();
-        
-        
-        dataset.addSeries(BarsBuilder.buildChartBarSeries(series, shortTermEma, "short"));
-        dataset.addSeries(BarsBuilder.buildChartBarSeries(series, longTermEma, "long"));
-        dataset.addSeries(BarsBuilder.buildChartBarSeries(series, closePrice, "price"));
-        dataset.addSeries(BarsBuilder.buildChartBarSeries(series, macd, "macd"));
-        
-        TradingChart chart = new TradingChart();
-        chart.drawChart(dataset, "MACD", Boolean.FALSE).createImage(outputStream, 1000, 800);
+        BarSeries series = dbToBarSeries.getBars("AMZN");
+        MACD macd = indicatorsService.getMACD(series);
+        macd.drawToOutputStrem(outputStream);
     }
     
     @ResponseBody
@@ -139,7 +129,7 @@ public class IndicatorsController {
     public void Stochastic(HttpServletRequest request, HttpServletResponse response) throws IOException{
         response.setContentType("image/png");
         OutputStream outputStream = response.getOutputStream();
-        BarSeries series = CsvBarsLoader.loadAppleIncSeries(request);
+        BarSeries series = dbToBarSeries.getBars("AMZN");
         ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
         
         
@@ -152,10 +142,10 @@ public class IndicatorsController {
         
         dataset.addSeries(BarsBuilder.buildChartBarSeries(series, stochasticOscillK, "K"));
         dataset.addSeries(BarsBuilder.buildChartBarSeries(series, stochasticOscillD, "D"));
-        //dataset.addSeries(BarsBuilder.buildChartBarSeries(series, macd, "macd"));
+        //dataset.addSeries(BarsBuilder.buildChartBarSeries(series, closePrice, "macd"));
         
         TradingChart chart = new TradingChart();
-        chart.drawChart(dataset, 80, 20, "Stochastic", Boolean.FALSE).createImage(outputStream, 1000, 800);
+        chart.drawChart(dataset, 80, 20, "Stochastic", Boolean.FALSE).createImage(outputStream, 2400, 250);
         //return outputStream;
     }
     
