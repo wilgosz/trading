@@ -5,20 +5,12 @@
  */
 package net.easyweb24.actionbot.indicators;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
 import net.easyweb24.actionbot.utils.BarsBuilder;
-import net.easyweb24.actionbot.utils.TradingChart;
 import org.jfree.data.time.TimeSeriesCollection;
-import org.springframework.stereotype.Component;
 import org.ta4j.core.BarSeries;
-import org.ta4j.core.indicators.AbstractIndicator;
 import org.ta4j.core.indicators.EMAIndicator;
 import org.ta4j.core.indicators.MACDIndicator;
-import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.num.Num;
 
 
 public class MACD extends AbstractMPIndicators{
@@ -27,8 +19,8 @@ public class MACD extends AbstractMPIndicators{
     private EMAIndicator longTermEma;
     private MACDIndicator macd;
     
-    public MACD(BarSeries series,int period_long, int period_short){
-        super(series, period_long, period_short);
+    public MACD(BarSeries series,int period_long, int period_short, int period){
+        super(series, period_long, period_short, period);
     }
     
     /**
@@ -36,9 +28,10 @@ public class MACD extends AbstractMPIndicators{
      * @param series
      * @param period_long
      * @param period_short
+     * @param period
      */
     @Override
-    protected void init(BarSeries series, int period_long, int period_short ) {
+    protected void init(BarSeries series, int period_long, int period_short, int period ) {
         
         this.shortTermEma = new EMAIndicator(getClosePrice(), period_short);
         this.longTermEma = new EMAIndicator(getClosePrice(), period_long);
@@ -85,10 +78,12 @@ public class MACD extends AbstractMPIndicators{
      */
     @Override
     protected TimeSeriesCollection addToDrawingSeries(TimeSeriesCollection dataset){
+        
+        dataset.addSeries(BarsBuilder.buildChartBarSeries(getSeries(), this.getMacd(), "macd"));
         dataset.addSeries(BarsBuilder.buildChartBarSeries(getSeries(), this.getShortTermEma(), "short"));
         dataset.addSeries(BarsBuilder.buildChartBarSeries(getSeries(), this.getLongTermEma(), "long"));
         dataset.addSeries(BarsBuilder.buildChartBarSeries(getSeries(), this.getClosePrice(), "price"));
-        dataset.addSeries(BarsBuilder.buildChartBarSeries(getSeries(), this.getMacd(), "macd"));
+        
         return dataset;
     }
     

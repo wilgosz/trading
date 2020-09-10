@@ -19,11 +19,11 @@ public abstract class AbstractMPIndicators {
     private final BarSeries series;
     private final ClosePriceIndicator closePrice;
     
-    public AbstractMPIndicators(BarSeries series,int period_long, int period_short){
+    public AbstractMPIndicators(BarSeries series,int period_long, int period_short, int period){
         
         this.series = series;
         this.closePrice = new ClosePriceIndicator(this.getSeries());
-        this.init(this.series, period_long, period_short);
+        this.init(this.series, period_long, period_short, period);
         this.beginIndex = closePrice.getBarSeries().getBeginIndex();
         this.endIndex = closePrice.getBarSeries().getEndIndex();
     }
@@ -34,7 +34,7 @@ public abstract class AbstractMPIndicators {
      * @param period_long
      * @param period_short
      */
-    protected abstract  void init(BarSeries series, int period_long, int period_short );
+    protected abstract  void init(BarSeries series, int period_long, int period_short, int period );
 
     /**
      * @return the closePrice
