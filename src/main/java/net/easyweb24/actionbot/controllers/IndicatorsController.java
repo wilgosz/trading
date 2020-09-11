@@ -4,6 +4,9 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,6 +17,7 @@ import net.easyweb24.actionbot.indicators.MONEYFLOW;
 import net.easyweb24.actionbot.indicators.RSI;
 import net.easyweb24.actionbot.indicators.SMA;
 import net.easyweb24.actionbot.indicators.STOCHASTIC;
+import net.easyweb24.actionbot.indicators.STOCHASTIC_SLOW;
 import net.easyweb24.actionbot.service.IndicatorsService;
 import net.easyweb24.actionbot.utils.BarsBuilder;
 import org.jfree.chart.ChartFactory;
@@ -25,6 +29,7 @@ import org.jfree.chart.renderer.xy.CandlestickRenderer;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.OHLCDataset;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,14 +53,17 @@ public class IndicatorsController {
     
     @ResponseBody
     @GetMapping("/rsi")
-    public void RSI(HttpServletRequest request, HttpServletResponse response) throws IOException{
+    public ResponseEntity<Map<String, List>> RSI(HttpServletRequest request, HttpServletResponse response) throws IOException{
         
-        response.setContentType("image/png");
-        OutputStream outputStream = response.getOutputStream();
+        //response.setContentType("image/png");
+        //OutputStream outputStream = response.getOutputStream();
         BarSeries series = dbToBarSeries.getBars("AMZN");
         RSI rsi = indicatorsService.getRsi(series);
-        rsi.drawToOutputStrem(outputStream, 1200, 200);
-        
+        Map<String, List>  map = new HashMap<String, List>();
+        map.put("R", rsi.getRsiValues());
+        map.put("dates", rsi.getDates());
+        //rsi.drawToOutputStrem(outputStream, 1200, 200);
+        return ResponseEntity.ok().body(map);
     }
     
     @ResponseBody
@@ -70,23 +78,34 @@ public class IndicatorsController {
     }
     @ResponseBody
     @GetMapping("/macd")
-    public void MACD(HttpServletRequest request, HttpServletResponse response) throws IOException{
+    public ResponseEntity<Map<String, List>> MACD(HttpServletRequest request, HttpServletResponse response) throws IOException{
         
-        response.setContentType("image/png");
-        OutputStream outputStream = response.getOutputStream();
+        //response.setContentType("image/png");
+        //OutputStream outputStream = response.getOutputStream();
         BarSeries series = dbToBarSeries.getBars("AMZN");
         MACD macd = indicatorsService.getMACD(series);
-        macd.drawToOutputStrem(outputStream);
+        //macd.drawToOutputStrem(outputStream);
+        Map<String, List>  map = new HashMap<String, List>();
+        map.put("S", macd.getShortTermEmaValues());
+        map.put("L", macd.getLongTermEmaValues());
+        map.put("macd", macd.getMacdValues());
+        map.put("dates", macd.getDates());
+        return ResponseEntity.ok().body(map);
     }
     
     @ResponseBody
     @GetMapping("/stochastic")
-    public void Stochastic(HttpServletRequest request, HttpServletResponse response) throws IOException{
-        response.setContentType("image/png");
-        OutputStream outputStream = response.getOutputStream();
-        BarSeries series = dbToBarSeries.getBars("GRVY");
-        STOCHASTIC stochastic = indicatorsService.getStochastic(series);
-        stochastic.drawToOutputStrem(outputStream, 1200, 200);
+    public ResponseEntity<Map<String, List>> Stochastic(HttpServletRequest request, HttpServletResponse response) throws IOException{
+        //response.setContentType("image/png");
+        //OutputStream outputStream = response.getOutputStream();
+        BarSeries series = dbToBarSeries.getBars("AMZN");
+        STOCHASTIC_SLOW stochastic = indicatorsService.getStochasticS(series);
+        //stochastic.drawToOutputStrem(outputStream, 2400, 200);
+        Map<String, List>  map = new HashMap<String, List>();
+        map.put("K", stochastic.getStochasticOscillKValues());
+        map.put("D", stochastic.getStochasticOscillDValues());
+        map.put("dates", stochastic.getDates());
+        return ResponseEntity.ok().body(map);
     }
     
     @ResponseBody
@@ -101,14 +120,35 @@ public class IndicatorsController {
     
     @ResponseBody
     @GetMapping("/bollinger")
-    public void BollingerBand(HttpServletRequest request, HttpServletResponse response) throws IOException{
+    public ResponseEntity<Map<String, List>> BollingerBand(HttpServletRequest request, HttpServletResponse response) throws IOException{
         
-        response.setContentType("image/png");
-        OutputStream outputStream = response.getOutputStream();
+        //response.setContentType("image/png");
+        //OutputStream outputStream = response.getOutputStream();
         BarSeries series = dbToBarSeries.getBars("AMZN");
         BOLLINGER bllg = indicatorsService.getBollinger(series);
-        bllg.drawToOutputStrem(outputStream, 1200, 400);
-        
+        Map<String, List>  map = new HashMap<String, List>();
+        map.put("BU", bllg.getUpBBandValues());
+        map.put("BL", bllg.getLowBBandValues());
+        map.put("BM", bllg.getMiddleBBandValues());
+        map.put("BP", bllg.getClosePriceValues());
+        map.put("CND", indicatorsService.getCandles(series));
+        map.put("dates", bllg.getDates());
+        //bllg.drawToOutputStrem(outputStream, 1200, 400);
+        return ResponseEntity.ok().body(map);
+    }
+    
+    @ResponseBody
+    @GetMapping("/candles")
+    public ResponseEntity<Map<String, List>>  Candles(HttpServletRequest request, HttpServletResponse response) throws IOException{
+        BarSeries series = dbToBarSeries.getBars("AMZN");
+        Map<String, List>  map = new HashMap<String, List>();
+        BOLLINGER bllg = indicatorsService.getBollinger(series);
+        map.put("BU", bllg.getUpBBandValues());
+        map.put("BL", bllg.getLowBBandValues());
+        map.put("BM", bllg.getMiddleBBandValues());
+        map.put("BP", bllg.getClosePriceValues());
+        map.put("CND", indicatorsService.getCandles(series));
+        return ResponseEntity.ok().body(map);
     }
     
     @ResponseBody

@@ -5,10 +5,14 @@
  */
 package net.easyweb24.actionbot.indicators;
 
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import net.easyweb24.actionbot.utils.BarsBuilder;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.ta4j.core.BarSeries;
+import org.ta4j.core.indicators.SMAIndicator;
 import org.ta4j.core.indicators.StochasticOscillatorDIndicator;
 import org.ta4j.core.indicators.StochasticOscillatorKIndicator;
 import org.ta4j.core.indicators.helpers.HighPriceIndicator;
@@ -17,12 +21,13 @@ import org.ta4j.core.indicators.helpers.HighPriceIndicator;
  *
  * @author zbigniewwilgosz
  */
-public class STOCHASTIC extends AbstractMPIndicators {
+public class STOCHASTIC_SLOW extends AbstractMPIndicators {
 
-    private StochasticOscillatorKIndicator stochasticOscillK;
-    private StochasticOscillatorDIndicator stochasticOscillD;
+    private SMAIndicator stochasticOscillK;
+    private SMAIndicator stochasticOscillD;
+    
 
-    public STOCHASTIC(BarSeries series, int period_long, int period_short, int period) {
+    public STOCHASTIC_SLOW(BarSeries series, int period_long, int period_short, int period) {
         super(series, period_long, period_short, period);
     }
 
@@ -35,15 +40,16 @@ public class STOCHASTIC extends AbstractMPIndicators {
      */
     @Override
     protected void init(BarSeries series, int period_long, int period_short, int period) {
-        stochasticOscillK = new StochasticOscillatorKIndicator(series, 14);
-        stochasticOscillD = new StochasticOscillatorDIndicator(stochasticOscillK);
+        stochasticOscillK = new SMAIndicator(new StochasticOscillatorKIndicator(series, 14),3);
+        stochasticOscillD = new SMAIndicator(getStochasticOscillK(),3);
+        
     }
 
     @Override
     protected TimeSeriesCollection addToDrawingSeries(TimeSeriesCollection dataset) {
 
-        dataset.addSeries(BarsBuilder.buildChartBarSeries(getSeries(), stochasticOscillK, getName()+"-K"));
-        dataset.addSeries(BarsBuilder.buildChartBarSeries(getSeries(), stochasticOscillD, getName()+"-D"));
+        dataset.addSeries(BarsBuilder.buildChartBarSeries(getSeries(), getStochasticOscillK(), getName()+"-K"));
+        dataset.addSeries(BarsBuilder.buildChartBarSeries(getSeries(), getStochasticOscillD(), getName()+"-D"));
 
         return dataset;
     }
@@ -53,7 +59,7 @@ public class STOCHASTIC extends AbstractMPIndicators {
         return "STOCHASTIC";
     }
 
-    public StochasticOscillatorKIndicator getStochasticOscillK() {
+    public SMAIndicator getStochasticOscillK() {
         return stochasticOscillK;
     }
     
@@ -61,7 +67,7 @@ public class STOCHASTIC extends AbstractMPIndicators {
         return getValues(stochasticOscillK);
     }
 
-    public StochasticOscillatorDIndicator getStochasticOscillD() {
+    public SMAIndicator getStochasticOscillD() {
         return stochasticOscillD;
     }
     

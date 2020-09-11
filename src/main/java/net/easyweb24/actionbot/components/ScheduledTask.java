@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
  *
  * @author zbigniewwilgosz
  */
-@Component
+//@Component
 public class ScheduledTask {
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
