@@ -6,6 +6,7 @@
 package net.easyweb24.actionbot.indicators;
 
 import java.util.List;
+import net.easyweb24.actionbot.entity.Indicators;
 import net.easyweb24.actionbot.utils.BarsBuilder;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.ta4j.core.BarSeries;
@@ -23,6 +24,10 @@ public class MONEYFLOW extends AbstractMPIndicators{
 
     public MONEYFLOW(BarSeries series, int period_long, int period_short, int period) {
         super(series, period_long, period_short, period);
+    }
+    
+    public MONEYFLOW(BarSeries series, Indicators ind){
+        super(series, ind);
     }
 
     @Override

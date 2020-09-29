@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import net.easyweb24.actionbot.entity.Indicators;
 import net.easyweb24.actionbot.utils.TradingChart;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.ta4j.core.BarSeries;
@@ -21,11 +22,15 @@ public abstract class AbstractMPIndicators {
     private final BarSeries series;
     private final ClosePriceIndicator closePrice;
     private List<String> dates;
+    private int bottom_border = 0;
+    private int top_border = 0;
     
-    public AbstractMPIndicators(BarSeries series,int period_long, int period_short, int period){
+    public AbstractMPIndicators(BarSeries series,int period_long, int period_short, int period, int bottom_border, int top_border){
         
         this.series = series;
         this.closePrice = new ClosePriceIndicator(this.getSeries());
+        this.bottom_border = bottom_border;
+        this.top_border = top_border;
         this.init(this.series, period_long, period_short, period);
         this.beginIndex = closePrice.getBarSeries().getBeginIndex();
         this.endIndex = closePrice.getBarSeries().getEndIndex();
@@ -35,6 +40,13 @@ public abstract class AbstractMPIndicators {
         for ( int i = begin; i<= end ; i++ ){
             dates.add(series.getBar(i).getEndTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.GERMANY))); 
         }
+    }
+    public AbstractMPIndicators(BarSeries series,int period_long, int period_short, int period){
+        this(series, period_long, period_short, period, 0, 0);
+    }
+    
+    public AbstractMPIndicators(BarSeries series, Indicators ind){
+        this(series, ind.getPeriodLong(), ind.getPeriodShort(), ind.getPeriod(), ind.getBottomBorder(), ind.getTopBorder());
     }
     
     /**
@@ -101,6 +113,34 @@ public abstract class AbstractMPIndicators {
      */
     public final BarSeries getSeries() {
         return series;
+    }
+
+    /**
+     * @return the bottom_border
+     */
+    public int getBottom_border() {
+        return bottom_border;
+    }
+
+    /**
+     * @param bottom_border the bottom_border to set
+     */
+    public void setBottom_border(int bottom_border) {
+        this.bottom_border = bottom_border;
+    }
+
+    /**
+     * @return the top_border
+     */
+    public int getTop_border() {
+        return top_border;
+    }
+
+    /**
+     * @param top_border the top_border to set
+     */
+    public void setTop_border(int top_border) {
+        this.top_border = top_border;
     }
     
     

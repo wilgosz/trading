@@ -19,6 +19,13 @@ public class MACD extends AbstractMPIndicators{
     private EMAIndicator longTermEma;
     private MACDIndicator macd;
     
+    /**
+     * 
+     * @param series
+     * @param period_long Long term
+     * @param period_short Short term
+     * @param period Bars count 
+     */
     public MACD(BarSeries series,int period_long, int period_short, int period){
         super(series, period_long, period_short, period);
     }

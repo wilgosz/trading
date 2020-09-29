@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +12,9 @@ import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import net.easyweb24.actionbot.components.utils.DBToBarSeries;
+import net.easyweb24.actionbot.indicators.ADX;
 import net.easyweb24.actionbot.indicators.BOLLINGER;
+import net.easyweb24.actionbot.indicators.CLOSE_PRICE;
 import net.easyweb24.actionbot.indicators.MACD;
 import net.easyweb24.actionbot.indicators.MONEYFLOW;
 import net.easyweb24.actionbot.indicators.RSI;
@@ -32,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.ta4j.core.BarSeries;
@@ -52,40 +56,39 @@ public class IndicatorsController {
     IndicatorsService indicatorsService;
     
     @ResponseBody
-    @GetMapping("/rsi")
-    public ResponseEntity<Map<String, List>> RSI(HttpServletRequest request, HttpServletResponse response) throws IOException{
+    @GetMapping("/rsi/{symbol}")
+    public ResponseEntity<Map<String, List>> RSI(@PathVariable(name = "symbol") String symbol){
         
         //response.setContentType("image/png");
         //OutputStream outputStream = response.getOutputStream();
-        BarSeries series = dbToBarSeries.getBars("AMZN");
-        RSI rsi = indicatorsService.getRsi(series);
+        BarSeries series = dbToBarSeries.getBars(symbol);
         Map<String, List>  map = new HashMap<String, List>();
+        RSI rsi = indicatorsService.getRsi(series);
         map.put("R", rsi.getRsiValues());
         map.put("dates", rsi.getDates());
+        map = indicatorsService.addTopBottom(map, rsi);
         //rsi.drawToOutputStrem(outputStream, 1200, 200);
         return ResponseEntity.ok().body(map);
     }
     
     @ResponseBody
-    @GetMapping("/sma")
-    public void SMA(HttpServletRequest request, HttpServletResponse response) throws IOException{
-        response.setContentType("image/png");
-        OutputStream outputStream = response.getOutputStream();
-        BarSeries series = dbToBarSeries.getBars("AMZN");
-        SMA sma = indicatorsService.getSMA(series);
-        sma.drawToOutputStrem(outputStream);
+    @GetMapping("/sma/{symbol}")
+    public  ResponseEntity<Map<String, List>>  SMA(@PathVariable(name = "symbol") String symbol) throws IOException{
         
+        BarSeries series = dbToBarSeries.getBars(symbol);
+        Map<String, List>  map = new HashMap<String, List>();
+        SMA sma = indicatorsService.getSMA(series);
+        map.put("SMA", sma.getMacdsmaValues());
+        map.put("dates", sma.getDates());
+        return ResponseEntity.ok().body(map);
     }
     @ResponseBody
-    @GetMapping("/macd")
-    public ResponseEntity<Map<String, List>> MACD(HttpServletRequest request, HttpServletResponse response) throws IOException{
+    @GetMapping("/macd/{symbol}")
+    public ResponseEntity<Map<String, List>> MACD(@PathVariable(name = "symbol") String symbol){
         
-        //response.setContentType("image/png");
-        //OutputStream outputStream = response.getOutputStream();
-        BarSeries series = dbToBarSeries.getBars("AMZN");
-        MACD macd = indicatorsService.getMACD(series);
-        //macd.drawToOutputStrem(outputStream);
+        BarSeries series = dbToBarSeries.getBars(symbol);
         Map<String, List>  map = new HashMap<String, List>();
+        MACD macd = indicatorsService.getMACD(series);
         map.put("S", macd.getShortTermEmaValues());
         map.put("L", macd.getLongTermEmaValues());
         map.put("macd", macd.getMacdValues());
@@ -94,59 +97,81 @@ public class IndicatorsController {
     }
     
     @ResponseBody
-    @GetMapping("/stochastic")
-    public ResponseEntity<Map<String, List>> Stochastic(HttpServletRequest request, HttpServletResponse response) throws IOException{
-        //response.setContentType("image/png");
-        //OutputStream outputStream = response.getOutputStream();
-        BarSeries series = dbToBarSeries.getBars("AMZN");
-        STOCHASTIC_SLOW stochastic = indicatorsService.getStochasticS(series);
-        //stochastic.drawToOutputStrem(outputStream, 2400, 200);
+    @GetMapping("/stochastic/{symbol}")
+    public ResponseEntity<Map<String, List>> Stochastic(@PathVariable(name = "symbol") String symbol){
+        
+        BarSeries series = dbToBarSeries.getBars(symbol);
         Map<String, List>  map = new HashMap<String, List>();
+        STOCHASTIC_SLOW stochastic = indicatorsService.getStochasticS(series);
         map.put("K", stochastic.getStochasticOscillKValues());
         map.put("D", stochastic.getStochasticOscillDValues());
         map.put("dates", stochastic.getDates());
+        map = indicatorsService.addTopBottom(map, stochastic);
         return ResponseEntity.ok().body(map);
     }
     
     @ResponseBody
-    @GetMapping("/moneyflow")
-    public void MoneyFlow(HttpServletRequest request, HttpServletResponse response) throws IOException{
-        response.setContentType("image/png");
-        OutputStream outputStream = response.getOutputStream();
-        BarSeries series = dbToBarSeries.getBars("AMZN");
-        MONEYFLOW mfl = indicatorsService.getMoneyFlow(series);
-        mfl.drawToOutputStrem(outputStream, 1200, 200);
-    }
-    
-    @ResponseBody
-    @GetMapping("/bollinger")
-    public ResponseEntity<Map<String, List>> BollingerBand(HttpServletRequest request, HttpServletResponse response) throws IOException{
+    @GetMapping("/adx/{symbol}")
+    public ResponseEntity<Map<String, List>> Adx(@PathVariable(name = "symbol") String symbol){
         
-        //response.setContentType("image/png");
-        //OutputStream outputStream = response.getOutputStream();
-        BarSeries series = dbToBarSeries.getBars("AMZN");
-        BOLLINGER bllg = indicatorsService.getBollinger(series);
+        BarSeries series = dbToBarSeries.getBars(symbol);
         Map<String, List>  map = new HashMap<String, List>();
-        map.put("BU", bllg.getUpBBandValues());
-        map.put("BL", bllg.getLowBBandValues());
-        map.put("BM", bllg.getMiddleBBandValues());
-        map.put("BP", bllg.getClosePriceValues());
-        map.put("CND", indicatorsService.getCandles(series));
-        map.put("dates", bllg.getDates());
-        //bllg.drawToOutputStrem(outputStream, 1200, 400);
+        ADX adx = indicatorsService.getAdx(series);
+        map.put("ADX", adx.getAdxIndicatorValues());
+        map.put("DMIN", adx.getMinusDIIndicatorValues());
+        map.put("DPLUS", adx.getPlusDIIndicatorValues());
+        map.put("SMA", adx.getSmaIndicatorValues());
+        map.put("dates", adx.getDates());
+        map = indicatorsService.addTopBottom(map, adx);
         return ResponseEntity.ok().body(map);
     }
     
     @ResponseBody
-    @GetMapping("/candles")
-    public ResponseEntity<Map<String, List>>  Candles(HttpServletRequest request, HttpServletResponse response) throws IOException{
-        BarSeries series = dbToBarSeries.getBars("AMZN");
+    @GetMapping("/moneyflow/{symbol}")
+    public  ResponseEntity<Map<String, List>> MoneyFlow(@PathVariable(name = "symbol") String symbol){
+       
+        BarSeries series = dbToBarSeries.getBars(symbol);
+        Map<String, List>  map = new HashMap<String, List>();
+        MONEYFLOW mfl = indicatorsService.getMoneyFlow(series);
+        map.put("MF", mfl.getMfiValues());
+        map.put("dates", mfl.getDates());
+        map = indicatorsService.addTopBottom(map, mfl);
+        
+        return ResponseEntity.ok().body(map);
+    }
+    
+    @ResponseBody
+    @GetMapping("/bollinger/{symbol}")
+    public ResponseEntity<Map<String, List>> BollingerBand(@PathVariable(name = "symbol") String symbol){
+        
+        BarSeries series = dbToBarSeries.getBars(symbol);
         Map<String, List>  map = new HashMap<String, List>();
         BOLLINGER bllg = indicatorsService.getBollinger(series);
         map.put("BU", bllg.getUpBBandValues());
         map.put("BL", bllg.getLowBBandValues());
         map.put("BM", bllg.getMiddleBBandValues());
         map.put("BP", bllg.getClosePriceValues());
+        map.put("dates", bllg.getDates());
+        return ResponseEntity.ok().body(map);
+    }
+    
+    @ResponseBody
+    @GetMapping("/price/{symbol}")
+    public ResponseEntity<Map<String, List>> ClosePrice(@PathVariable(name = "symbol") String symbol){
+        
+        BarSeries series = dbToBarSeries.getBars(symbol);
+        Map<String, List>  map = new HashMap<String, List>();
+        CLOSE_PRICE price = indicatorsService.getClosePrice(series);
+        map.put("price", price.getClosePriceValues());
+        map.put("dates", price.getDates());
+        return ResponseEntity.ok().body(map);
+    }
+    
+    @ResponseBody
+    @GetMapping("/candles/{symbol}")
+    public ResponseEntity<Map<String, List>>  Candles(@PathVariable(name = "symbol") String symbol){
+        BarSeries series = dbToBarSeries.getBars(symbol);
+        Map<String, List>  map = new HashMap<String, List>();
         map.put("CND", indicatorsService.getCandles(series));
         return ResponseEntity.ok().body(map);
     }

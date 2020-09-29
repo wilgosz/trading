@@ -21,7 +21,14 @@ public class STOCHASTIC extends AbstractMPIndicators {
 
     private StochasticOscillatorKIndicator stochasticOscillK;
     private StochasticOscillatorDIndicator stochasticOscillD;
-
+    
+    /**
+     * 
+     * @param series
+     * @param period_long Smoothing D
+     * @param period_short Don't use
+     * @param period Bars count 
+     */
     public STOCHASTIC(BarSeries series, int period_long, int period_short, int period) {
         super(series, period_long, period_short, period);
     }
@@ -35,8 +42,8 @@ public class STOCHASTIC extends AbstractMPIndicators {
      */
     @Override
     protected void init(BarSeries series, int period_long, int period_short, int period) {
-        stochasticOscillK = new StochasticOscillatorKIndicator(series, 14);
-        stochasticOscillD = new StochasticOscillatorDIndicator(stochasticOscillK);
+        stochasticOscillK = new StochasticOscillatorKIndicator(series, period);
+        stochasticOscillD = new StochasticOscillatorDIndicator(getStochasticOscillK(), period_long);
     }
 
     @Override

@@ -41,6 +41,8 @@ public class SMAIndicator extends CachedIndicator<Num> {
 
     public SMAIndicator(Indicator<Num> indicator, int barCount) {
         super(indicator);
+        System.out.println(indicator);
+        System.out.println(barCount);
         this.indicator = indicator;
         this.barCount = barCount;
     }

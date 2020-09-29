@@ -26,7 +26,14 @@ public class STOCHASTIC_SLOW extends AbstractMPIndicators {
     private SMAIndicator stochasticOscillK;
     private SMAIndicator stochasticOscillD;
     
-
+    
+    /**
+     * 
+     * @param series
+     * @param period_long  Smoothing D
+     * @param period_short Smoothing K
+     * @param period Bar Count 
+     */
     public STOCHASTIC_SLOW(BarSeries series, int period_long, int period_short, int period) {
         super(series, period_long, period_short, period);
     }
@@ -34,14 +41,14 @@ public class STOCHASTIC_SLOW extends AbstractMPIndicators {
     /**
      *
      * @param series
-     * @param period_long
-     * @param period_short
-     * @param period
+     * @param period_long  Smoothing D
+     * @param period_short Smoothing K
+     * @param period Bar Count
      */
     @Override
     protected void init(BarSeries series, int period_long, int period_short, int period) {
-        stochasticOscillK = new SMAIndicator(new StochasticOscillatorKIndicator(series, 14),3);
-        stochasticOscillD = new SMAIndicator(getStochasticOscillK(),3);
+        stochasticOscillK = new SMAIndicator(new StochasticOscillatorKIndicator(series, period),period_short);
+        stochasticOscillD = new SMAIndicator(getStochasticOscillK(),period_long);
         
     }
 

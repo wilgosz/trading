@@ -19,9 +19,11 @@ import net.easyweb24.actionbot.entity.CompanyNews;
 import net.easyweb24.actionbot.entity.CompanyProfile;
 import net.easyweb24.actionbot.dto.OHLCDTO;
 import net.easyweb24.actionbot.entity.FinnhubSignals;
+import net.easyweb24.actionbot.entity.OHLC;
 import net.easyweb24.actionbot.entity.Symbols;
 import net.easyweb24.actionbot.repository.CompanyProfileRepository;
 import net.easyweb24.actionbot.repository.FinnhubSignalsRepository;
+import net.easyweb24.actionbot.repository.OHLCRepository;
 import net.easyweb24.actionbot.repository.SymbolsRepository;
 import net.easyweb24.actionbot.service.FinnhubDtoService;
 import net.easyweb24.actionbot.service.FinnhubService;
@@ -49,18 +51,21 @@ public class FinnhubController {
     private final FinnhubDtoService finnhubDtoService;
     private final FinnhubSignalsRepository finnhubSignalsRepository;
     private final CompanyProfileRepository companyProfileRepository;
+    private final OHLCRepository ohlcRepository;
 
     public FinnhubController(
             SymbolsRepository symbolsRepository,
             FinnhubService finnhubService,
             FinnhubDtoService finnhubDtoService,
             FinnhubSignalsRepository finnhubSignalsRepository,
-            CompanyProfileRepository companyProfileRepository) {
+            CompanyProfileRepository companyProfileRepository,
+            OHLCRepository ohlcRepository) {
         this.symbolsRepository = symbolsRepository;
         this.finnhubService = finnhubService;
         this.finnhubDtoService = finnhubDtoService;
         this.finnhubSignalsRepository = finnhubSignalsRepository;
         this.companyProfileRepository = companyProfileRepository;
+        this.ohlcRepository = ohlcRepository;
     }
 
     @RequestMapping(value = "/ohlc/{symbol}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -176,33 +181,19 @@ public class FinnhubController {
         return ResponseEntity.ok().body(companies);
     }
 
-    @RequestMapping(value = "/fnohlc", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/fnohlc/{symbol}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<List<String>> getOhlc() {
+    public ResponseEntity<List<String>> getOhlc(@PathVariable(name = "symbol") String symbol) {
 
         List<String> ohlcSymbols = new ArrayList<>();
-        List<Symbols> symbols = symbolsRepository.findAllOnlyWithExistingComany();
-        String abbreviation;
-        int counter = 0;
-        for (Symbols next : symbols) {
-            abbreviation = next.getAbbreviation();
             try {
-                finnhubDtoService.saveOHLC(abbreviation);
-                ohlcSymbols.add(abbreviation);
-            } catch (IOException e) {
+                List<OHLC> ohlc = ohlcRepository.findByAbbreviation(symbol);
+                ohlcRepository.deleteAll(ohlc);
+                finnhubDtoService.saveOHLC(symbol);
+                ohlcSymbols.add(symbol);
+            } catch (Exception e) {
                 Logger.getLogger(FinnhubController.class.getName()).log(Level.SEVERE, null, e);
             }
-            counter++;
-            if (counter > 10) {
-                break;
-            }
-            try {
-                TimeUnit.MILLISECONDS.sleep(1500);
-            } catch (Exception e) {
-
-            }
-        }
-
         return ResponseEntity.ok().body(ohlcSymbols);
     }
 

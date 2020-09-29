@@ -6,6 +6,7 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.indicators.EMAIndicator;
+import org.ta4j.core.indicators.MACDSMAIndicator;
 import org.ta4j.core.indicators.SMAIndicator;
 import org.ta4j.core.num.Num;
 
@@ -15,23 +16,32 @@ import org.ta4j.core.num.Num;
  */
 public class SMA extends AbstractMPIndicators{
     
-    SMAIndicator shortSma;
-    SMAIndicator longSma;
+    private SMAIndicator shortSma;
+    private SMAIndicator longSma;
+    private MACDSMAIndicator macdsma;
 
+    /**
+     * 
+     * @param series
+     * @param period_long Long term
+     * @param period_short Short term
+     * @param period Bars count 
+     */
     public SMA(BarSeries series, int period_long, int period_short, int period) {
         super(series, period_long, period_short, period);
     }
 
     @Override
     protected void init(BarSeries series, int period_long, int period_short, int period) {
-        shortSma = new SMAIndicator(getClosePrice(), 5);
-        longSma = new SMAIndicator(getClosePrice(), 30);
+        setShortSma(new SMAIndicator(getClosePrice(), period_short));
+        setLongSma(new SMAIndicator(getClosePrice(), period_long));
+        setMacdsma(new MACDSMAIndicator(getClosePrice(), period_short, period_long));
     }
 
     @Override
     protected TimeSeriesCollection addToDrawingSeries(TimeSeriesCollection dataset) {
-        dataset.addSeries(BarsBuilder.buildChartBarSeries(getSeries(), this.getShortTermEma(), "short"));
-        dataset.addSeries(BarsBuilder.buildChartBarSeries(getSeries(), this.getLongTermEma(), "long"));
+        dataset.addSeries(BarsBuilder.buildChartBarSeries(getSeries(), this.getShortSma(), "short"));
+        dataset.addSeries(BarsBuilder.buildChartBarSeries(getSeries(), this.getLongSma(), "long"));
         dataset.addSeries(BarsBuilder.buildChartBarSeries(getSeries(), this.getClosePrice(), "price"));
         return dataset;
     }
@@ -40,21 +50,60 @@ public class SMA extends AbstractMPIndicators{
     protected String getName() {
         return "SMA";
     }
-
-    public SMAIndicator getShortTermEma() {
+    /**
+     * @return the shortSma
+     */
+    public SMAIndicator getShortSma() {
         return shortSma;
     }
     
-    public List<Double> getShortTermEmaValues(){
+    public List<Double> getShortSmaValues() {
         return getValues(shortSma);
     }
 
-    public SMAIndicator getLongTermEma() {
+    /**
+     * @param shortSma the shortSma to set
+     */
+    public void setShortSma(SMAIndicator shortSma) {
+        this.shortSma = shortSma;
+    }
+
+    /**
+     * @return the longSma
+     */
+    public SMAIndicator getLongSma() {
         return longSma;
     }
     
-    public List<Double> getLongTermEmaValues() {
+    public List<Double> getLongSmaValues(){
         return getValues(longSma);
     }
+
+    /**
+     * @param longSma the longSma to set
+     */
+    public void setLongSma(SMAIndicator longSma) {
+        this.longSma = longSma;
+    }
+
+    /**
+     * @return the macdsma
+     */
+    public MACDSMAIndicator getMacdsma() {
+        return macdsma;
+    }
+    
+    public List<Double> getMacdsmaValues(){
+        return getValues(macdsma);
+    }
+
+    /**
+     * @param macdsma the macdsma to set
+     */
+    public void setMacdsma(MACDSMAIndicator macdsma) {
+        this.macdsma = macdsma;
+    }
+    
+    
     
 }
