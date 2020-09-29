@@ -23,6 +23,9 @@
                 <div class="container-fluid">
                     <div th:replace="parts/topmenu :: topmenu"></div>
                     <div class="row">
+                        <div class="col-md-12">
+                            <a class="btn btn-cyan" th:href="${'/mp/' + symbol}">MP Indicators</a>
+                        </div>
                         <div class="col-md-9">
                             <div class="card p-t-20"  style="height: 320px" id="ohlc"></div>
                         </div>

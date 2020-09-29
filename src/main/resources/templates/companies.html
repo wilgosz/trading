@@ -26,7 +26,10 @@
                                 <th scope="row" th:text="${company.id}"></th>
                                 <td th:text="${company.name}"></td>
                                 <td th:text="${company.abbreviation}"></td>
-                                <td><a th:href="@{/companies/{abbreviation}(abbreviation = ${company.abbreviation})}">Show detail</a></td>
+                                <td>
+                                    <a class="btn btn-sm btn-cyan" th:href="@{/companies/{abbreviation}(abbreviation = ${company.abbreviation})}">Detail</a>
+                                    <a class="btn btn-sm btn-primary" th:href="@{/mp/{abbreviation}(abbreviation = ${company.abbreviation})}">MP Ind</a>
+                                </td>
                             </tr>
                         </tbody>
                     </table>

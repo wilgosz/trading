@@ -10,21 +10,147 @@
             <div  th:replace="parts/topbar :: topbar"></div>
             <div  th:replace="parts/left-sidebar :: left-sidebar"></div>
             <div class="page-wrapper">
+                <div  th:replace="parts/breadcrumb :: breadcrumb"></div>
                 <div class="container-fluid">
-                    <div id="chart_candle"></div>
-                    <div id="chart_bollinger"></div>
-                    <div id="chart_stoch"></div>
-                    <div id="chart_rsi"></div>
-                    <div id="chart_macd"></div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <a class="btn btn-cyan" th:href="${'/companies/' + symbol}">Company detail</a>
+                            <a class="btn btn-primary" th:href="@{'/'}">Strong buy companies</a>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="chart_price"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="chart_bollinger"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="chart_stoch"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="chart_rsi"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="chart_macd"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="chart_mfl"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="chart_sma"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="chart_adx"></div>
+                        </div>
+                    </div>
                 </div>
                 <div  th:replace="parts/footer :: footer"></div>
             </div>
         </div>
         <div  th:replace="parts/requiredjs :: requiredjs"></div>
         <script>
-            
+            //PRICE
             $.ajax({
-                url: "/indicator/rsi",
+                url: "/indicator/price/[[${symbol}]]",
+                success: function (obj) {
+                    var options = {
+                        tooltip: {
+                            fixed: {
+                                enabled: true,
+                                position: 'topLeft',
+                                offsetX: 70,
+                                offsetY: 40,
+                            }
+                        },
+                        series: [{
+                                name: "Close Price",
+                                data: obj.price
+                            }],
+                        chart: {
+                            toolbar: {
+                                show: false
+                            },
+                            height: 400,
+                            id: 'price',
+                            group: 'ind',
+                            type: 'area',
+                            zoom: {
+                                enabled: false
+                            },
+                            dropShadow: {
+                                enabled: true,
+                                top: 2,
+                                left: 2,
+                                blur: 1,
+                                opacity: 0.2
+                            }
+                        },
+                        dataLabels: {
+                            enabled: false
+                        },
+                        stroke: {
+                            curve: 'straight',
+                            width: 1,
+                            colors: ["#2255a4"],
+                            dashArray: [0, 0]
+                        },
+
+                        title: {
+                            text: 'Close Price',
+                            align: 'left',
+                            margin: 0,
+                            offsetY: 24,
+                            offsetX: 36
+                        },
+                        grid: {
+                            row: {
+                                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                                opacity: 0.5
+                            },
+                        },
+                        xaxis: {
+                            type: 'datetime',
+                            categories: obj.dates,
+                            axisBorder: {
+                                show: true,
+                                color: '#78909C',
+                                offsetX: 0,
+                                offsetY: 0
+                            },
+                            labels: {
+                                show: true
+                            },
+                            tooltip: {
+                                enabled: false
+                            }
+                        },
+                        yaxis: {
+                            show: true,
+                            axisBorder: {
+                                show: true,
+                                color: '#78909C',
+                                offsetX: 0,
+                                offsetY: 0
+                            },
+                            labels: {
+                                formatter: (value) => {
+                                    return value.toFixed(2)
+                                },
+                                minWidth: 60,
+                                maxWidth: 60
+                            }
+                        },
+                        legend: {
+                            show: false
+                        }
+                    };
+
+                    var chart_price = new ApexCharts(document.querySelector("#chart_price"), options);
+                    chart_price.render();
+                }
+            });
+            //RSI
+            $.ajax({
+                url: "/indicator/rsi/[[${symbol}]]",
                 success: function (obj) {
                     var options = {
                         tooltip: {
@@ -38,11 +164,11 @@
                         annotations: {
                             yaxis: [
                                 {
-                                    y: [70],
+                                    y: [obj.top[0]],
                                     borderColor: '#000000',
                                 },
                                 {
-                                    y: [30],
+                                    y: [obj.bottom[0]],
                                     borderColor: '#000000',
                                 }
                             ]
@@ -103,7 +229,7 @@
                                 offsetY: 0
                             },
                             labels: {
-                                show: false
+                                show: true
                             },
                             tooltip: {
                                 enabled: false
@@ -121,7 +247,7 @@
                             },
                             labels: {
                                 formatter: (value) => {
-                                    return value.toFixed(0)
+                                    return value.toFixed(2)
                                 },
                                 minWidth: 60,
                                 maxWidth: 60
@@ -136,8 +262,9 @@
                     chart_rsi.render();
                 }
             });
+            //STOCHASTIC
             $.ajax({
-                url: "/indicator/stochastic",
+                url: "/indicator/stochastic/[[${symbol}]]",
                 success: function (obj) {
                     var options = {
                         tooltip: {
@@ -221,7 +348,7 @@
                                 offsetY: 0
                             },
                             labels: {
-                                show: false
+                                show: true
                             },
                             tooltip: {
                                 enabled: false
@@ -239,7 +366,7 @@
                             },
                             labels: {
                                 formatter: (value) => {
-                                    return value.toFixed(0)
+                                    return value.toFixed(2)
                                 },
                                 minWidth: 60,
                                 maxWidth: 60
@@ -254,8 +381,109 @@
                     chart.render();
                 }
             });
+            //SMA
             $.ajax({
-                url: "/indicator/macd",
+                url: "/indicator/sma/[[${symbol}]]",
+                success: function (obj) {
+                    var options = {
+                        tooltip: {
+                            fixed: {
+                                enabled: true,
+                                position: 'topLeft',
+                                offsetX: 70,
+                                offsetY: 40,
+                            }
+                        },
+                        colors: ["#ff1a1a"],
+                        series: [{
+                                name: "SMA",
+                                data: obj.SMA
+                            }],
+                        chart: {
+                            toolbar: {
+                                show: false
+                            },
+                            height: 180,
+                            id: 'sma',
+                            group: 'ind',
+                            type: 'area',
+                            zoom: {
+                                enabled: false
+                            },
+                            dropShadow: {
+                                enabled: true,
+                                top: 2,
+                                left: 2,
+                                blur: 1,
+                                opacity: 0.2
+                            }
+                        },
+                        dataLabels: {
+                            enabled: false
+                        },
+                        stroke: {
+                            curve: 'straight',
+                            width: 1,
+                            dashArray: [0, 0]
+                        },
+
+                        title: {
+                            text: 'SMA',
+                            align: 'left',
+                            margin: 0,
+                            offsetY: 24,
+                            offsetX: 36
+                        },
+                        grid: {
+                            row: {
+                                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                                opacity: 0.5
+                            },
+                        },
+                        xaxis: {
+                            type: 'datetime',
+                            categories: obj.dates,
+                            axisBorder: {
+                                show: true,
+                                color: '#78909C',
+                                offsetX: 0,
+                                offsetY: 0
+                            },
+                            labels: {
+                                show: true
+                            },
+                            tooltip: {
+                                enabled: false
+                            }
+                        },
+                        yaxis: {
+                            show: true,
+                            axisBorder: {
+                                show: true,
+                                color: '#78909C',
+                                offsetX: 0,
+                                offsetY: 0
+                            },
+                            labels: {
+                                formatter: (value) => {
+                                    return value.toFixed(2)
+                                },
+                                minWidth: 60,
+                                maxWidth: 60
+                            }
+                        },
+                        legend: {
+                            show: false
+                        }
+                    };
+
+                    var chart = new ApexCharts(document.querySelector("#chart_sma"), options);
+                    chart.render();
+                }
+            });
+            //MACD
+            $.ajax({
+                url: "/indicator/macd/[[${symbol}]]",
                 success: function (obj) {
                     var options = {
                         tooltip: {
@@ -337,7 +565,7 @@
                                 },
                                 labels: {
                                     formatter: (value) => {
-                                        return value.toFixed(0)
+                                        return value.toFixed(2)
                                     },
                                     minWidth: 60,
                                     maxWidth: 60
@@ -352,8 +580,9 @@
                     chart2.render();
                 }
             });
+            //BOLLINGER
             $.ajax({
-                url: "/indicator/bollinger",
+                url: "/indicator/bollinger/[[${symbol}]]",
                 success: function (obj) {
                     var options = {
                         tooltip: {
@@ -386,7 +615,7 @@
                             toolbar: {
                                 show: false
                             },
-                            height: 550,
+                            height: 400,
                             id: 'boll',
                             group: 'ind',
                             type: 'line',
@@ -406,7 +635,7 @@
                         },
                         stroke: {
                             curve: 'straight',
-                            width: [1, 3, 1, 1],
+                            width: [1, 2, 1, 1],
                             dashArray: [0, 0]
                         },
 
@@ -433,7 +662,7 @@
                                 offsetY: 0
                             },
                             labels: {
-                                show: false
+                                show: true
                             },
                             tooltip: {
                                 enabled: false
@@ -449,7 +678,7 @@
                             },
                             labels: {
                                 formatter: (value) => {
-                                    return value.toFixed(0)
+                                    return value.toFixed(2)
                                 },
                                 minWidth: 60,
                                 maxWidth: 60
@@ -464,8 +693,9 @@
                     chart_bollinger.render();
                 }
             });
-           /* $.ajax({
-                url: "/indicator/candles",
+            //CANDLES
+            /*$.ajax({
+                url: "/indicator/candles/[[${symbol}]]",
                 success: function (obj) {
                     var options = {
                         tooltip: {
@@ -486,7 +716,7 @@
                                 show: false
                             },
                             type: 'line',
-                            height: 450,
+                            height: 400,
                             id: 'cnd',
                             group: 'ind',
                         },
@@ -514,7 +744,7 @@
                                 offsetY: 0
                             },
                             labels: {
-                                show: false
+                                show: true
                             },
                             tooltip: {
                                 enabled: false
@@ -530,7 +760,7 @@
                             },
                             labels: {
                                 formatter: (value) => {
-                                    return value.toFixed(0)
+                                    return value.toFixed(2)
                                 },
                                 minWidth: 60,
                                 maxWidth: 60
@@ -545,6 +775,237 @@
                     chart_candle.render();
                 }
             });*/
+            //MONEYFLOW
+            $.ajax({
+                url: "/indicator/moneyflow/[[${symbol}]]",
+                success: function (obj) {
+                    var options = {
+                        tooltip: {
+                            fixed: {
+                                enabled: true,
+                                position: 'topLeft',
+                                offsetX: 70,
+                                offsetY: 40,
+                            }
+                        },
+                        annotations: {
+                            yaxis: [
+                                {
+                                    y: [80],
+                                    borderColor: '#000000',
+                                },
+                                {
+                                    y: [20],
+                                    borderColor: '#000000',
+                                }
+                            ]
+                        },
+                        series: [{
+                                name: "MFL",
+                                data: obj.MF
+                            }],
+                        chart: {
+                            toolbar: {
+                                show: false
+                            },
+                            height: 180,
+                            id: 'rsi',
+                            group: 'ind',
+                            type: 'line',
+                            zoom: {
+                                enabled: false
+                            },
+                            dropShadow: {
+                                enabled: true,
+                                top: 2,
+                                left: 2,
+                                blur: 1,
+                                opacity: 0.2
+                            }
+                        },
+                        dataLabels: {
+                            enabled: false
+                        },
+                        stroke: {
+                            curve: 'straight',
+                            width: 1,
+                            colors: ["#da542e"],
+                            dashArray: [0, 0]
+                        },
+
+                        title: {
+                            text: 'Money Flow',
+                            align: 'left',
+                            margin: 0,
+                            offsetY: 24,
+                            offsetX: 36
+                        },
+                        grid: {
+                            row: {
+                                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                                opacity: 0.5
+                            },
+                        },
+                        xaxis: {
+                            type: 'datetime',
+                            categories: obj.dates,
+                            axisBorder: {
+                                show: true,
+                                color: '#78909C',
+                                offsetX: 0,
+                                offsetY: 0
+                            },
+                            labels: {
+                                show: true
+                            },
+                            tooltip: {
+                                enabled: false
+                            }
+                        },
+                        yaxis: {
+                            show: true,
+                            min: 0,
+                            max: 100,
+                            axisBorder: {
+                                show: true,
+                                color: '#78909C',
+                                offsetX: 0,
+                                offsetY: 0
+                            },
+                            labels: {
+                                formatter: (value) => {
+                                    return value.toFixed(2)
+                                },
+                                minWidth: 60,
+                                maxWidth: 60
+                            }
+                        },
+                        legend: {
+                            show: false
+                        }
+                    };
+
+                    var chart_rsi = new ApexCharts(document.querySelector("#chart_mfl"), options);
+                    chart_rsi.render();
+                }
+            });
+            //ADX
+            $.ajax({
+                url: "/indicator/adx/[[${symbol}]]",
+                success: function (obj) {
+                    var options = {
+                        tooltip: {
+                            fixed: {
+                                enabled: true,
+                                position: 'topLeft',
+                                offsetX: 70,
+                                offsetY: 40,
+                            }
+                        },
+                        annotations: {
+                            yaxis: [
+                                {
+                                    y: 20,
+                                    borderColor: '#000000',
+                                }
+                            ]
+                        },
+                        series: [{
+                                name: "ADX",
+                                data: obj.ADX
+                            },
+                            {
+                                name: "D minus",
+                                data: obj.DMIN
+                            },
+                            {
+                                name: "D plus",
+                                data: obj.DPLUS
+                            }
+                        ],
+                        colors: ['#2255a4', '#da542e', '#28b779'],
+                        chart: {
+                            toolbar: {
+                                show: false
+                            },
+                            height: 180,
+                            id: 'adx',
+                            group: 'ind',
+                            type: 'line',
+                            zoom: {
+                                enabled: false
+                            },
+                            dropShadow: {
+                                enabled: true,
+                                top: 2,
+                                left: 2,
+                                blur: 1,
+                                opacity: 0.2
+                            }
+                        },
+                        dataLabels: {
+                            enabled: false
+                        },
+                        stroke: {
+                            curve: 'straight',
+                            width: [2, 1, 1],
+                            dashArray: [0, 1, 1]
+                        },
+
+                        title: {
+                            text: 'ADX Trend',
+                            align: 'left',
+                            margin: 0,
+                            offsetY: 24,
+                            offsetX: 36
+                        },
+                        grid: {
+                            row: {
+                                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                                opacity: 0.5
+                            },
+                        },
+                        xaxis: {
+                            type: 'datetime',
+                            categories: obj.dates,
+                            axisBorder: {
+                                show: true,
+                                color: '#78909C',
+                                offsetX: 0,
+                                offsetY: 0
+                            },
+                            labels: {
+                                show: true
+                            },
+                            tooltip: {
+                                enabled: false
+                            }
+                        },
+                        yaxis: {
+                            show: true,
+                            axisBorder: {
+                                show: true,
+                                color: '#78909C',
+                                offsetX: 0,
+                                offsetY: 0
+                            },
+                            labels: {
+                                formatter: (value) => {
+                                    return value.toFixed(2)
+                                },
+                                minWidth: 60,
+                                maxWidth: 60
+                            }
+                        },
+                        legend: {
+                            show: false
+                        }
+                    };
+
+                    var chart_adx = new ApexCharts(document.querySelector("#chart_adx"), options);
+                    chart_adx.render();
+                }
+            });
         </script>
     </body>
 </html>
