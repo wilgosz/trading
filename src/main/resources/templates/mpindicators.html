@@ -47,963 +47,275 @@
             </div>
         </div>
         <div  th:replace="parts/requiredjs :: requiredjs"></div>
+        <script src="/js/indicators.js"></script>
         <script>
+
+            function createButton(selector, id, data, description, name, symbol, chart) {
+                var obj = $(selector);
+                var html = "<form action='#'><div class='row my-form' id='" + id + "'>";
+
+                if (description[0] !== null) {
+                    html += "<div class='col-md-2'>";
+                    html += "<label>" + description[0] + "</label>"
+                    html += "<input type='number' class='margin_bottom little_input' value='" + data[0] + "'> "
+                    html += "</div>";
+                }
+
+                if (description[1] !== null) {
+                    html += "<div class='col-md-2'>";
+                    html += "<label>" + description[1] + "</label>"
+                    html += "<input type='number' class='margin_top little_input' value='" + data[1] + "'> "
+                    html += "</div>";
+                }
+
+                if (description[2] !== null) {
+                    html += "<div class='col-md-2'>";
+                    html += "<label>" + description[2] + "</label>"
+                    html += "<input type='number' class='period little_input' value='" + data[2] + "'> "
+                    html += "</div>";
+                }
+
+                if (description[3] !== null) {
+                    html += "<div class='col-md-2'>";
+                    html += "<label>" + description[3] + "</label>"
+                    html += "<input type='number' class='period_short little_input' value='" + data[3] + "'> "
+                    html += "</div>";
+                }
+                if (description[4] !== null) {
+                    html += "<div class='col-md-2'>";
+                    html += "<label>" + description[4] + "</label>"
+                    html += "<input type='number' class='period_long little_input' value='" + data[4] + "'> "
+                    html += "</div>";
+                }
+                html += "<div class='col-md-2'>";
+                html += "<input type='button' class='btn btn-sm btn-warning my-btn' value='Save'>"
+                html += "</div>";
+
+                html += "</div></form>";
+                var form = $(html);
+                var button = form.find('input[type="button"]')
+                obj.parent().prepend(form);
+                button.unbind('click');
+                button.bind('click', function () {
+                    updateIndicator(name, symbol, form, chart)
+                });
+            }
+
+            function updateIndicator(name, symbol, form, chart) {
+                var margin_bottom = parseInt(form.find('.margin_bottom').val());
+                var margin_top = parseInt(form.find('.margin_top').val());
+                var period = parseInt(form.find('.period').val());
+                var period_short = parseInt(form.find('.period_short').val());
+                var period_long = parseInt(form.find('.period_long').val());
+
+                margin_bottom = isNaN(margin_bottom) ? 0 : margin_bottom;
+                margin_top = isNaN(margin_top) ? 0 : margin_top;
+                period = isNaN(period) ? 0 : period;
+                period_short = isNaN(period_short) ? 0 : period_short;
+                period_long = isNaN(period_long) ? 0 : period_long;
+                
+                $.ajax({
+                    url: "/indicator/updateindicator",
+                    type: "PUT",
+                    data: {
+                        symbol: symbol,
+                        abbreviation: name,
+                        bottomBorder: margin_bottom,
+                        topBorder: margin_top,
+                        period: period,
+                        periodShort: period_short,
+                        periodLong: period_long
+                    },
+                    success: function (obj) {
+                        var series;
+                        var annotation = {};
+                        switch (name) {
+                            case "RSI":
+                                series = rsi_series(obj);
+                                annotation =  rsi_annotation(obj);
+                                break;
+                            case "STOCHASTIC_SLOW":
+                                annotation = stochastic_annotation(obj);
+                                series = stochastic_series(obj);
+                                break;
+                            case "SMA":
+                                series = sma_series(obj);
+                                break;
+                            case "MACD":
+                                series = macd_series(obj);
+                                break;
+                            case "BOLLINGER":
+                                series = bollinger_series(obj);
+                                break;
+                            case "MONEYFLOW":
+                                annotation = moneyflow_annotation(obj);
+                                series = moneyflow_series(obj);
+                                break;
+                            case "ADX":
+                                annotation = adx_annotation(obj);
+                                series = adx_series(obj);
+                                break;
+                        }
+                        
+                        chart.updateSeries(series);
+                        setTimeout(function(){
+                           chart.updateOptions({annotations: annotation}, false, true, false); 
+                        }, 1000)
+                    }
+                });
+            }
             //PRICE
             $.ajax({
                 url: "/indicator/price/[[${symbol}]]",
                 success: function (obj) {
-                    var options = {
-                        tooltip: {
-                            fixed: {
-                                enabled: true,
-                                position: 'topLeft',
-                                offsetX: 70,
-                                offsetY: 40,
-                            }
-                        },
-                        series: [{
-                                name: "Close Price",
-                                data: obj.price
-                            }],
-                        chart: {
-                            toolbar: {
-                                show: false
-                            },
-                            height: 400,
-                            id: 'price',
-                            group: 'ind',
-                            type: 'area',
-                            zoom: {
-                                enabled: false
-                            },
-                            dropShadow: {
-                                enabled: true,
-                                top: 2,
-                                left: 2,
-                                blur: 1,
-                                opacity: 0.2
-                            }
-                        },
-                        dataLabels: {
-                            enabled: false
-                        },
-                        stroke: {
-                            curve: 'straight',
-                            width: 1,
-                            colors: ["#2255a4"],
-                            dashArray: [0, 0]
-                        },
-
-                        title: {
-                            text: 'Close Price',
-                            align: 'left',
-                            margin: 0,
-                            offsetY: 24,
-                            offsetX: 36
-                        },
-                        grid: {
-                            row: {
-                                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-                                opacity: 0.5
-                            },
-                        },
-                        xaxis: {
-                            type: 'datetime',
-                            categories: obj.dates,
-                            axisBorder: {
-                                show: true,
-                                color: '#78909C',
-                                offsetX: 0,
-                                offsetY: 0
-                            },
-                            labels: {
-                                show: true
-                            },
-                            tooltip: {
-                                enabled: false
-                            }
-                        },
-                        yaxis: {
-                            show: true,
-                            axisBorder: {
-                                show: true,
-                                color: '#78909C',
-                                offsetX: 0,
-                                offsetY: 0
-                            },
-                            labels: {
-                                formatter: (value) => {
-                                    return value.toFixed(2)
-                                },
-                                minWidth: 60,
-                                maxWidth: 60
-                            }
-                        },
-                        legend: {
-                            show: false
-                        }
-                    };
-
-                    var chart_price = new ApexCharts(document.querySelector("#chart_price"), options);
+                    var chart_price = new ApexCharts(document.querySelector("#chart_price"), price_option(obj));
                     chart_price.render();
+
                 }
             });
             //RSI
             $.ajax({
                 url: "/indicator/rsi/[[${symbol}]]",
                 success: function (obj) {
-                    var options = {
-                        tooltip: {
-                            fixed: {
-                                enabled: true,
-                                position: 'topLeft',
-                                offsetX: 70,
-                                offsetY: 40,
-                            }
-                        },
-                        annotations: {
-                            yaxis: [
-                                {
-                                    y: [obj.top[0]],
-                                    borderColor: '#000000',
-                                },
-                                {
-                                    y: [obj.bottom[0]],
-                                    borderColor: '#000000',
-                                }
-                            ]
-                        },
-                        series: [{
-                                name: "RSI",
-                                data: obj.R
-                            }],
-                        chart: {
-                            toolbar: {
-                                show: false
-                            },
-                            height: 180,
-                            id: 'rsi',
-                            group: 'ind',
-                            type: 'line',
-                            zoom: {
-                                enabled: false
-                            },
-                            dropShadow: {
-                                enabled: true,
-                                top: 2,
-                                left: 2,
-                                blur: 1,
-                                opacity: 0.2
-                            }
-                        },
-                        dataLabels: {
-                            enabled: false
-                        },
-                        stroke: {
-                            curve: 'straight',
-                            width: 1,
-                            colors: ["#2255a4"],
-                            dashArray: [0, 0]
-                        },
-
-                        title: {
-                            text: 'RSI',
-                            align: 'left',
-                            margin: 0,
-                            offsetY: 24,
-                            offsetX: 36
-                        },
-                        grid: {
-                            row: {
-                                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-                                opacity: 0.5
-                            },
-                        },
-                        xaxis: {
-                            type: 'datetime',
-                            categories: obj.dates,
-                            axisBorder: {
-                                show: true,
-                                color: '#78909C',
-                                offsetX: 0,
-                                offsetY: 0
-                            },
-                            labels: {
-                                show: true
-                            },
-                            tooltip: {
-                                enabled: false
-                            }
-                        },
-                        yaxis: {
-                            show: true,
-                            min: 0,
-                            max: 100,
-                            axisBorder: {
-                                show: true,
-                                color: '#78909C',
-                                offsetX: 0,
-                                offsetY: 0
-                            },
-                            labels: {
-                                formatter: (value) => {
-                                    return value.toFixed(2)
-                                },
-                                minWidth: 60,
-                                maxWidth: 60
-                            }
-                        },
-                        legend: {
-                            show: false
-                        }
-                    };
-
-                    var chart_rsi = new ApexCharts(document.querySelector("#chart_rsi"), options);
+                    var chart_rsi = new ApexCharts(document.querySelector("#chart_rsi"), rsi_option(obj));
                     chart_rsi.render();
+                    createButton("#chart_rsi", "ind_rsi", obj.add, ["low", "up", "period", null, null], "RSI", "[[${symbol}]]", chart_rsi);
                 }
             });
             //STOCHASTIC
             $.ajax({
                 url: "/indicator/stochastic/[[${symbol}]]",
                 success: function (obj) {
-                    var options = {
-                        tooltip: {
-                            fixed: {
-                                enabled: true,
-                                position: 'topLeft',
-                                offsetX: 70,
-                                offsetY: 40,
-                            }
-                        },
-                        annotations: {
-                            yaxis: [
-                                {
-                                    y: [80],
-                                    borderColor: '#000000',
-                                },
-                                {
-                                    y: [20],
-                                    borderColor: '#000000',
-                                }
-                            ]
-                        },
-                        colors: ["#ff1a1a", "#008200"],
-                        series: [{
-                                name: "Stoch %K",
-                                data: obj.K
-                            },
-                            {
-                                name: "Stoch %D",
-                                data: obj.D
-                            }],
-                        chart: {
-                            toolbar: {
-                                show: false
-                            },
-                            height: 180,
-                            id: 'sto',
-                            group: 'ind',
-                            type: 'line',
-                            zoom: {
-                                enabled: false
-                            },
-                            dropShadow: {
-                                enabled: true,
-                                top: 2,
-                                left: 2,
-                                blur: 1,
-                                opacity: 0.2
-                            }
-                        },
-                        dataLabels: {
-                            enabled: false
-                        },
-                        stroke: {
-                            curve: 'straight',
-                            width: 1,
-                            colors: ["#ff1a1a", "#008200"],
-                            dashArray: [0, 0]
-                        },
-
-                        title: {
-                            text: 'Slow Stochastic',
-                            align: 'left',
-                            margin: 0,
-                            offsetY: 24,
-                            offsetX: 36
-                        },
-                        grid: {
-                            row: {
-                                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-                                opacity: 0.5
-                            },
-                        },
-                        xaxis: {
-                            type: 'datetime',
-                            categories: obj.dates,
-                            axisBorder: {
-                                show: true,
-                                color: '#78909C',
-                                offsetX: 0,
-                                offsetY: 0
-                            },
-                            labels: {
-                                show: true
-                            },
-                            tooltip: {
-                                enabled: false
-                            }
-                        },
-                        yaxis: {
-                            show: true,
-                            min: 0,
-                            max: 100,
-                            axisBorder: {
-                                show: true,
-                                color: '#78909C',
-                                offsetX: 0,
-                                offsetY: 0
-                            },
-                            labels: {
-                                formatter: (value) => {
-                                    return value.toFixed(2)
-                                },
-                                minWidth: 60,
-                                maxWidth: 60
-                            }
-                        },
-                        legend: {
-                            show: false
-                        }
-                    };
-
-                    var chart = new ApexCharts(document.querySelector("#chart_stoch"), options);
-                    chart.render();
+                    var chart_stoch = new ApexCharts(document.querySelector("#chart_stoch"), stochastic_option(obj));
+                    chart_stoch.render();
+                    createButton("#chart_stoch", "ind_stoch", obj.add, ["low", "up", "period", "smoothing K", "smoothing D"], "STOCHASTIC_SLOW", "[[${symbol}]]", chart_stoch);
                 }
             });
             //SMA
             $.ajax({
                 url: "/indicator/sma/[[${symbol}]]",
                 success: function (obj) {
-                    var options = {
-                        tooltip: {
-                            fixed: {
-                                enabled: true,
-                                position: 'topLeft',
-                                offsetX: 70,
-                                offsetY: 40,
-                            }
-                        },
-                        colors: ["#ff1a1a"],
-                        series: [{
-                                name: "SMA",
-                                data: obj.SMA
-                            }],
-                        chart: {
-                            toolbar: {
-                                show: false
-                            },
-                            height: 180,
-                            id: 'sma',
-                            group: 'ind',
-                            type: 'area',
-                            zoom: {
-                                enabled: false
-                            },
-                            dropShadow: {
-                                enabled: true,
-                                top: 2,
-                                left: 2,
-                                blur: 1,
-                                opacity: 0.2
-                            }
-                        },
-                        dataLabels: {
-                            enabled: false
-                        },
-                        stroke: {
-                            curve: 'straight',
-                            width: 1,
-                            dashArray: [0, 0]
-                        },
-
-                        title: {
-                            text: 'SMA',
-                            align: 'left',
-                            margin: 0,
-                            offsetY: 24,
-                            offsetX: 36
-                        },
-                        grid: {
-                            row: {
-                                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-                                opacity: 0.5
-                            },
-                        },
-                        xaxis: {
-                            type: 'datetime',
-                            categories: obj.dates,
-                            axisBorder: {
-                                show: true,
-                                color: '#78909C',
-                                offsetX: 0,
-                                offsetY: 0
-                            },
-                            labels: {
-                                show: true
-                            },
-                            tooltip: {
-                                enabled: false
-                            }
-                        },
-                        yaxis: {
-                            show: true,
-                            axisBorder: {
-                                show: true,
-                                color: '#78909C',
-                                offsetX: 0,
-                                offsetY: 0
-                            },
-                            labels: {
-                                formatter: (value) => {
-                                    return value.toFixed(2)
-                                },
-                                minWidth: 60,
-                                maxWidth: 60
-                            }
-                        },
-                        legend: {
-                            show: false
-                        }
-                    };
-
-                    var chart = new ApexCharts(document.querySelector("#chart_sma"), options);
-                    chart.render();
+                    var chart_sma = new ApexCharts(document.querySelector("#chart_sma"), sma_option(obj));
+                    chart_sma.render();
+                    createButton("#chart_sma", "ind_sma", obj.add, [null, null, null, "short term", "long term"], "SMA", "[[${symbol}]]", chart_sma);
                 }
             });
             //MACD
             $.ajax({
                 url: "/indicator/macd/[[${symbol}]]",
                 success: function (obj) {
-                    var options = {
-                        tooltip: {
-                            fixed: {
-                                enabled: true,
-                                position: 'topLeft',
-                                offsetX: 70,
-                                offsetY: 40,
-                            }
-                        },
-                        series: [
-                            {
-                                name: "MACD",
-                                type: 'area',
-                                data: obj.macd
-                            }],
-                        chart: {
-                            toolbar: {
-                                show: false
-                            },
-                            height: 180,
-                            id: 'macd',
-                            group: 'ind',
-                            type: 'line',
-                            zoom: {
-                                enabled: false
-                            },
-                            dropShadow: {
-                                enabled: true,
-                                top: 2,
-                                left: 2,
-                                blur: 1,
-                                opacity: 0.2
-                            }
-                        },
-                        dataLabels: {
-                            enabled: false
-                        },
-                        colors: ["#ffb848"],
-                        stroke: {
-                            curve: 'straight',
-                            width: 1,
-                            colors: ["#ff1a1a"]
-                        },
-
-                        title: {
-                            text: 'MACD',
-                            align: 'left',
-                            margin: 0,
-                            offsetY: 24,
-                            offsetX: 36
-                        },
-                        grid: {
-                            row: {
-                                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-                                opacity: 0.5
-                            },
-                        },
-                        xaxis: {
-                            type: 'datetime',
-                            categories: obj.dates,
-                            axisBorder: {
-                                show: true,
-                                color: '#78909C',
-                                offsetX: 0,
-                                offsetY: 0
-                            },
-                            tooltip: {
-                                enabled: false
-                            }
-                        },
-                        yaxis: [{
-                                show: true,
-                                axisBorder: {
-                                    show: true,
-                                    color: '#78909C',
-                                    offsetX: 0,
-                                    offsetY: 0
-                                },
-                                labels: {
-                                    formatter: (value) => {
-                                        return value.toFixed(2)
-                                    },
-                                    minWidth: 60,
-                                    maxWidth: 60
-                                }
-                            }],
-                        legend: {
-                            show: false
-                        }
-                    };
-
-                    var chart2 = new ApexCharts(document.querySelector("#chart_macd"), options);
-                    chart2.render();
+                    var chart_macd = new ApexCharts(document.querySelector("#chart_macd"), macd_option(obj));
+                    chart_macd.render();
+                    createButton("#chart_macd", "ind_macd", obj.add, [null, null, null, "short term", "long term"], "MACD", "[[${symbol}]]", chart_macd);
                 }
             });
             //BOLLINGER
             $.ajax({
                 url: "/indicator/bollinger/[[${symbol}]]",
                 success: function (obj) {
-                    var options = {
-                        tooltip: {
-                            fixed: {
-                                enabled: true,
-                                position: 'topLeft',
-                                offsetX: 70,
-                                offsetY: 40,
-                            }
-                        },
-                        series: [{
-                                name: "Up",
-                                data: obj.BU
-                            },
-                            {
-                                name: "Close price",
-                                data: obj.BP
-                            },
-                            {
-                                name: "Middle",
-                                data: obj.BM
-                            },
-                            {
-                                name: "Low",
-                                data: obj.BL
-                            },
-                        ],
-                        colors: ['#28b779', '#da542e', '#fb8c00', '#20c997'],
-                        chart: {
-                            toolbar: {
-                                show: false
-                            },
-                            height: 400,
-                            id: 'boll',
-                            group: 'ind',
-                            type: 'line',
-                            zoom: {
-                                enabled: false
-                            },
-                            dropShadow: {
-                                enabled: true,
-                                top: 2,
-                                left: 2,
-                                blur: 1,
-                                opacity: 0.2
-                            }
-                        },
-                        dataLabels: {
-                            enabled: false
-                        },
-                        stroke: {
-                            curve: 'straight',
-                            width: [1, 2, 1, 1],
-                            dashArray: [0, 0]
-                        },
-
-                        title: {
-                            text: 'Bollinger Band',
-                            align: 'left',
-                            margin: 0,
-                            offsetY: 24,
-                            offsetX: 36
-                        },
-                        grid: {
-                            row: {
-                                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-                                opacity: 0.5
-                            },
-                        },
-                        xaxis: {
-                            type: 'datetime',
-                            categories: obj.dates,
-                            axisBorder: {
-                                show: true,
-                                color: '#78909C',
-                                offsetX: 0,
-                                offsetY: 0
-                            },
-                            labels: {
-                                show: true
-                            },
-                            tooltip: {
-                                enabled: false
-                            }
-                        },
-                        yaxis: {
-                            show: true,
-                            axisBorder: {
-                                show: true,
-                                color: '#78909C',
-                                offsetX: 0,
-                                offsetY: 0
-                            },
-                            labels: {
-                                formatter: (value) => {
-                                    return value.toFixed(2)
-                                },
-                                minWidth: 60,
-                                maxWidth: 60
-                            }
-                        },
-                        legend: {
-                            show: false
-                        }
-                    };
-
-                    var chart_bollinger = new ApexCharts(document.querySelector("#chart_bollinger"), options);
+                    var chart_bollinger = new ApexCharts(document.querySelector("#chart_bollinger"), bollinger_option(obj));
                     chart_bollinger.render();
+                    createButton("#chart_bollinger", "ind_bollinger", obj.add, [null, null, "period", null, null], "BOLLINGER", "[[${symbol}]]", chart_bollinger);
                 }
             });
             //CANDLES
             /*$.ajax({
-                url: "/indicator/candles/[[${symbol}]]",
-                success: function (obj) {
-                    var options = {
-                        tooltip: {
-                            fixed: {
-                                enabled: true,
-                                position: 'topLeft',
-                                offsetX: 70,
-                                offsetY: 40,
-                            }
-                        },
-                        series: [{
-                                data: obj.CND,
-                                type: 'candlestick',
-                                name: 'Open price'
-                            }],
-                        chart: {
-                            toolbar: {
-                                show: false
-                            },
-                            type: 'line',
-                            height: 400,
-                            id: 'cnd',
-                            group: 'ind',
-                        },
-                        title: {
-                            text: 'CandleStick Chart',
-                            align: 'left'
-                        }, stroke: {
-                            width: [1, 1, 1, 1]
-                        },
-                        dataLabels: {
-                            enabled: false
-                        },
-                        grid: {
-                            row: {
-                                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-                                opacity: 0.5
-                            },
-                        },
-                        xaxis: {
-                            type: 'datetime',
-                            axisBorder: {
-                                show: true,
-                                color: '#78909C',
-                                offsetX: 0,
-                                offsetY: 0
-                            },
-                            labels: {
-                                show: true
-                            },
-                            tooltip: {
-                                enabled: false
-                            }
-                        },
-                        yaxis: {
-                            show: true,
-                            axisBorder: {
-                                show: true,
-                                color: '#78909C',
-                                offsetX: 0,
-                                offsetY: 0
-                            },
-                            labels: {
-                                formatter: (value) => {
-                                    return value.toFixed(2)
-                                },
-                                minWidth: 60,
-                                maxWidth: 60
-                            }
-                        },
-                        legend: {
-                            show: false
-                        }
-                    };
-
-                    var chart_candle = new ApexCharts(document.querySelector("#chart_candle"), options);
-                    chart_candle.render();
-                }
-            });*/
+             url: "/indicator/candles/[[${symbol}]]",
+             success: function (obj) {
+             var options = {
+             tooltip: {
+             fixed: {
+             enabled: true,
+             position: 'topLeft',
+             offsetX: 70,
+             offsetY: 40,
+             }
+             },
+             series: [{
+             data: obj.CND,
+             type: 'candlestick',
+             name: 'Open price'
+             }],
+             chart: {
+             toolbar: {
+             show: false
+             },
+             type: 'line',
+             height: 400,
+             id: 'cnd',
+             group: 'ind',
+             },
+             title: {
+             text: 'CandleStick Chart',
+             align: 'left'
+             }, stroke: {
+             width: [1, 1, 1, 1]
+             },
+             dataLabels: {
+             enabled: false
+             },
+             grid: {
+             row: {
+             colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+             opacity: 0.5
+             },
+             },
+             xaxis: {
+             type: 'datetime',
+             axisBorder: {
+             show: true,
+             color: '#78909C',
+             offsetX: 0,
+             offsetY: 0
+             },
+             labels: {
+             show: true
+             },
+             tooltip: {
+             enabled: false
+             }
+             },
+             yaxis: {
+             show: true,
+             axisBorder: {
+             show: true,
+             color: '#78909C',
+             offsetX: 0,
+             offsetY: 0
+             },
+             labels: {
+             formatter: (value) => {
+             return value.toFixed(2)
+             },
+             minWidth: 60,
+             maxWidth: 60
+             }
+             },
+             legend: {
+             show: false
+             }
+             };
+             
+             var chart_candle = new ApexCharts(document.querySelector("#chart_candle"), options);
+             chart_candle.render();
+             }
+             });*/
             //MONEYFLOW
             $.ajax({
                 url: "/indicator/moneyflow/[[${symbol}]]",
                 success: function (obj) {
-                    var options = {
-                        tooltip: {
-                            fixed: {
-                                enabled: true,
-                                position: 'topLeft',
-                                offsetX: 70,
-                                offsetY: 40,
-                            }
-                        },
-                        annotations: {
-                            yaxis: [
-                                {
-                                    y: [80],
-                                    borderColor: '#000000',
-                                },
-                                {
-                                    y: [20],
-                                    borderColor: '#000000',
-                                }
-                            ]
-                        },
-                        series: [{
-                                name: "MFL",
-                                data: obj.MF
-                            }],
-                        chart: {
-                            toolbar: {
-                                show: false
-                            },
-                            height: 180,
-                            id: 'rsi',
-                            group: 'ind',
-                            type: 'line',
-                            zoom: {
-                                enabled: false
-                            },
-                            dropShadow: {
-                                enabled: true,
-                                top: 2,
-                                left: 2,
-                                blur: 1,
-                                opacity: 0.2
-                            }
-                        },
-                        dataLabels: {
-                            enabled: false
-                        },
-                        stroke: {
-                            curve: 'straight',
-                            width: 1,
-                            colors: ["#da542e"],
-                            dashArray: [0, 0]
-                        },
-
-                        title: {
-                            text: 'Money Flow',
-                            align: 'left',
-                            margin: 0,
-                            offsetY: 24,
-                            offsetX: 36
-                        },
-                        grid: {
-                            row: {
-                                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-                                opacity: 0.5
-                            },
-                        },
-                        xaxis: {
-                            type: 'datetime',
-                            categories: obj.dates,
-                            axisBorder: {
-                                show: true,
-                                color: '#78909C',
-                                offsetX: 0,
-                                offsetY: 0
-                            },
-                            labels: {
-                                show: true
-                            },
-                            tooltip: {
-                                enabled: false
-                            }
-                        },
-                        yaxis: {
-                            show: true,
-                            min: 0,
-                            max: 100,
-                            axisBorder: {
-                                show: true,
-                                color: '#78909C',
-                                offsetX: 0,
-                                offsetY: 0
-                            },
-                            labels: {
-                                formatter: (value) => {
-                                    return value.toFixed(2)
-                                },
-                                minWidth: 60,
-                                maxWidth: 60
-                            }
-                        },
-                        legend: {
-                            show: false
-                        }
-                    };
-
-                    var chart_rsi = new ApexCharts(document.querySelector("#chart_mfl"), options);
-                    chart_rsi.render();
+                    var chart_moneyflow = new ApexCharts(document.querySelector("#chart_mfl"), moneyflow_option(obj));
+                    chart_moneyflow.render();
+                    createButton("#chart_mfl", "ind_mfl", obj.add, ["low", "up", "period", null, null], "MONEYFLOW", "[[${symbol}]]", chart_moneyflow);
                 }
             });
             //ADX
             $.ajax({
                 url: "/indicator/adx/[[${symbol}]]",
                 success: function (obj) {
-                    var options = {
-                        tooltip: {
-                            fixed: {
-                                enabled: true,
-                                position: 'topLeft',
-                                offsetX: 70,
-                                offsetY: 40,
-                            }
-                        },
-                        annotations: {
-                            yaxis: [
-                                {
-                                    y: 20,
-                                    borderColor: '#000000',
-                                }
-                            ]
-                        },
-                        series: [{
-                                name: "ADX",
-                                data: obj.ADX
-                            },
-                            {
-                                name: "D minus",
-                                data: obj.DMIN
-                            },
-                            {
-                                name: "D plus",
-                                data: obj.DPLUS
-                            }
-                        ],
-                        colors: ['#2255a4', '#da542e', '#28b779'],
-                        chart: {
-                            toolbar: {
-                                show: false
-                            },
-                            height: 180,
-                            id: 'adx',
-                            group: 'ind',
-                            type: 'line',
-                            zoom: {
-                                enabled: false
-                            },
-                            dropShadow: {
-                                enabled: true,
-                                top: 2,
-                                left: 2,
-                                blur: 1,
-                                opacity: 0.2
-                            }
-                        },
-                        dataLabels: {
-                            enabled: false
-                        },
-                        stroke: {
-                            curve: 'straight',
-                            width: [2, 1, 1],
-                            dashArray: [0, 1, 1]
-                        },
-
-                        title: {
-                            text: 'ADX Trend',
-                            align: 'left',
-                            margin: 0,
-                            offsetY: 24,
-                            offsetX: 36
-                        },
-                        grid: {
-                            row: {
-                                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-                                opacity: 0.5
-                            },
-                        },
-                        xaxis: {
-                            type: 'datetime',
-                            categories: obj.dates,
-                            axisBorder: {
-                                show: true,
-                                color: '#78909C',
-                                offsetX: 0,
-                                offsetY: 0
-                            },
-                            labels: {
-                                show: true
-                            },
-                            tooltip: {
-                                enabled: false
-                            }
-                        },
-                        yaxis: {
-                            show: true,
-                            axisBorder: {
-                                show: true,
-                                color: '#78909C',
-                                offsetX: 0,
-                                offsetY: 0
-                            },
-                            labels: {
-                                formatter: (value) => {
-                                    return value.toFixed(2)
-                                },
-                                minWidth: 60,
-                                maxWidth: 60
-                            }
-                        },
-                        legend: {
-                            show: false
-                        }
-                    };
-
-                    var chart_adx = new ApexCharts(document.querySelector("#chart_adx"), options);
+                    var chart_adx = new ApexCharts(document.querySelector("#chart_adx"), adx_option(obj));
                     chart_adx.render();
+                    var x = createButton("#chart_adx", "ind_adx", obj.add, ["trend", null, "period", null, "sma"], "ADX", "[[${symbol}]]", chart_adx);
                 }
             });
         </script>
