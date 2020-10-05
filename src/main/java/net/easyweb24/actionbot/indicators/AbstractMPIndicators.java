@@ -24,10 +24,16 @@ public abstract class AbstractMPIndicators {
     private List<String> dates;
     private int bottom_border = 0;
     private int top_border = 0;
+    private int period = 0;
+    private int period_long = 0;
+    private int period_short = 0;
     
     public AbstractMPIndicators(BarSeries series,int period_long, int period_short, int period, int bottom_border, int top_border){
         
         this.series = series;
+        this.period = period;
+        this.period_long = period_long;
+        this.period_short = period_short;
         this.closePrice = new ClosePriceIndicator(this.getSeries());
         this.bottom_border = bottom_border;
         this.top_border = top_border;
@@ -141,6 +147,27 @@ public abstract class AbstractMPIndicators {
      */
     public void setTop_border(int top_border) {
         this.top_border = top_border;
+    }
+
+    /**
+     * @return the period
+     */
+    public int getPeriod() {
+        return period;
+    }
+
+    /**
+     * @return the period_long
+     */
+    public int getPeriod_long() {
+        return period_long;
+    }
+
+    /**
+     * @return the period_short
+     */
+    public int getPeriod_short() {
+        return period_short;
     }
     
     

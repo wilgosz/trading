@@ -76,7 +76,7 @@ public class FinnhubDtoService {
             company.setIpo(jsonObject.getString("ipo"));
             company.setWeburl(jsonObject.getString("weburl"));
         } catch (Exception e) {
-            System.out.println(jsonObject);
+            //System.out.println(jsonObject);
             company = null;
         }
 
@@ -302,8 +302,8 @@ public class FinnhubDtoService {
         if(fnsignalsArchive == null){
             fnsignalsArchive = new FinnhubSignalsArchive();
         }
-        System.out.println(fnsignalsArchive);
-        System.out.println(abbreviation);
+        //System.out.println(fnsignalsArchive);
+        //System.out.println(abbreviation);
         fnsignalsArchive.setAbbreviation(abbreviation);
         fnsignalsArchive.setAdx(aggregate.getAdx());
         fnsignalsArchive.setBuy(aggregate.getBuy());

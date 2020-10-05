@@ -66,7 +66,7 @@ public class MFIIndicator extends CachedIndicator<Num>{
         try {
             return timeSeries.numOf((float)money_flow_index);
         } catch (Exception e) {
-            System.out.println(money_flow_index);
+            //System.out.println(money_flow_index);
             return timeSeries.numOf(10);
         }
         

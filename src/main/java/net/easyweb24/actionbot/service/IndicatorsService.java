@@ -63,7 +63,7 @@ public class IndicatorsService {
     
     public SMA getSMA(BarSeries series){
         Indicators ind = indicatorsRepository.findByAbbreviation("SMA");
-        SMA sma = new SMA(series, ind.getPeriodLong(), ind.getPeriodShort(), ind.getPeriod());
+        SMA sma = new SMA(series, ind);
         return sma;
     }
     
@@ -80,7 +80,7 @@ public class IndicatorsService {
     
     public STOCHASTIC_SLOW getStochasticS(BarSeries series){
         Indicators ind = indicatorsRepository.findByAbbreviation("STOCHASTIC_SLOW");
-        STOCHASTIC_SLOW stochastic = new STOCHASTIC_SLOW(series, ind.getPeriodLong(), ind.getPeriodShort(), ind.getPeriod());
+        STOCHASTIC_SLOW stochastic = new STOCHASTIC_SLOW(series, ind);
         return stochastic;
     }
     
@@ -123,13 +123,28 @@ public class IndicatorsService {
         return data;
     }
     
+    public Indicators findByAbbreviationAndSave(Indicators data){
+        Indicators ind = indicatorsRepository.findByAbbreviation(data.getAbbreviation());
+        
+        if(ind != null){
+            ind.setBottomBorder(data.getBottomBorder());
+            ind.setTopBorder(data.getTopBorder());
+            ind.setPeriod(data.getPeriod());
+            ind.setPeriodLong(data.getPeriodLong());
+            ind.setPeriodShort(data.getPeriodShort());
+            ind = indicatorsRepository.save(ind);
+        }
+        return ind;
+    }
+    
     public Map addTopBottom(Map map, AbstractMPIndicators ind){
-        List bottom = new ArrayList();
-        bottom.add(ind.getBottom_border());
-        List top = new ArrayList();
-        top.add(ind.getTop_border());
-        map.put("bottom", bottom);
-        map.put("top", top);
+        List add = new ArrayList();
+        add.add(ind.getBottom_border());
+        add.add(ind.getTop_border());
+        add.add(ind.getPeriod());
+        add.add(ind.getPeriod_short());
+        add.add(ind.getPeriod_long());
+        map.put("add", add);
         return map;
     }
     

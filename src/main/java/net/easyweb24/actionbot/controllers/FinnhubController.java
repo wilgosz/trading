@@ -155,7 +155,6 @@ public class FinnhubController {
             try {
                 Symbols next = (Symbols) itr.next();
                 abbreviation = next.getAbbreviation();
-                System.out.println(abbreviation);
                 if (companyProfileRepository.findByAbbreviation(abbreviation) == null) {
                     jsonstring = finnhubService.companyProfile(abbreviation);
                     company = finnhubDtoService.convertToCompanyProfile(jsonstring, abbreviation);
@@ -224,7 +223,7 @@ public class FinnhubController {
                 jsonstring = finnhubService.aggregateIndicatorsPerDay(abbreviation);
                 aggregate = finnhubDtoService.convertToAggregateIdicators(jsonstring);
                 fnsignals = finnhubSignalsRepository.findByAbbreviation(abbreviation);
-                System.out.println(fnsignals);
+                
                 if (fnsignals == null) {
                     fnsignals = new FinnhubSignals();
                     fnsignals.setCreateDateTime(LocalDateTime.now());
