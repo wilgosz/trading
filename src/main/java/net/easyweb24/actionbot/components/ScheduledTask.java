@@ -18,6 +18,7 @@ import net.easyweb24.actionbot.repository.FinnhubSignalsRepository;
 import net.easyweb24.actionbot.repository.SymbolsRepository;
 import net.easyweb24.actionbot.service.FinnhubDtoService;
 import net.easyweb24.actionbot.service.FinnhubService;
+import net.easyweb24.actionbot.service.MpSignalsService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -25,25 +26,25 @@ import org.springframework.stereotype.Component;
  *
  * @author zbigniewwilgosz
  */
-@Component
+//@Component
 public class ScheduledTask {
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
     private final SymbolsRepository symbolsRepository;
-    private final FinnhubService finnhubService;
+    private final MpSignalsService mpSignalsService;
     private final FinnhubDtoService finnhubDtoService;
     private final FinnhubSignalsRepository finnhubSignalsRepository;
 
     public ScheduledTask(
             SymbolsRepository symbolsRepository,
-            FinnhubService finnhubService,
+            MpSignalsService mpSignalsService,
             FinnhubDtoService finnhubDtoService,
             FinnhubSignalsRepository finnhubSignalsRepository
     ) {
         this.symbolsRepository = symbolsRepository;
         this.finnhubDtoService = finnhubDtoService;
-        this.finnhubService = finnhubService;
+        this.mpSignalsService = mpSignalsService;
         this.finnhubSignalsRepository = finnhubSignalsRepository;
     }
 
@@ -52,6 +53,7 @@ public class ScheduledTask {
     public void getCandlesAndIndicatorsPerDay() {
         getAllIndicators();
         getCandles();
+        saveMpSignals();
     }
 
     
@@ -61,6 +63,11 @@ public class ScheduledTask {
     public void getCandlesAndIndicatorsPerHour() {
         getAllIndicatorsPerHour();
         getCandlesPerHour();
+        saveMpSignals();
+    }
+    
+    private void saveMpSignals(){
+        mpSignalsService.saveSignals();
     }
 
     private void getCandlesPerHour() {
