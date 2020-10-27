@@ -28,4 +28,12 @@ public interface MpSignalsRepository extends JpaRepository < MpSignals, Long > {
             //+ " AND trending = 1"
             + " ORDER BY buy DESC, sell ASC  LIMIT 12", nativeQuery = true)
     List<FinnhubSignalsDTO> strongBuyQuery();
+    
+    @Query(value = ""
+            + " SELECT f.*, f.update_date_time as updatedatetime , s.description as description FROM symbols s, mp_signals f, company_profile cp "
+            + " WHERE s.abbreviation = f.abbreviation "
+            + " AND cp.abbreviation = f.abbreviation "
+            //+ " AND trending = 1"
+            + " ORDER BY buy DESC, sell ASC  LIMIT 100", nativeQuery = true)
+    List<FinnhubSignalsDTO> strongBuyQueryForUpdate();
 }

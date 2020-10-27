@@ -15,6 +15,7 @@ import net.easyweb24.actionbot.controllers.FinnhubController;
 import net.easyweb24.actionbot.dto.FinnhubSignalsDTO;
 import net.easyweb24.actionbot.entity.Symbols;
 import net.easyweb24.actionbot.repository.FinnhubSignalsRepository;
+import net.easyweb24.actionbot.repository.MpSignalsRepository;
 import net.easyweb24.actionbot.repository.SymbolsRepository;
 import net.easyweb24.actionbot.service.FinnhubDtoService;
 import net.easyweb24.actionbot.service.FinnhubService;
@@ -35,17 +36,20 @@ public class ScheduledTask {
     private final MpSignalsService mpSignalsService;
     private final FinnhubDtoService finnhubDtoService;
     private final FinnhubSignalsRepository finnhubSignalsRepository;
+    private final MpSignalsRepository mpSignalsRepository;
 
     public ScheduledTask(
             SymbolsRepository symbolsRepository,
             MpSignalsService mpSignalsService,
             FinnhubDtoService finnhubDtoService,
-            FinnhubSignalsRepository finnhubSignalsRepository
+            FinnhubSignalsRepository finnhubSignalsRepository,
+            MpSignalsRepository mpSignalsRepository
     ) {
         this.symbolsRepository = symbolsRepository;
         this.finnhubDtoService = finnhubDtoService;
         this.mpSignalsService = mpSignalsService;
         this.finnhubSignalsRepository = finnhubSignalsRepository;
+        this.mpSignalsRepository = mpSignalsRepository;
     }
 
     //@Scheduled(cron = "0 */2 * * * *", zone = "Europe/Berlin")
@@ -71,15 +75,22 @@ public class ScheduledTask {
     }
 
     private void getCandlesPerHour() {
-        List<String> ohlcSymbols = new ArrayList<>();
-        List<FinnhubSignalsDTO> symbols = finnhubSignalsRepository.strongBuyQueryForUpdate();
+        List<FinnhubSignalsDTO> symbols; 
+        
+        symbols = finnhubSignalsRepository.strongBuyQueryForUpdate();
+        saveOhlc(symbols);
+        symbols = mpSignalsRepository.strongBuyQueryForUpdate();
+        saveOhlc(symbols);
+    }
+    
+    private void saveOhlc(List<FinnhubSignalsDTO> symbols){
+        
         String abbreviation;
         int counter = 0;
         for (FinnhubSignalsDTO next : symbols) {
             abbreviation = next.getAbbreviation();
             try {
                 finnhubDtoService.saveOHLC(abbreviation);
-                ohlcSymbols.add(abbreviation);
             } catch (IOException e) {
                 java.util.logging.Logger.getLogger(FinnhubController.class.getName()).log(Level.SEVERE, null, e);
             }

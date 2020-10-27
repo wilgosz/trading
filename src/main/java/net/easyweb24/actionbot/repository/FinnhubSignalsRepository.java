@@ -34,7 +34,7 @@ public interface FinnhubSignalsRepository extends JpaRepository < FinnhubSignals
             + " WHERE s.abbreviation = f.abbreviation "
             + " AND cp.abbreviation = f.abbreviation "
             //+ " AND trending = 1"
-            + " ORDER BY buy DESC, sell ASC  LIMIT 300", nativeQuery = true)
+            + " ORDER BY buy DESC, sell ASC  LIMIT 200", nativeQuery = true)
     List<FinnhubSignalsDTO> strongBuyQueryForUpdate();
     //Page<FinnhubSignals> findByDescriptionStartingWith(String letter, Pageable pglb);
 }
