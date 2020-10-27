@@ -6,6 +6,7 @@
 package net.easyweb24.actionbot.indicators;
 
 import java.util.List;
+import net.easyweb24.actionbot.entity.Indicators;
 import net.easyweb24.actionbot.utils.BarsBuilder;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.ta4j.core.BarSeries;
@@ -31,6 +32,10 @@ public class STOCHASTIC extends AbstractMPIndicators {
      */
     public STOCHASTIC(BarSeries series, int period_long, int period_short, int period) {
         super(series, period_long, period_short, period);
+    }
+    
+    public STOCHASTIC(BarSeries series, Indicators ind) {
+        super(series, ind);
     }
 
     /**

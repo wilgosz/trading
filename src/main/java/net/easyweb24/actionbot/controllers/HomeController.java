@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import net.easyweb24.actionbot.dto.CompanyProfileDTO;
+import net.easyweb24.actionbot.repository.MpSignalsRepository;
 
 /**
  *
@@ -50,6 +51,7 @@ public class HomeController {
     private final SymbolsRepository symbolsRepository;
     private final CompanyProfileRepository companyProfileRepository;
     private final CompanyNewsRepository companyNewsRepository;
+    private final MpSignalsRepository mpSignalsRepository;
 
     public HomeController(
             FinnhubService finnhubService,
@@ -58,7 +60,8 @@ public class HomeController {
             FinnhubComponent finnhubComponent,
             FinnhubSignalsRepository finnhubSignalsRepository,
             CompanyProfileRepository companyProfileRepository,
-            CompanyNewsRepository companyNewsRepository
+            CompanyNewsRepository companyNewsRepository,
+            MpSignalsRepository mpSignalsRepository
     ) {
 
         this.finnhubService = finnhubService;
@@ -68,6 +71,7 @@ public class HomeController {
         this.finnhubSignalsRepository = finnhubSignalsRepository;
         this.companyProfileRepository = companyProfileRepository;
         this.companyNewsRepository = companyNewsRepository;
+        this.mpSignalsRepository = mpSignalsRepository;
     }
 
     @GetMapping("/")
@@ -79,9 +83,10 @@ public class HomeController {
         model.addAttribute("title", "Dashboard");*/
         model.addAttribute("title", "Dashboard");
         List<FinnhubSignalsDTO> signalslist = finnhubSignalsRepository.strongBuyQuery();
-        //System.out.println(signalslist.get(0).getUpdatedatetime());
+        List<FinnhubSignalsDTO> mplist = mpSignalsRepository.strongBuyQuery();
         
         model.addAttribute("signals", signalslist);
+        model.addAttribute("mpsignals", mplist);
         return "index";
     }
 

@@ -52,7 +52,7 @@ public class IndicatorsService {
     public MACD getMACD(BarSeries series){
         
         Indicators ind = indicatorsRepository.findByAbbreviation("MACD");
-        MACD macd = new MACD(series, ind.getPeriodLong(), ind.getPeriodShort(), 0);
+        MACD macd = new MACD(series, ind);
         return macd;
     }
     
@@ -74,7 +74,7 @@ public class IndicatorsService {
     
     public STOCHASTIC getStochastic(BarSeries series){
         Indicators ind = indicatorsRepository.findByAbbreviation("STOCHASTIC");
-        STOCHASTIC stochastic = new STOCHASTIC(series, ind.getPeriodLong(), ind.getPeriodShort(), ind.getPeriod());
+        STOCHASTIC stochastic = new STOCHASTIC(series, ind);
         return stochastic;
     }
     
@@ -98,7 +98,7 @@ public class IndicatorsService {
     
     public BOLLINGER getBollinger(BarSeries series){
         Indicators ind = indicatorsRepository.findByAbbreviation("BOLLINGER");
-        BOLLINGER bllg = new BOLLINGER(series, ind.getPeriodLong(), ind.getPeriodShort(), ind.getPeriod());
+        BOLLINGER bllg = new BOLLINGER(series, ind);
         return bllg;
     }
     

@@ -26,7 +26,7 @@ public interface FinnhubSignalsRepository extends JpaRepository < FinnhubSignals
             + " AND cp.abbreviation = f.abbreviation "
             + " AND  f.signals = 'strong buy' "
             //+ " AND trending = 1"
-            + " ORDER BY buy DESC, sell ASC  LIMIT 48", nativeQuery = true)
+            + " ORDER BY buy DESC, sell ASC  LIMIT 18", nativeQuery = true)
     List<FinnhubSignalsDTO> strongBuyQuery();
     
     @Query(value = ""

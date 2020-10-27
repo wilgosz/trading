@@ -14,8 +14,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
@@ -24,16 +22,12 @@ import javax.validation.constraints.Size;
  * @author zbigniewwilgosz
  */
 @Entity
-@Table(name = "finnhub_signals", indexes = {
-    @Index(name = "finnhub_signals_abbreviation_idx", columnList = "abbreviation", unique = false),
-    @Index(name = "finnhub_signals_signals_idx", columnList = "signals", unique = false),
-    @Index(name = "finnhub_signals_buy_idx", columnList = "buy", unique = false),
-    @Index(name = "finnhub_signals_neutral_idx", columnList = "neutral", unique = false),
-    @Index(name = "finnhub_signals_sell_idx", columnList = "sell", unique = false)
+@Table(name = "mp_signals", indexes = {
+    @Index(name = "mp_signals_abbreviation_idx", columnList = "abbreviation", unique = false),
+    @Index(name = "mp_signals_update_date_time_idx", columnList = "update_date_time", unique = false)
 })
-@NamedQueries({
-    @NamedQuery(name = "FinnhubSignals.findAll", query = "SELECT f FROM FinnhubSignals f")})
-public class FinnhubSignals implements Serializable {
+
+public class MpSignals implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -46,43 +40,22 @@ public class FinnhubSignals implements Serializable {
     @Column(name = "abbreviation")
     private String abbreviation;
     
-    @Column(name = "buy")
-    private Integer buy;
-    
-    @Column(name = "neutral")
-    private Integer neutral;
-    
-    @Column(name = "sell")
-    private Integer sell;
-    
-    @Size(max = 16)
-    @Column(name = "signals")
-    private String signals;
-    
-    //@Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Column(name = "adx")
-    private Double adx;
-    
-    @Basic(optional = false)
-    @Column(name = "trending")
-    private boolean trending;
-    
     @Column(name = "create_date_time", columnDefinition="DATETIME DEFAULT CURRENT_TIMESTAMP")
     public LocalDateTime createDateTime;
  
     @Column(name = "update_date_time", columnDefinition="DATETIME ON UPDATE CURRENT_TIMESTAMP")
     public LocalDateTime updateDateTime;
+    
+    private Integer buy;
+    private Integer neutral;
+    private Integer sell;
+    
 
-    public FinnhubSignals() {
+    public MpSignals() {
     }
 
-    public FinnhubSignals(Integer id) {
+    public MpSignals(Integer id) {
         this.id = id;
-    }
-
-    public FinnhubSignals(Integer id, boolean trending) {
-        this.id = id;
-        this.trending = trending;
     }
 
     public Integer getId() {
@@ -101,54 +74,6 @@ public class FinnhubSignals implements Serializable {
         this.abbreviation = abbreviation;
     }
 
-    public Integer getBuy() {
-        return buy;
-    }
-
-    public void setBuy(Integer buy) {
-        this.buy = buy;
-    }
-
-    public Integer getNeutral() {
-        return neutral;
-    }
-
-    public void setNeutral(Integer neutral) {
-        this.neutral = neutral;
-    }
-
-    public Integer getSell() {
-        return sell;
-    }
-
-    public void setSell(Integer sell) {
-        this.sell = sell;
-    }
-
-    public String getSignals() {
-        return signals;
-    }
-
-    public void setSignals(String signals) {
-        this.signals = signals;
-    }
-
-    public Double getAdx() {
-        return adx;
-    }
-
-    public void setAdx(Double adx) {
-        this.adx = adx;
-    }
-
-    public boolean getTrending() {
-        return trending;
-    }
-
-    public void setTrending(boolean trending) {
-        this.trending = trending;
-    }
-
     @Override
     public int hashCode() {
         int hash = 0;
@@ -159,10 +84,10 @@ public class FinnhubSignals implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof FinnhubSignals)) {
+        if (!(object instanceof MpSignals)) {
             return false;
         }
-        FinnhubSignals other = (FinnhubSignals) object;
+        MpSignals other = (MpSignals) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -171,7 +96,7 @@ public class FinnhubSignals implements Serializable {
 
     @Override
     public String toString() {
-        return "net.easyweb24.actionbot.entity.FinnhubSignals[ id=" + id + " ]";
+        return "net.easyweb24.actionbot.entity.MpSignals[ id=" + id + " ]";
     }
 
     /**
@@ -200,6 +125,48 @@ public class FinnhubSignals implements Serializable {
      */
     public void setUpdateDateTime(LocalDateTime updateDateTime) {
         this.updateDateTime = updateDateTime;
+    }
+
+    /**
+     * @return the buy
+     */
+    public Integer getBuy() {
+        return buy;
+    }
+
+    /**
+     * @param buy the buy to set
+     */
+    public void setBuy(Integer buy) {
+        this.buy = buy;
+    }
+
+    /**
+     * @return the neutral
+     */
+    public Integer getNeutral() {
+        return neutral;
+    }
+
+    /**
+     * @param neutral the neutral to set
+     */
+    public void setNeutral(Integer neutral) {
+        this.neutral = neutral;
+    }
+
+    /**
+     * @return the sell
+     */
+    public Integer getSell() {
+        return sell;
+    }
+
+    /**
+     * @param sell the sell to set
+     */
+    public void setSell(Integer sell) {
+        this.sell = sell;
     }
     
 }
