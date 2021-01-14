@@ -10,9 +10,9 @@
     </parent>
     <groupId>net.easyweb24</groupId>
     <artifactId>trading</artifactId>
+    <packaging>jar</packaging>
     <version>1</version>
     <name>Trading Bot</name>
-    <packaging>war</packaging>
     <description>trading bot project for Spring Boot</description>
 
     <properties>
@@ -177,6 +177,13 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

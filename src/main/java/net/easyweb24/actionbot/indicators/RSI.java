@@ -6,6 +6,7 @@
 package net.easyweb24.actionbot.indicators;
 
 import java.util.List;
+import net.easyweb24.actionbot.dto.IndicatorsDTO;
 import net.easyweb24.actionbot.entity.Indicators;
 import net.easyweb24.actionbot.utils.BarsBuilder;
 import org.jfree.data.time.TimeSeriesCollection;
@@ -24,7 +25,7 @@ public class RSI extends AbstractMPIndicators{
         super(series, period_long, period_short, period);
     }
     
-    public RSI(BarSeries series, Indicators ind) {
+    public RSI(BarSeries series, IndicatorsDTO ind) {
         super(series, ind);
     }
 

@@ -6,6 +6,7 @@
 package net.easyweb24.actionbot.indicators;
 
 import java.util.List;
+import net.easyweb24.actionbot.dto.IndicatorsDTO;
 import net.easyweb24.actionbot.entity.Indicators;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.ta4j.core.BarSeries;
@@ -25,7 +26,7 @@ public class ADX extends AbstractMPIndicators{
     private MinusDIIndicator minusDIIndicator;
     private SMAIndicator smaIndicator;
 
-    public ADX(BarSeries series, Indicators ind) {
+    public ADX(BarSeries series, IndicatorsDTO ind) {
         super(series, ind);
     }
 

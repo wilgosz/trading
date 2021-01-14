@@ -5,6 +5,7 @@
  */
 package net.easyweb24.actionbot.repository;
 
+import net.easyweb24.actionbot.dto.IndicatorsDTO;
 import net.easyweb24.actionbot.entity.Indicators;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

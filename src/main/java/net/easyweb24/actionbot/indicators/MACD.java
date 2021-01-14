@@ -6,7 +6,7 @@
 package net.easyweb24.actionbot.indicators;
 
 import java.util.List;
-import net.easyweb24.actionbot.entity.Indicators;
+import net.easyweb24.actionbot.dto.IndicatorsDTO;
 import net.easyweb24.actionbot.utils.BarsBuilder;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.ta4j.core.BarSeries;
@@ -31,7 +31,7 @@ public class MACD extends AbstractMPIndicators{
         super(series, period_long, period_short, period);
     }
     
-    public MACD(BarSeries series, Indicators ind) {
+    public MACD(BarSeries series, IndicatorsDTO ind) {
         super(series, ind);
     }
     

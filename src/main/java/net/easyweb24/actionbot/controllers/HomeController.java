@@ -7,10 +7,12 @@ package net.easyweb24.actionbot.controllers;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import net.easyweb24.actionbot.components.FinnhubComponent;
+import net.easyweb24.actionbot.components.utils.DBToBarSeries;
 import net.easyweb24.actionbot.dto.AggregateIndicators;
 import net.easyweb24.actionbot.entity.CompanyNews;
 import net.easyweb24.actionbot.entity.CompanyProfile;
@@ -36,6 +38,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import net.easyweb24.actionbot.dto.CompanyProfileDTO;
 import net.easyweb24.actionbot.repository.MpSignalsRepository;
+import net.easyweb24.actionbot.rules.MACDRules;
+import net.easyweb24.actionbot.rules.MONEYFLOWRules;
+import net.easyweb24.actionbot.rules.MPRules;
+import net.easyweb24.actionbot.rules.RSIRules;
+import net.easyweb24.actionbot.rules.SMARules;
+import net.easyweb24.actionbot.rules.STOCHRules;
+import net.easyweb24.actionbot.service.StandartRulesGroup;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.ta4j.core.BarSeries;
+import org.ta4j.core.BaseBarSeries;
 
 /**
  *
@@ -52,6 +64,9 @@ public class HomeController {
     private final CompanyProfileRepository companyProfileRepository;
     private final CompanyNewsRepository companyNewsRepository;
     private final MpSignalsRepository mpSignalsRepository;
+
+    @Autowired
+    private DBToBarSeries dbToBarSeries;
 
     public HomeController(
             FinnhubService finnhubService,
@@ -84,7 +99,7 @@ public class HomeController {
         model.addAttribute("title", "Dashboard");
         List<FinnhubSignalsDTO> signalslist = finnhubSignalsRepository.strongBuyQuery();
         List<FinnhubSignalsDTO> mplist = mpSignalsRepository.strongBuyQuery();
-        
+
         model.addAttribute("signals", signalslist);
         model.addAttribute("mpsignals", mplist);
         return "index";
@@ -104,7 +119,7 @@ public class HomeController {
         if (request.getParameter("size") != null && !request.getParameter("size").equals("")) {
             pagesize = Integer.parseInt(request.getParameter("size"));
         }
-        
+
         Pageable pgbl = PageRequest.of(pagenumber, pagesize, Sort.by("name"));
         if (request.getParameter("letter") != null && !request.getParameter("letter").equals("")) {
             page = companyProfileRepository.getAllCompaniesDescriptionStartingWith(request.getParameter("letter"), pgbl);
@@ -142,6 +157,7 @@ public class HomeController {
                 model.addAttribute("company", company);
                 model.addAttribute("title", company.getName());
                 model.addAttribute("symbol", symbol);
+                
 
             } catch (Exception ex) {
                 model.addAttribute("company", finnhubComponent.dummyCompany(symbols));
@@ -195,14 +211,25 @@ public class HomeController {
         }
         return "company_news";
     }
-    
+
     @GetMapping("/strategies")
-    public String strategies(Model model){
+    public String strategies(Model model) {
+
+        BarSeries series = dbToBarSeries.getBars("CEF");
+        List<MPRules> list = new ArrayList<>();
+        list.add(new STOCHRules(new BaseBarSeries()));
+        list.add(new SMARules(new BaseBarSeries()));
+        list.add(new RSIRules(new BaseBarSeries()));
+        list.add(new MONEYFLOWRules(new BaseBarSeries()));
+        list.add(new MACDRules(new BaseBarSeries()));
+        StandartRulesGroup group = new StandartRulesGroup(series, list, 120);
+
         model.addAttribute("title", "User Strategies");
         return "strategies";
     }
+
     @GetMapping("/actions")
-    public String actions(Model model){
+    public String actions(Model model) {
         model.addAttribute("title", "Current Actions");
         return "actions";
     }

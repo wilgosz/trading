@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import net.easyweb24.actionbot.dto.IndicatorsDTO;
 import net.easyweb24.actionbot.entity.Indicators;
 import net.easyweb24.actionbot.utils.TradingChart;
 import org.jfree.data.time.TimeSeriesCollection;
@@ -51,7 +52,7 @@ public abstract class AbstractMPIndicators {
         this(series, period_long, period_short, period, 0, 0);
     }
     
-    public AbstractMPIndicators(BarSeries series, Indicators ind){
+    public AbstractMPIndicators(BarSeries series, IndicatorsDTO ind){
         this(series, ind.getPeriodLong(), ind.getPeriodShort(), ind.getPeriod(), ind.getBottomBorder(), ind.getTopBorder());
     }
     

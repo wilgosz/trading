@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import net.easyweb24.actionbot.dto.IndicatorsDTO;
 import net.easyweb24.actionbot.entity.Indicators;
 import net.easyweb24.actionbot.utils.BarsBuilder;
 import org.jfree.data.time.TimeSeriesCollection;
@@ -40,7 +41,7 @@ public class STOCHASTIC_SLOW extends AbstractMPIndicators {
     }
     
     
-    public STOCHASTIC_SLOW(BarSeries series, Indicators ind) {
+    public STOCHASTIC_SLOW(BarSeries series, IndicatorsDTO ind) {
         super(series, ind);
     }
 

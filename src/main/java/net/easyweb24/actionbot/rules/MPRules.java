@@ -17,26 +17,30 @@ import org.ta4j.core.BaseStrategy;
  */
 public abstract class MPRules {
 
-    private final IndicatorsService indicatorsService;
+    private final IndicatorsService indicatorsService = ApplicationContextHolder.getContext().getBean(IndicatorsService.class);
     private int endIndex;
+    private int reallyEndIndex;
     private BarSeries series;
     private boolean shouldEnter = false;
     private boolean entryContinue = false;
     private double lastIndexTheBest = 0;
     private double lastValue = 0;
     private boolean goUp = false;
-    private int timeRange = 14;
+    private int timeRange = 3;
     private BaseStrategy entryStrategie;
     private BaseStrategy entryContinueStrategie;
 
     public MPRules(BarSeries series) {
         this.series = series;
-        endIndex = series.getEndIndex();
-        indicatorsService = ApplicationContextHolder.getContext().getBean(IndicatorsService.class);
-        setIndicator(series);
-        buildEntryRule();
-        buildEntryRuleContinueInLastIndex();
-        checkRules();
+        if (series.getBarCount() > 0) {
+            reallyEndIndex = series.getEndIndex();
+            endIndex = series.getEndIndex();
+
+            setIndicator(series);
+            buildEntryRule();
+            buildEntryRuleContinueInLastIndex();
+            checkRules();
+        }
     }
 
     protected abstract void buildEntryRule();
@@ -52,6 +56,14 @@ public abstract class MPRules {
      */
     public IndicatorsService getIndicatorsService() {
         return indicatorsService;
+    }
+
+    public void getCheckDate() {
+        System.out.print(getSeries().getBar(endIndex).getSimpleDateName());
+    }
+
+    public int getReallyEndIndex() {
+        return reallyEndIndex;
     }
 
     /**
@@ -78,8 +90,16 @@ public abstract class MPRules {
     /**
      * @param series the series to set
      */
-    public void setSeries(BarSeries series) {
+    public MPRules setSeries(BarSeries series) {
         this.series = series;
+        reallyEndIndex = series.getEndIndex();
+        endIndex = series.getEndIndex();
+
+        setIndicator(series);
+        buildEntryRule();
+        buildEntryRuleContinueInLastIndex();
+        checkRules();
+        return this;
     }
 
     /**
@@ -215,7 +235,7 @@ public abstract class MPRules {
 
         setEntryContinue(getEntryContinueStrategie().shouldEnter(getEndIndex()));
         setLastIndexTheBest((values.get(getEndIndex()) / topValue) * 100);
-        setGoUp(values.get(getEndIndex() - 2) < values.get(getEndIndex()-1) && values.get(getEndIndex() - 1) < values.get(getEndIndex()));
+        setGoUp(values.get(getEndIndex() - 2) < values.get(getEndIndex() - 1) && values.get(getEndIndex() - 1) < values.get(getEndIndex()));
         setLastValue(values.get(getEndIndex()));
     }
 
