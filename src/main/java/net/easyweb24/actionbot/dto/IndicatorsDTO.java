@@ -19,10 +19,14 @@ public class IndicatorsDTO {
     private Integer topBorder;
     private Integer bottomBorder;
     private Integer strategieId = 0;
+    private Boolean reverse = false;
+    private Boolean active = false;
     
     public IndicatorsDTO(){
         
     }
+    
+    
 
     /**
      * @return the id
@@ -134,6 +138,34 @@ public class IndicatorsDTO {
      */
     public void setStrategieId(Integer strategieId) {
         this.strategieId = strategieId;
+    }
+
+    /**
+     * @return the reverse
+     */
+    public Boolean getReverse() {
+        return reverse;
+    }
+
+    /**
+     * @param reverse the reverse to set
+     */
+    public void setReverse(Boolean reverse) {
+        this.reverse = reverse;
+    }
+
+    /**
+     * @return the active
+     */
+    public Boolean getActive() {
+        return active;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(Boolean active) {
+        this.active = active;
     }
     
     

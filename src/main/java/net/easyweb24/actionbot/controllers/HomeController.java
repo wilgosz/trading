@@ -6,9 +6,12 @@
 package net.easyweb24.actionbot.controllers;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import net.easyweb24.actionbot.components.FinnhubComponent;
@@ -37,7 +40,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import net.easyweb24.actionbot.dto.CompanyProfileDTO;
+import net.easyweb24.actionbot.dto.StrategiesDTO;
+import net.easyweb24.actionbot.entity.Strategies;
+import net.easyweb24.actionbot.entity.StrategiesIndicators;
 import net.easyweb24.actionbot.repository.MpSignalsRepository;
+import net.easyweb24.actionbot.repository.StrategiesIndicatorsRepository;
+import net.easyweb24.actionbot.repository.StrategiesRepository;
 import net.easyweb24.actionbot.rules.MACDRules;
 import net.easyweb24.actionbot.rules.MONEYFLOWRules;
 import net.easyweb24.actionbot.rules.MPRules;
@@ -45,6 +53,7 @@ import net.easyweb24.actionbot.rules.RSIRules;
 import net.easyweb24.actionbot.rules.SMARules;
 import net.easyweb24.actionbot.rules.STOCHRules;
 import net.easyweb24.actionbot.service.StandartRulesGroup;
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseBarSeries;
@@ -64,6 +73,8 @@ public class HomeController {
     private final CompanyProfileRepository companyProfileRepository;
     private final CompanyNewsRepository companyNewsRepository;
     private final MpSignalsRepository mpSignalsRepository;
+    private final StrategiesRepository strategiesRepository;
+    private final StrategiesIndicatorsRepository strategiesIndicatorsRepository;
 
     @Autowired
     private DBToBarSeries dbToBarSeries;
@@ -76,7 +87,9 @@ public class HomeController {
             FinnhubSignalsRepository finnhubSignalsRepository,
             CompanyProfileRepository companyProfileRepository,
             CompanyNewsRepository companyNewsRepository,
-            MpSignalsRepository mpSignalsRepository
+            MpSignalsRepository mpSignalsRepository,
+            StrategiesRepository strategiesRepository,
+            StrategiesIndicatorsRepository strategiesIndicatorsRepository
     ) {
 
         this.finnhubService = finnhubService;
@@ -87,6 +100,8 @@ public class HomeController {
         this.companyProfileRepository = companyProfileRepository;
         this.companyNewsRepository = companyNewsRepository;
         this.mpSignalsRepository = mpSignalsRepository;
+        this.strategiesRepository = strategiesRepository;
+        this.strategiesIndicatorsRepository = strategiesIndicatorsRepository;
     }
 
     @GetMapping("/")
@@ -214,15 +229,24 @@ public class HomeController {
 
     @GetMapping("/strategies")
     public String strategies(Model model) {
-
+        
+        Strategies strategies = strategiesRepository.findById(1);
+        StrategiesDTO dto = new StrategiesDTO();
+        try {
+            BeanUtils.copyProperties(dto, strategies);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
+        }
         BarSeries series = dbToBarSeries.getBars("CEF");
         List<MPRules> list = new ArrayList<>();
-        list.add(new STOCHRules(new BaseBarSeries()));
-        list.add(new SMARules(new BaseBarSeries()));
-        list.add(new RSIRules(new BaseBarSeries()));
-        list.add(new MONEYFLOWRules(new BaseBarSeries()));
-        list.add(new MACDRules(new BaseBarSeries()));
-        StandartRulesGroup group = new StandartRulesGroup(series, list, 120);
+        list.add(new STOCHRules(new BaseBarSeries(), dto));
+        list.add(new SMARules(new BaseBarSeries(), dto));
+        list.add(new RSIRules(new BaseBarSeries(), dto));
+        list.add(new MONEYFLOWRules(new BaseBarSeries(), dto));
+        list.add(new MACDRules(new BaseBarSeries(), dto));
+        //StandartRulesGroup group = new StandartRulesGroup(series, list, 120);
 
         model.addAttribute("title", "User Strategies");
         return "strategies";

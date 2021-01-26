@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +14,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import net.easyweb24.actionbot.components.utils.DBToBarSeries;
+import net.easyweb24.actionbot.dto.IndicatorsDTO;
 import net.easyweb24.actionbot.entity.Indicators;
 import net.easyweb24.actionbot.indicators.ADX;
 import net.easyweb24.actionbot.indicators.BOLLINGER;
@@ -26,6 +28,7 @@ import net.easyweb24.actionbot.indicators.STOCHASTIC_SLOW;
 import net.easyweb24.actionbot.repository.IndicatorsRepository;
 import net.easyweb24.actionbot.service.IndicatorsService;
 import net.easyweb24.actionbot.utils.BarsBuilder;
+import org.apache.commons.beanutils.BeanUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
@@ -62,14 +65,22 @@ public class IndicatorsController {
     IndicatorsService indicatorsService;
 
     @ResponseBody
-    @GetMapping("/rsi/{symbol}")
-    public ResponseEntity<Map<String, List>> RSI(@PathVariable(name = "symbol") String symbol) {
+    @GetMapping(value = {"/rsi/{symbol}", "/rsi/{symbol}/{strategyid}"})
+    public ResponseEntity<Map<String, List>> RSI(@PathVariable(name = "symbol") String symbol, @PathVariable(name = "strategyid", required = false) Integer strategyid, IndicatorsDTO indicatorsDTO) {
 
         //response.setContentType("image/png");
         //OutputStream outputStream = response.getOutputStream();
+        if (strategyid == null) {
+            strategyid = 0;
+        }
         BarSeries series = dbToBarSeries.getBars(symbol);
         Map<String, List> map = new HashMap<String, List>();
-        RSI rsi = indicatorsService.getRsi(series);
+        RSI rsi;
+        if (indicatorsDTO == null || indicatorsDTO.getAbbreviation() == null) {
+            rsi = indicatorsService.getRsi(series, strategyid);
+        } else {
+            rsi = indicatorsService.getRsi(series, indicatorsDTO);
+        }
         map.put("R", rsi.getRsiValues());
         map.put("dates", rsi.getDates());
         map = indicatorsService.addTopBottom(map, rsi);
@@ -78,12 +89,20 @@ public class IndicatorsController {
     }
 
     @ResponseBody
-    @GetMapping("/sma/{symbol}")
-    public ResponseEntity<Map<String, List>> SMA(@PathVariable(name = "symbol") String symbol) {
+    @GetMapping(value = {"/sma/{symbol}", "/sma/{symbol}/{strategyid}"})
+    public ResponseEntity<Map<String, List>> SMA(@PathVariable(name = "symbol") String symbol, @PathVariable(name = "strategyid", required = false) Integer strategyid, IndicatorsDTO indicatorsDTO) {
 
+        if (strategyid == null) {
+            strategyid = 0;
+        }
         BarSeries series = dbToBarSeries.getBars(symbol);
         Map<String, List> map = new HashMap<String, List>();
-        SMA sma = indicatorsService.getSMA(series);
+        SMA sma;
+        if (indicatorsDTO == null || indicatorsDTO.getAbbreviation() == null) {
+            sma = indicatorsService.getSMA(series, strategyid);
+        } else {
+            sma = indicatorsService.getSMA(series, indicatorsDTO);
+        }
         map.put("SMA", sma.getMacdsmaValues());
         map.put("dates", sma.getDates());
         map = indicatorsService.addTopBottom(map, sma);
@@ -91,12 +110,20 @@ public class IndicatorsController {
     }
 
     @ResponseBody
-    @GetMapping("/macd/{symbol}")
-    public ResponseEntity<Map<String, List>> MACD(@PathVariable(name = "symbol") String symbol) {
+    @GetMapping(value = {"/macd/{symbol}", "/macd/{symbol}/{strategyid}"})
+    public ResponseEntity<Map<String, List>> MACD(@PathVariable(name = "symbol") String symbol, @PathVariable(name = "strategyid", required = false) Integer strategyid, IndicatorsDTO indicatorsDTO) {
 
+        if (strategyid == null) {
+            strategyid = 0;
+        }
         BarSeries series = dbToBarSeries.getBars(symbol);
         Map<String, List> map = new HashMap<String, List>();
-        MACD macd = indicatorsService.getMACD(series);
+        MACD macd;
+        if (indicatorsDTO == null || indicatorsDTO.getAbbreviation() != null) {
+            macd = indicatorsService.getMACD(series, indicatorsDTO);
+        } else {
+            macd = indicatorsService.getMACD(series, strategyid);
+        }
         map.put("S", macd.getShortTermEmaValues());
         map.put("L", macd.getLongTermEmaValues());
         map.put("macd", macd.getMacdValues());
@@ -106,12 +133,20 @@ public class IndicatorsController {
     }
 
     @ResponseBody
-    @GetMapping("/stochastic/{symbol}")
-    public ResponseEntity<Map<String, List>> Stochastic(@PathVariable(name = "symbol") String symbol) {
+    @GetMapping(value = {"/stochastic/{symbol}", "/stochastic/{symbol}/{strategyid}"})
+    public ResponseEntity<Map<String, List>> Stochastic(@PathVariable(name = "symbol") String symbol, @PathVariable(name = "strategyid", required = false) Integer strategyid, IndicatorsDTO indicatorsDTO) {
 
+        if (strategyid == null) {
+            strategyid = 0;
+        }
         BarSeries series = dbToBarSeries.getBars(symbol);
         Map<String, List> map = new HashMap<String, List>();
-        STOCHASTIC_SLOW stochastic = indicatorsService.getStochasticS(series);
+        STOCHASTIC_SLOW stochastic;
+        if(indicatorsDTO == null || indicatorsDTO.getAbbreviation() == null){
+            stochastic = indicatorsService.getStochasticS(series, strategyid);
+        }else{
+            stochastic = indicatorsService.getStochasticS(series, indicatorsDTO);
+        }
         map.put("K", stochastic.getStochasticOscillKValues());
         map.put("D", stochastic.getStochasticOscillDValues());
         map.put("dates", stochastic.getDates());
@@ -120,12 +155,21 @@ public class IndicatorsController {
     }
 
     @ResponseBody
-    @GetMapping("/adx/{symbol}")
-    public ResponseEntity<Map<String, List>> Adx(@PathVariable(name = "symbol") String symbol) {
+    @GetMapping(value = {"/adx/{symbol}", "/adx/{symbol}/{strategyid}"})
+    public ResponseEntity<Map<String, List>> Adx(@PathVariable(name = "symbol") String symbol, @PathVariable(name = "strategyid", required = false) Integer strategyid, IndicatorsDTO indicatorsDTO) {
 
+        if (strategyid == null) {
+            strategyid = 0;
+        }
         BarSeries series = dbToBarSeries.getBars(symbol);
         Map<String, List> map = new HashMap<String, List>();
-        ADX adx = indicatorsService.getAdx(series);
+        ADX adx;
+        if(indicatorsDTO == null || indicatorsDTO.getAbbreviation() == null){ 
+            adx = indicatorsService.getAdx(series, strategyid);
+        }else{
+            adx = indicatorsService.getAdx(series, indicatorsDTO);
+        }
+        
         map.put("ADX", adx.getAdxIndicatorValues());
         map.put("DMIN", adx.getMinusDIIndicatorValues());
         map.put("DPLUS", adx.getPlusDIIndicatorValues());
@@ -136,12 +180,20 @@ public class IndicatorsController {
     }
 
     @ResponseBody
-    @GetMapping("/moneyflow/{symbol}")
-    public ResponseEntity<Map<String, List>> MoneyFlow(@PathVariable(name = "symbol") String symbol) {
+    @GetMapping(value = {"/moneyflow/{symbol}", "/moneyflow/{symbol}/{strategyid}"})
+    public ResponseEntity<Map<String, List>> MoneyFlow(@PathVariable(name = "symbol") String symbol, @PathVariable(name = "strategyid", required = false) Integer strategyid, IndicatorsDTO indicatorsDTO) {
 
+        if (strategyid == null) {
+            strategyid = 0;
+        }
         BarSeries series = dbToBarSeries.getBars(symbol);
         Map<String, List> map = new HashMap<String, List>();
-        MONEYFLOW mfl = indicatorsService.getMoneyFlow(series);
+        MONEYFLOW mfl;
+        if(indicatorsDTO == null || indicatorsDTO.getAbbreviation() == null){
+            mfl = indicatorsService.getMoneyFlow(series, strategyid);
+        }else{
+            mfl = indicatorsService.getMoneyFlow(series, indicatorsDTO);
+        }
         map.put("MF", mfl.getMfiValues());
         map.put("dates", mfl.getDates());
         map = indicatorsService.addTopBottom(map, mfl);
@@ -150,12 +202,20 @@ public class IndicatorsController {
     }
 
     @ResponseBody
-    @GetMapping("/bollinger/{symbol}")
-    public ResponseEntity<Map<String, List>> BollingerBand(@PathVariable(name = "symbol") String symbol) {
+    @GetMapping(value = {"/bollinger/{symbol}", "/bollinger/{symbol}/{strategyid}"})
+    public ResponseEntity<Map<String, List>> BollingerBand(@PathVariable(name = "symbol") String symbol, @PathVariable(name = "strategyid", required = false) Integer strategyid, IndicatorsDTO indicatorsDTO) {
 
+        if (strategyid == null) {
+            strategyid = 0;
+        }
         BarSeries series = dbToBarSeries.getBars(symbol);
         Map<String, List> map = new HashMap<String, List>();
-        BOLLINGER bllg = indicatorsService.getBollinger(series);
+        BOLLINGER bllg;
+        if(indicatorsDTO == null || indicatorsDTO.getAbbreviation() == null){
+            bllg = indicatorsService.getBollinger(series, strategyid);
+        }else{
+            bllg = indicatorsService.getBollinger(series, indicatorsDTO);
+        }
         map.put("BU", bllg.getUpBBandValues());
         map.put("BL", bllg.getLowBBandValues());
         map.put("BM", bllg.getMiddleBBandValues());
@@ -187,27 +247,79 @@ public class IndicatorsController {
     }
 
     @ResponseBody
-    @PutMapping("/updateindicator")
-    public ResponseEntity<Map<String, List>> updateIndicator(ServletRequest request, Indicators ind ) {
-        
+    @PutMapping("/testindicator")
+    public ResponseEntity<Map<String, List>> testIndicator(ServletRequest request, Indicators ind) throws IllegalAccessException, InvocationTargetException {
+
         String symbol = request.getParameter("symbol");
-        indicatorsService.findByAbbreviationAndSave(ind);
-        
+        IndicatorsDTO indicatorsDTO = new IndicatorsDTO();
+        BeanUtils.copyProperties(indicatorsDTO, ind);
+
         switch (ind.getAbbreviation()) {
             case "RSI":
-                return RSI(symbol);
+                return RSI(symbol, 0, indicatorsDTO);
             case "STOCHASTIC_SLOW":
-                return Stochastic(symbol);
+                return Stochastic(symbol, 0, indicatorsDTO);
             case "SMA":
-                return SMA(symbol);
+                return SMA(symbol, 0, indicatorsDTO);
             case "MACD":
-                return MACD(symbol);
+                return MACD(symbol, 0, indicatorsDTO);
             case "BOLLINGER":
-                return BollingerBand(symbol);
+                return BollingerBand(symbol, 0, indicatorsDTO);
             case "MONEYFLOW":
-                return MoneyFlow(symbol);
+                return MoneyFlow(symbol, 0, indicatorsDTO);
             case "ADX":
-                return Adx(symbol);
+                return Adx(symbol, 0, indicatorsDTO);
+        }
+        return ResponseEntity.ok().body(new HashMap<String, List>());
+    }
+
+    @ResponseBody
+    @PutMapping("/resetindicator")
+    public ResponseEntity<Map<String, List>> resetIndicator(ServletRequest request, Indicators ind) {
+
+        String symbol = request.getParameter("symbol");
+
+        switch (ind.getAbbreviation()) {
+            case "RSI":
+                return RSI(symbol, 0, new IndicatorsDTO());
+            case "STOCHASTIC_SLOW":
+                return Stochastic(symbol, 0, new IndicatorsDTO());
+            case "SMA":
+                return SMA(symbol, 0, new IndicatorsDTO());
+            case "MACD":
+                return MACD(symbol, 0, new IndicatorsDTO());
+            case "BOLLINGER":
+                return BollingerBand(symbol, 0, new IndicatorsDTO());
+            case "MONEYFLOW":
+                return MoneyFlow(symbol, 0, new IndicatorsDTO());
+            case "ADX":
+                return Adx(symbol, 0, null);
+        }
+        return ResponseEntity.ok().body(new HashMap<String, List>());
+    }
+
+    @ResponseBody
+    @PutMapping("/updateindicator")
+    public ResponseEntity<Map<String, List>> updateIndicator(ServletRequest request, Indicators ind) {
+
+        String symbol = request.getParameter("symbol");
+        indicatorsService.findByAbbreviationAndSave(ind);
+
+        switch (ind.getAbbreviation()) {
+            case "RSI":
+                return RSI(symbol, 0, new IndicatorsDTO());
+            case "STOCHASTIC_SLOW":
+                return Stochastic(symbol, 0, new IndicatorsDTO());
+            case "SMA":
+                return SMA(symbol, 0, new IndicatorsDTO());
+            case "MACD":
+                return MACD(symbol, 0, new IndicatorsDTO());
+            case "BOLLINGER":
+                return BollingerBand(symbol, 0, new IndicatorsDTO());
+            case "MONEYFLOW":
+                return MoneyFlow(symbol, 0, new IndicatorsDTO());
+            case "ADX":
+                return Adx(symbol, 0, null);
         }
         return ResponseEntity.ok().body(new HashMap<String, List>());
     }
@@ -256,8 +368,8 @@ public class IndicatorsController {
         ImageIO.write(image, "PNG", outputStream);
         //return outputStream;
     }
-    
-    private Indicators setData(Indicators data){
+
+    private Indicators setData(Indicators data) {
         return indicatorsService.findByAbbreviationAndSave(data);
     }
 }

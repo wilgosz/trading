@@ -12,6 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -23,7 +24,9 @@ import javax.persistence.Table;
  * @author zbigniewwilgosz
  */
 @Entity
-@Table(name = "strategies_indicators", catalog = "trading", schema = "")
+@Table(name = "strategies_indicators", indexes = {
+    @Index(name = "strategies_indicators_abbr_idx", columnList = "indicators_abbreviation", unique = false)
+})
 @NamedQueries({
     @NamedQuery(name = "StrategiesIndicators.findAll", query = "SELECT s FROM StrategiesIndicators s"),
     @NamedQuery(name = "StrategiesIndicators.findById", query = "SELECT s FROM StrategiesIndicators s WHERE s.id = :id"),
@@ -56,6 +59,10 @@ public class StrategiesIndicators implements Serializable {
     private Integer bottomBorder;
     @Column(name = "time_range")
     private Integer timeRange;
+    @Column(name = "active")
+    private Boolean active = false;
+    @Column(name = "reverse")
+    private Boolean reverse = false;
     @JoinColumn(name = "strategies_id", referencedColumnName = "id")
     @ManyToOne
     private Strategies strategiesId;
@@ -66,6 +73,8 @@ public class StrategiesIndicators implements Serializable {
     public StrategiesIndicators(Integer id) {
         this.id = id;
     }
+    
+    
 
     public Integer getId() {
         return id;
@@ -162,6 +171,34 @@ public class StrategiesIndicators implements Serializable {
     @Override
     public String toString() {
         return "net.easyweb24.actionbot.entity.StrategiesIndicators[ id=" + id + " ]";
+    }
+
+    /**
+     * @return the active
+     */
+    public Boolean getActive() {
+        return active;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+    /**
+     * @return the reverse
+     */
+    public Boolean getReverse() {
+        return reverse;
+    }
+
+    /**
+     * @param reverse the reverse to set
+     */
+    public void setReverse(Boolean reverse) {
+        this.reverse = reverse;
     }
     
 }

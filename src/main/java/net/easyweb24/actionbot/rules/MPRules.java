@@ -7,6 +7,7 @@ package net.easyweb24.actionbot.rules;
 
 import java.util.List;
 import net.easyweb24.actionbot.components.ApplicationContextHolder;
+import net.easyweb24.actionbot.dto.StrategiesDTO;
 import net.easyweb24.actionbot.service.IndicatorsService;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseStrategy;
@@ -26,17 +27,28 @@ public abstract class MPRules {
     private double lastIndexTheBest = 0;
     private double lastValue = 0;
     private boolean goUp = false;
-    private int timeRange = 3;
+    private int timeRange;
     private BaseStrategy entryStrategie;
     private BaseStrategy entryContinueStrategie;
+    private StrategiesDTO strategiesDTO;
 
     public MPRules(BarSeries series) {
+        this(series, null);
+    }
+
+    public MPRules(BarSeries series, StrategiesDTO strategiesDTO) {
+        if (strategiesDTO == null) {
+            this.strategiesDTO = new StrategiesDTO();
+        } else {
+            this.strategiesDTO = strategiesDTO;
+        }
+        this.timeRange = this.strategiesDTO.getTimeRange();
         this.series = series;
         if (series.getBarCount() > 0) {
             reallyEndIndex = series.getEndIndex();
             endIndex = series.getEndIndex();
 
-            setIndicator(series);
+            setIndicator(series, this.strategiesDTO.getId());
             buildEntryRule();
             buildEntryRuleContinueInLastIndex();
             checkRules();
@@ -49,7 +61,7 @@ public abstract class MPRules {
 
     protected abstract void checkRules();
 
-    protected abstract void setIndicator(BarSeries series);
+    protected abstract void setIndicator(BarSeries series, int strategieId);
 
     /**
      * @return the indicatorsService
@@ -95,7 +107,7 @@ public abstract class MPRules {
         reallyEndIndex = series.getEndIndex();
         endIndex = series.getEndIndex();
 
-        setIndicator(series);
+        setIndicator(series, this.strategiesDTO.getId());
         buildEntryRule();
         buildEntryRuleContinueInLastIndex();
         checkRules();
@@ -213,6 +225,8 @@ public abstract class MPRules {
     public void setEntryContinueStrategie(BaseStrategy entryContinueStrategie) {
         this.entryContinueStrategie = entryContinueStrategie;
     }
+    
+    
 
     protected void checkSimplyRules(List<Double> values) {
         double topValue = 0;
@@ -237,6 +251,13 @@ public abstract class MPRules {
         setLastIndexTheBest((values.get(getEndIndex()) / topValue) * 100);
         setGoUp(values.get(getEndIndex() - 2) < values.get(getEndIndex() - 1) && values.get(getEndIndex() - 1) < values.get(getEndIndex()));
         setLastValue(values.get(getEndIndex()));
+    }
+
+    /**
+     * @return the strategiesDTO
+     */
+    public StrategiesDTO getStrategiesDTO() {
+        return strategiesDTO;
     }
 
 }

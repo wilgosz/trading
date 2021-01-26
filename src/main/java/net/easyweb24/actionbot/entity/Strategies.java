@@ -38,6 +38,10 @@ public class Strategies implements Serializable {
     private Integer id;
     @Column(name = "name", length = 255)
     private String name;
+    @Column(name = "time_range")
+    private Integer timeRange;
+    @Column(name = "support_time_range")
+    private Integer supportTimeRange;
     @OneToMany(mappedBy = "strategiesId")
     private List<Alerts> alertsList;
     @OneToMany(mappedBy = "strategiesId")
@@ -105,6 +109,34 @@ public class Strategies implements Serializable {
     @Override
     public String toString() {
         return "net.easyweb24.actionbot.entity.Strategies[ id=" + id + " ]";
+    }
+
+    /**
+     * @return the timeRange
+     */
+    public Integer getTimeRange() {
+        return timeRange;
+    }
+
+    /**
+     * @param timeRange the timeRange to set
+     */
+    public void setTimeRange(Integer timeRange) {
+        this.timeRange = timeRange;
+    }
+
+    /**
+     * @return the supportTimeRange
+     */
+    public Integer getSupportTimeRange() {
+        return supportTimeRange;
+    }
+
+    /**
+     * @param supportTimeRange the supportTimeRange to set
+     */
+    public void setSupportTimeRange(Integer supportTimeRange) {
+        this.supportTimeRange = supportTimeRange;
     }
     
 }

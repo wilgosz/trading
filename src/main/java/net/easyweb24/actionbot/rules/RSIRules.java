@@ -6,6 +6,7 @@
 package net.easyweb24.actionbot.rules;
 
 import java.util.List;
+import net.easyweb24.actionbot.dto.StrategiesDTO;
 import net.easyweb24.actionbot.indicators.RSI;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseStrategy;
@@ -25,6 +26,10 @@ public class RSIRules extends MPRules{
     
     public RSIRules(BarSeries series) {
         super(series);
+    }
+    
+    public RSIRules(BarSeries series, StrategiesDTO strategiesDTO){
+        super(series, strategiesDTO);
     }
 
     protected void buildEntryRule() {
@@ -48,7 +53,7 @@ public class RSIRules extends MPRules{
     }
 
     @Override
-    protected void setIndicator(BarSeries series) {
-        rsi = getIndicatorsService().getRsi(series);
+    protected void setIndicator(BarSeries series, int strategieId) {
+        rsi = getIndicatorsService().getRsi(series, strategieId);
     }
 }

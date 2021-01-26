@@ -6,6 +6,7 @@
 package net.easyweb24.actionbot.rules;
 
 import java.util.List;
+import net.easyweb24.actionbot.dto.StrategiesDTO;
 import net.easyweb24.actionbot.indicators.MONEYFLOW;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseStrategy;
@@ -25,6 +26,10 @@ public class MONEYFLOWRules extends MPRules{
 
     public MONEYFLOWRules(BarSeries series) {
         super(series);
+    }
+    
+    public MONEYFLOWRules(BarSeries series, StrategiesDTO strategiesDTO){
+        super(series, strategiesDTO);
     }
 
     protected void buildEntryRule() {
@@ -48,7 +53,7 @@ public class MONEYFLOWRules extends MPRules{
     }
 
     @Override
-    protected void setIndicator(BarSeries series) {
-        moneyFlow = getIndicatorsService().getMoneyFlow(series);
+    protected void setIndicator(BarSeries series, int strategieId) {
+        moneyFlow = getIndicatorsService().getMoneyFlow(series, strategieId);
     }
 }

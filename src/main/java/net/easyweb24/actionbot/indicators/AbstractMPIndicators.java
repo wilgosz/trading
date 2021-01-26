@@ -28,8 +28,10 @@ public abstract class AbstractMPIndicators {
     private int period = 0;
     private int period_long = 0;
     private int period_short = 0;
+    private boolean active = true;
+    private boolean reverse = false;
     
-    public AbstractMPIndicators(BarSeries series,int period_long, int period_short, int period, int bottom_border, int top_border){
+    public AbstractMPIndicators(BarSeries series,int period_long, int period_short, int period, int bottom_border, int top_border, boolean active, boolean reverse){
         
         this.series = series;
         this.period = period;
@@ -38,6 +40,8 @@ public abstract class AbstractMPIndicators {
         this.closePrice = new ClosePriceIndicator(this.getSeries());
         this.bottom_border = bottom_border;
         this.top_border = top_border;
+        this.active = active;
+        this.reverse = reverse;
         this.init(this.series, period_long, period_short, period);
         this.beginIndex = closePrice.getBarSeries().getBeginIndex();
         this.endIndex = closePrice.getBarSeries().getEndIndex();
@@ -49,11 +53,11 @@ public abstract class AbstractMPIndicators {
         }
     }
     public AbstractMPIndicators(BarSeries series,int period_long, int period_short, int period){
-        this(series, period_long, period_short, period, 0, 0);
+        this(series, period_long, period_short, period, 0, 0, false, false);
     }
     
     public AbstractMPIndicators(BarSeries series, IndicatorsDTO ind){
-        this(series, ind.getPeriodLong(), ind.getPeriodShort(), ind.getPeriod(), ind.getBottomBorder(), ind.getTopBorder());
+        this(series, ind.getPeriodLong(), ind.getPeriodShort(), ind.getPeriod(), ind.getBottomBorder(), ind.getTopBorder(), ind.getActive(), ind.getReverse());
     }
     
     /**
@@ -100,7 +104,8 @@ public abstract class AbstractMPIndicators {
     protected abstract TimeSeriesCollection addToDrawingSeries(TimeSeriesCollection dataset);
     
     protected abstract String getName();
-
+    
+    
     /**
      * @return the beginIndex
      */
@@ -169,6 +174,47 @@ public abstract class AbstractMPIndicators {
      */
     public int getPeriod_short() {
         return period_short;
+    }
+    
+    /**
+     * @return the active
+     */
+    public boolean getActive() {
+        return active;
+    }
+
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+    
+    /**
+     * @return the reverse
+     */
+    public boolean getReverse() {
+        return reverse;
+    }
+    /**
+     * @return the reverse
+     */
+    public boolean isReverse() {
+        return reverse;
+    }
+
+    /**
+     * @param reverse the reverse to set
+     */
+    public void setReverse(boolean reverse) {
+        this.reverse = reverse;
     }
     
     

@@ -7,6 +7,7 @@ package net.easyweb24.actionbot.rules;
 
 import java.util.List;
 import net.easyweb24.actionbot.components.ApplicationContextHolder;
+import net.easyweb24.actionbot.dto.StrategiesDTO;
 import net.easyweb24.actionbot.indicators.SMA;
 import net.easyweb24.actionbot.service.IndicatorsService;
 import org.ta4j.core.BarSeries;
@@ -26,6 +27,10 @@ public class SMARules extends MPRules {
 
     public SMARules(BarSeries series) {
         super(series);
+    }
+    
+    public SMARules(BarSeries series, StrategiesDTO strategiesDTO){
+        super(series, strategiesDTO);
     }
 
     protected void buildEntryRule() {
@@ -47,7 +52,7 @@ public class SMARules extends MPRules {
     }
 
     @Override
-    protected void setIndicator(BarSeries series) {
-        sma = getIndicatorsService().getSMA(series);
+    protected void setIndicator(BarSeries series, int strategieId) {
+        sma = getIndicatorsService().getSMA(series, strategieId);
     }
 }

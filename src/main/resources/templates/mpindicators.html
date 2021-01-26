@@ -12,11 +12,36 @@
             <div class="page-wrapper">
                 <div  th:replace="parts/breadcrumb :: breadcrumb"></div>
                 <div class="container-fluid">
+                    <div class="text-center"><span th:text="${'Strategy editor: '+strategies.name}" style="display: inline-block; font-size: 18px; margin-left: 20px; font-weight: bold"></span></div>
                     <div class="row">
-                        <div class="col-md-12">
-                            <a class="btn btn-cyan" th:href="${'/companies/' + symbol}">Company detail</a>
-                            <a class="btn btn-primary" th:href="@{'/'}">Strong buy companies</a>
+                        <div class="col-md-6 pb-3">
+                            <div><label>&nbsp;</label></div>
+                            <div>
+                                <a class="btn btn-cyan" th:href="${'/companies/' + symbol}">Company detail</a>
+                                <a class="btn btn-primary" th:href="@{'/'}">Strong buy companies</a>
+                            </div>
                         </div>
+
+
+                        <div class="col-md-6 text-right pb-3" style="box-sizing: border-box">
+                            <div>
+                                <label style="width: 22%; display: inline-block" class="text-left">Name</label>
+                                <label style="width: 22%; display: inline-block" class="text-left">Time range</label>
+                                <label style="width: 22%; display: inline-block" class="text-left">Support time range</label>
+                                <label style="width: 22%; display: inline-block" class="text-left">&nbsp;</label>
+                            </div>
+                            <div>
+                                <input type="text" id="strategy_name" th:value="${strategies.name}" class="form-control" style="width: 22%; display: inline-block">
+                                <input type="number" id="strategy_timerange" th:value="${strategies.timeRange}"  class="form-control" style="width: 22%; display: inline-block">
+                                <input type="number" id="strategy_supporttimerange" th:value="${strategies.supportTimeRange}" class="form-control" style="width: 22%; display: inline-block">
+                                <input type="hidden" id="strategy_id" th:value="${strategies.id}">
+
+                                <a th:if="${strategies.id == 0}" class="btn btn-danger" id="strategy_save" href="#" style="width: 22%; display: inline-block">Create strategy</a>
+                                <a th:if="${strategies.id > 0}" class="btn btn-danger" id="strategy_save" href="#" style="width: 22%; display: inline-block">Update strategy</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="my-charts">
                         <div class="col-md-6">
                             <div id="chart_price"></div>
                         </div>
@@ -49,91 +74,84 @@
         <div  th:replace="parts/requiredjs :: requiredjs"></div>
         <script src="/js/apexcharts/apexcharts.min.js"></script>
         <script src="/js/indicators.js"></script>
+        <script src="/js/toastr.min.js"></script>
         <script>
 
             function createButton(selector, id, data, description, name, symbol, chart) {
                 var obj = $(selector);
                 var html = "<form action='#'><div class='row my-form' id='" + id + "'>";
 
-                if (description[0] !== null) {
-                    html += "<div class='col-md-2'>";
-                    html += "<label>" + description[0] + "</label>"
-                    html += "<input type='number' class='margin_bottom little_input' value='" + data[0] + "'> "
-                    html += "</div>";
-                }
+                html += "<input type='hidden' class='charts-form' name='abbreviation' value='" + name + "'>";
+                html += createSelect(data[5], 'active');
+                html += createSelect(data[6], 'reverse');
+                html += createInput(description[0], data[0], 'bottom_border');
+                html += createInput(description[1], data[1], 'top_border');
+                html += createInput(description[2], data[2], 'period');
+                html += createInput(description[3], data[3], 'period_short');
+                html += createInput(description[4], data[4], 'period_long');
 
-                if (description[1] !== null) {
-                    html += "<div class='col-md-2'>";
-                    html += "<label>" + description[1] + "</label>"
-                    html += "<input type='number' class='margin_top little_input' value='" + data[1] + "'> "
-                    html += "</div>";
-                }
-
-                if (description[2] !== null) {
-                    html += "<div class='col-md-2'>";
-                    html += "<label>" + description[2] + "</label>"
-                    html += "<input type='number' class='period little_input' value='" + data[2] + "'> "
-                    html += "</div>";
-                }
-
-                if (description[3] !== null) {
-                    html += "<div class='col-md-2'>";
-                    html += "<label>" + description[3] + "</label>"
-                    html += "<input type='number' class='period_short little_input' value='" + data[3] + "'> "
-                    html += "</div>";
-                }
-                if (description[4] !== null) {
-                    html += "<div class='col-md-2'>";
-                    html += "<label>" + description[4] + "</label>"
-                    html += "<input type='number' class='period_long little_input' value='" + data[4] + "'> "
-                    html += "</div>";
-                }
-                html += "<div class='col-md-2'>";
-                html += "<input type='button' class='btn btn-sm btn-warning my-btn' value='Save'>"
+                html += "<div class='col-md-3 text-right'>";
+                html += "<input type='button' class='btn btn-sm btn-warning btn-test' value='Test'>";
+                html += "<input type='button' class='btn btn-sm btn-success btn-reset' value='Reset'>";
                 html += "</div>";
 
                 html += "</div></form>";
                 var form = $(html);
-                var button = form.find('input[type="button"]')
+                var button = form.find('input[type="button"].btn-test')
                 obj.parent().prepend(form);
                 button.unbind('click');
                 button.bind('click', function () {
-                    updateIndicator(name, symbol, form, chart)
+                    updateIndicator(name, symbol, form, chart, "/indicator/testindicator");
+                });
+                var button2 = form.find('input[type="button"].btn-reset');
+                button2.unbind('click');
+                button2.bind('click', function () {
+                    updateIndicator(name, symbol, form, chart, "/indicator/resetindicator", resetFields);
                 });
             }
 
-            function updateIndicator(name, symbol, form, chart) {
-                var margin_bottom = parseInt(form.find('.margin_bottom').val());
-                var margin_top = parseInt(form.find('.margin_top').val());
+            function resetFields(obj, form) {
+                form.find('.bottom_border').val(obj.add[0]);
+                form.find('.top_border').val(obj.add[1]);
+                form.find('.period').val(obj.add[2]);
+                form.find('.period_short').val(obj.add[3]);
+                form.find('.period_long').val(obj.add[4]);
+            }
+
+            function updateIndicator(name, symbol, form, chart, url, callback) {
+                var bottom_border = parseInt(form.find('.bottom_border').val());
+                var top_border = parseInt(form.find('.top_border').val());
                 var period = parseInt(form.find('.period').val());
                 var period_short = parseInt(form.find('.period_short').val());
                 var period_long = parseInt(form.find('.period_long').val());
 
-                margin_bottom = isNaN(margin_bottom) ? 0 : margin_bottom;
-                margin_top = isNaN(margin_top) ? 0 : margin_top;
+                bottom_border = isNaN(bottom_border) ? 0 : bottom_border;
+                top_border = isNaN(top_border) ? 0 : top_border;
                 period = isNaN(period) ? 0 : period;
                 period_short = isNaN(period_short) ? 0 : period_short;
                 period_long = isNaN(period_long) ? 0 : period_long;
-                
+
+                var data = {
+                    symbol: symbol,
+                    abbreviation: name,
+                    bottomBorder: bottom_border,
+                    topBorder: top_border,
+                    period: period,
+                    periodShort: period_short,
+                    periodLong: period_long
+                };
+
                 $.ajax({
-                    url: "/indicator/updateindicator",
+                    url: url,
                     type: "PUT",
-                    data: {
-                        symbol: symbol,
-                        abbreviation: name,
-                        bottomBorder: margin_bottom,
-                        topBorder: margin_top,
-                        period: period,
-                        periodShort: period_short,
-                        periodLong: period_long
-                    },
+                    data: data,
                     success: function (obj) {
                         var series;
                         var annotation = {};
                         switch (name) {
                             case "RSI":
                                 series = rsi_series(obj);
-                                annotation =  rsi_annotation(obj);
+                                annotation = rsi_annotation(obj);
                                 break;
                             case "STOCHASTIC_SLOW":
                                 annotation = stochastic_annotation(obj);
@@ -157,11 +175,14 @@
                                 series = adx_series(obj);
                                 break;
                         }
-                        
+                        if (typeof callback == "function") {
+                            callback(obj, form)
+                        }
                         chart.updateSeries(series);
-                        setTimeout(function(){
-                           chart.updateOptions({annotations: annotation}, false, true, false); 
-                        }, 1000)
+                        setTimeout(function () {
+                            chart.updateOptions({annotations: annotation}, false, true, false);
+
+                        }, 500)
                     }
                 });
             }
@@ -176,7 +197,7 @@
             });
             //RSI
             $.ajax({
-                url: "/indicator/rsi/[[${symbol}]]",
+                url: "/indicator/rsi/[[${symbol}]]/[[${strategies.id}]]",
                 success: function (obj) {
                     var chart_rsi = new ApexCharts(document.querySelector("#chart_rsi"), rsi_option(obj));
                     chart_rsi.render();
@@ -185,7 +206,7 @@
             });
             //STOCHASTIC
             $.ajax({
-                url: "/indicator/stochastic/[[${symbol}]]",
+                url: "/indicator/stochastic/[[${symbol}]]/[[${strategies.id}]]",
                 success: function (obj) {
                     var chart_stoch = new ApexCharts(document.querySelector("#chart_stoch"), stochastic_option(obj));
                     chart_stoch.render();
@@ -194,7 +215,7 @@
             });
             //SMA
             $.ajax({
-                url: "/indicator/sma/[[${symbol}]]",
+                url: "/indicator/sma/[[${symbol}]]/[[${strategies.id}]]",
                 success: function (obj) {
                     var chart_sma = new ApexCharts(document.querySelector("#chart_sma"), sma_option(obj));
                     chart_sma.render();
@@ -203,7 +224,7 @@
             });
             //MACD
             $.ajax({
-                url: "/indicator/macd/[[${symbol}]]",
+                url: "/indicator/macd/[[${symbol}]]/[[${strategies.id}]]",
                 success: function (obj) {
                     var chart_macd = new ApexCharts(document.querySelector("#chart_macd"), macd_option(obj));
                     chart_macd.render();
@@ -212,98 +233,16 @@
             });
             //BOLLINGER
             $.ajax({
-                url: "/indicator/bollinger/[[${symbol}]]",
+                url: "/indicator/bollinger/[[${symbol}]]/[[${strategies.id}]]",
                 success: function (obj) {
                     var chart_bollinger = new ApexCharts(document.querySelector("#chart_bollinger"), bollinger_option(obj));
                     chart_bollinger.render();
                     createButton("#chart_bollinger", "ind_bollinger", obj.add, [null, null, "period", null, null], "BOLLINGER", "[[${symbol}]]", chart_bollinger);
                 }
             });
-            //CANDLES
-            /*$.ajax({
-             url: "/indicator/candles/[[${symbol}]]",
-             success: function (obj) {
-             var options = {
-             tooltip: {
-             fixed: {
-             enabled: true,
-             position: 'topLeft',
-             offsetX: 70,
-             offsetY: 40,
-             }
-             },
-             series: [{
-             data: obj.CND,
-             type: 'candlestick',
-             name: 'Open price'
-             }],
-             chart: {
-             toolbar: {
-             show: false
-             },
-             type: 'line',
-             height: 400,
-             id: 'cnd',
-             group: 'ind',
-             },
-             title: {
-             text: 'CandleStick Chart',
-             align: 'left'
-             }, stroke: {
-             width: [1, 1, 1, 1]
-             },
-             dataLabels: {
-             enabled: false
-             },
-             grid: {
-             row: {
-             colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-             opacity: 0.5
-             },
-             },
-             xaxis: {
-             type: 'datetime',
-             axisBorder: {
-             show: true,
-             color: '#78909C',
-             offsetX: 0,
-             offsetY: 0
-             },
-             labels: {
-             show: true
-             },
-             tooltip: {
-             enabled: false
-             }
-             },
-             yaxis: {
-             show: true,
-             axisBorder: {
-             show: true,
-             color: '#78909C',
-             offsetX: 0,
-             offsetY: 0
-             },
-             labels: {
-             formatter: (value) => {
-             return value.toFixed(2)
-             },
-             minWidth: 60,
-             maxWidth: 60
-             }
-             },
-             legend: {
-             show: false
-             }
-             };
-             
-             var chart_candle = new ApexCharts(document.querySelector("#chart_candle"), options);
-             chart_candle.render();
-             }
-             });*/
             //MONEYFLOW
             $.ajax({
-                url: "/indicator/moneyflow/[[${symbol}]]",
+                url: "/indicator/moneyflow/[[${symbol}]]/[[${strategies.id}]]",
                 success: function (obj) {
                     var chart_moneyflow = new ApexCharts(document.querySelector("#chart_mfl"), moneyflow_option(obj));
                     chart_moneyflow.render();
@@ -312,13 +251,133 @@
             });
             //ADX
             $.ajax({
-                url: "/indicator/adx/[[${symbol}]]",
+                url: "/indicator/adx/[[${symbol}]]/[[${strategies.id}]]",
                 success: function (obj) {
                     var chart_adx = new ApexCharts(document.querySelector("#chart_adx"), adx_option(obj));
                     chart_adx.render();
                     var x = createButton("#chart_adx", "ind_adx", obj.add, ["trend", null, "period", null, "sma"], "ADX", "[[${symbol}]]", chart_adx);
                 }
             });
+
+            $("#strategy_save").bind('click', saveStrategy);
+
+            function saveStrategy() {
+
+                var strategies = {
+                    id: parseInt($("#strategy_id").val()),
+                    timeRange: (!isNaN(parseInt($("#strategy_timerange").val())) && parseInt($("#strategy_timerange").val()) > 0) ? parseInt($("#strategy_timerange").val()) : 14,
+                    supportTimeRange: (!isNaN(parseInt($("#strategy_supporttimerange").val())) && parseInt($("#strategy_supporttimerange").val()) > 0) ? parseInt($("#strategy_supporttimerange").val()) : 50,
+                    name: $("#strategy_name").val()
+                };
+
+                saveUpdateStartegy(strategies, saveUpdateStartegyIndicaors);
+
+            }
+
+            function saveUpdateStartegyIndicaors(strategies_id) {
+                var indicators = [];
+                $('#my-charts form').each(function () {
+                    var that = $(this);
+                    var IndicatorsDTO = {}
+                    IndicatorsDTO.id = 0;
+                    IndicatorsDTO.strategieId = strategies_id;
+                    that.find('.charts-form').each(function () {
+                        var athis = $(this);
+                        IndicatorsDTO[camelCase(athis.attr("name"))] = athis.val();
+                    });
+                    indicators.push(IndicatorsDTO);
+                });
+
+
+
+                $.ajax({
+                    url: '/mp/updatestrategyindicators',
+                    type: 'post',
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON.stringify(indicators),
+                    success: function (html) {
+                        show_toastr("The strategy has been saved successfully","success")
+                    }
+                });
+            }
+
+            function saveUpdateStartegy(strategies, callback) {
+                $.ajax({
+                    url: '/mp/updatestrategy',
+                    type: 'post',
+                    data: strategies,
+                    success: function (status) {
+                        
+                        if (status.success && status.new_id > 0) {
+                            if (typeof callback == 'function') {
+                                callback(status.new_id);
+                            }
+                        } else if (status.name_exists) {
+                            console.log(status)
+                            show_toastr("A strategy with that name exists. Please enter a different name","error")
+                        }
+                    }
+                });
+            }
+
+            toastr.options = {
+                "closeButton": false,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": false,
+                "positionClass": "toast-bottom-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            }
+
+            function show_toastr(message, type) {
+                console.log('tutaj')
+                toastr[type](message);
+            }
+
+            function camelCase(input) {
+                return input.toLowerCase().replace(/_(.)/g, function (match, group1) {
+                    return group1.toUpperCase();
+                });
+            }
+
+            function createInput(description, data, className) {
+                html = "";
+                if (description !== null) {
+                    html += "<div class='col'>";
+                    html += "<label>" + description + "</label>"
+                    html += "<input type='number' name='" + className + "' class='charts-form " + className + " little_input' value='" + data + "'> "
+                    html += "</div>";
+                } else {
+                    html += "<input type='hidden' name='" + className + "' class='charts-form " + className + "' value='" + data + "'> ";
+                }
+                return html;
+            }
+
+            function createSelect(data, className) {
+                html = "";
+                html += "<div class='col'>";
+                html += "<label>" + className + "</label>"
+                html += "<select name='" + className + "' class='charts-form " + className + " little_input'>";
+                html += "<option value='false'>no</option>";
+                html += "<option value='true' "
+                if (data) {
+                    html += "selected='selected'";
+                }
+                html += ">yes</option>";
+                html += "</select>";
+                html += "</div>";
+                return html;
+            }
         </script>
     </body>
 </html>

@@ -4,11 +4,14 @@
     margin-top: 20px
 }
 .my-form label{
-    display: block; margin-bottom: 0;
+    display: inline-block; margin-bottom: 0;
     line-height: 20px;
     white-space: nowrap;
 }
+.my-form input[type=number]{width: 50px}
 .my-form{
     justify-content: flex-end;
     z-index:1000; width:80%; position:absolute; top:0px; right:8px;
 }
+.my-form .col{flex-grow: 0; padding-left: 2px; padding-right: 2px}
+.my-form select{padding: 2px}

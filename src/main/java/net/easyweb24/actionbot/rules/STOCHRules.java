@@ -6,6 +6,7 @@
 package net.easyweb24.actionbot.rules;
 
 import java.util.List;
+import net.easyweb24.actionbot.dto.StrategiesDTO;
 import net.easyweb24.actionbot.indicators.STOCHASTIC_SLOW;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseStrategy;
@@ -18,17 +19,20 @@ import org.ta4j.core.trading.rules.UnderIndicatorRule;
  *
  * @author zbigniewwilgosz
  */
-public class STOCHRules extends MPRules{
+public class STOCHRules extends MPRules {
 
-    
     private STOCHASTIC_SLOW stoch;
-    
+
     public STOCHRules(BarSeries series) {
         super(series);
     }
 
+    public STOCHRules(BarSeries series, StrategiesDTO strategiesDTO) {
+        super(series, strategiesDTO);
+    }
+
     protected void buildEntryRule() {
-        
+
         CrossedUpIndicatorRule entryRule = new CrossedUpIndicatorRule(stoch.getStochasticOscillK(), stoch.getBottom_border());
         CrossedDownIndicatorRule exitRule = new CrossedDownIndicatorRule(stoch.getStochasticOscillK(), stoch.getTop_border());
         setEntryStrategie(new BaseStrategy(entryRule, exitRule));
@@ -43,12 +47,11 @@ public class STOCHRules extends MPRules{
     protected void checkRules() {
         List<Double> values = stoch.getStochasticOscillKValues();
         checkSimplyRules(values);
-        
 
     }
 
     @Override
-    protected void setIndicator(BarSeries series) {
-        stoch = getIndicatorsService().getStochasticS(series);
+    protected void setIndicator(BarSeries series, int strategieId) {
+        stoch = getIndicatorsService().getStochasticS(series, strategieId);
     }
 }
