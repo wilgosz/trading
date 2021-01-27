@@ -13,7 +13,45 @@
                 <div  th:replace="parts/breadcrumb :: breadcrumb"></div>
                 <div class="container-fluid">
                     <div th:replace="parts/topmenu :: topmenu"></div>
-                    <h3 style="padding: 40px" class="text-center">coming soon</h3>
+                    <div class="row">
+                        <div class="col-md-6" th:each="strategie : ${strategies}">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 th:text="${strategie.name}"></h4>
+                                </div>
+                                <div>
+                                    <table class="table table-hover table-condensed table-bordered">
+                                        <tr>
+                                            <th>Indicator</th>
+                                            <th>Active</th>
+                                            <th>Top</th>
+                                            <th>Bottom</th>
+                                            <th>Period</th>
+                                            <th>Short term</th>
+                                            <th>Long term</th>
+                                        </tr>
+                                        <tr th:each="indicator : ${strategie.strategiesIndicatorsList}">
+                                            <td style="padding: 2px 1rem" th:text="${indicator.indicatorsAbbreviation}"></td>
+                                            <td class="text-center" style="padding: 2px 1rem">
+                                                <div th:if="${indicator.active}" style="margin: auto; width: 18px; height: 18px; background: green; border-radius: 100%"></div>
+                                                <div th:if="${!indicator.active}" style="margin: auto; width: 18px; height: 18px; background: red; border-radius: 100%"></div>
+                                            </td>
+                                            <td style="padding: 2px 1rem" th:text="${indicator.topBorder == 0?'-':indicator.topBorder}">Top</td>
+                                            <td style="padding: 2px 1rem" th:text="${indicator.bottomBorder == 0?'-':indicator.bottomBorder}">Bottom</td>
+                                            <td style="padding: 2px 1rem" th:text="${indicator.period == 0?'-':indicator.period}">Period</td>
+                                            <td style="padding: 2px 1rem" th:text="${indicator.periodShort == 0?'-':indicator.periodShort }">Short term</td>
+                                            <td style="padding: 2px 1rem" th:text="${indicator.periodLong == 0?'-':indicator.periodLong}">Long term</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="card-body text-right">
+                                    <a th:href="@{/mp/AAPL/}+${strategie.id}" class="btn btn-sm btn-info"><i class="fas fa-edit"></i> Edit</a>
+                                    <a th:href="@{/mp/AAPL/}+${strategie.id}" class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i> Delete</a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
                 <div  th:replace="parts/footer :: footer"></div>
             </div>

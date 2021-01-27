@@ -19,6 +19,7 @@ import net.easyweb24.actionbot.repository.CompanyProfileRepository;
 import net.easyweb24.actionbot.repository.StrategiesIndicatorsRepository;
 import net.easyweb24.actionbot.repository.StrategiesRepository;
 import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -68,6 +69,7 @@ public class MPIndicatorsController {
         }
         model.addAttribute("title", company.getName());
         model.addAttribute("symbol", symbol);
+        model.addAttribute("strategies_select", strategiesRepository.findAll(Sort.by("name")));
         model.addAttribute("strategies", strategiesDto);
 
         return "mpindicators";

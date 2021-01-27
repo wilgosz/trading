@@ -12,13 +12,23 @@
             <div class="page-wrapper">
                 <div  th:replace="parts/breadcrumb :: breadcrumb"></div>
                 <div class="container-fluid">
-                    <div class="text-center"><span th:text="${'Strategy editor: '+strategies.name}" style="display: inline-block; font-size: 18px; margin-left: 20px; font-weight: bold"></span></div>
+                    <div class="text-center">
+                        <a class="btn btn-primary float-left" th:href="@{'/'}"><i class="fas fa-backward"></i> Strong buy companies</a>
+                        <span th:text="${'Strategy editor: '+strategies.name}" style="display: inline-block; font-size: 18px; margin-left: 20px; font-weight: bold"></span>
+                        <a class="btn btn-warning float-right" th:href="@{/strategies}">All strategies <i class="fas fa-forward"></i></a>
+                        <div class="clearfix"></div>
+                    </div>
                     <div class="row">
                         <div class="col-md-6 pb-3">
                             <div><label>&nbsp;</label></div>
                             <div>
                                 <a class="btn btn-cyan" th:href="${'/companies/' + symbol}">Company detail</a>
-                                <a class="btn btn-primary" th:href="@{'/'}">Strong buy companies</a>
+                                <a class="btn btn-success" href="javascript:void(0)">Change company</a>
+                                <select class="form-control" style="display: inline-block; width: auto" id="strategies_select">
+                                    <option>Choose strategy</option>
+                                    <option th:each="str: ${strategies_select}" th:value="${str.id}" th:text="${str.name}" th:selected="${strategies.id==str.id}"></option>
+                                </select>
+                                <a th:if="${strategies.id>0}" class="btn btn-danger" href="javascript:void(0)">Start symulation</a>
                             </div>
                         </div>
 
@@ -260,7 +270,13 @@
             });
 
             $("#strategy_save").bind('click', saveStrategy);
-
+            $("#strategies_select").bind('change', changeStrategy);
+            
+            function changeStrategy(){
+                var that = $(this);
+                parent.location.href = "/mp/[[${symbol}]]/"+that.val();
+            }
+            
             function saveStrategy() {
 
                 var strategies = {
@@ -297,7 +313,10 @@
                     contentType: "application/json",
                     data: JSON.stringify(indicators),
                     success: function (html) {
-                        show_toastr("The strategy has been saved successfully","success")
+                        show_toastr("The strategy has been saved successfully","success");
+                        setTimeout(function (){
+                           parent.location.href = "/mp/[[${symbol}]]/"+strategies_id; 
+                        }, 3000);
                     }
                 });
             }
