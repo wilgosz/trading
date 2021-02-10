@@ -7,6 +7,7 @@ package net.easyweb24.actionbot.rules;
 
 import java.util.List;
 import net.easyweb24.actionbot.dto.StrategiesDTO;
+import net.easyweb24.actionbot.indicators.AbstractMPIndicators;
 import net.easyweb24.actionbot.indicators.STOCHASTIC_SLOW;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseStrategy;
@@ -53,5 +54,10 @@ public class STOCHRules extends MPRules {
     @Override
     protected void setIndicator(BarSeries series, int strategieId) {
         stoch = getIndicatorsService().getStochasticS(series, strategieId);
+    }
+    
+    @Override
+    public AbstractMPIndicators getIdicatorMainInfo() {
+        return stoch;
     }
 }

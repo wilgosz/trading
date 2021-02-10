@@ -33,7 +33,7 @@ public class StandartRulesGroup extends GroupOfRulesBuilder {
     protected void groupAndBuildRule(BarSeries subseries, MPRules rules) {
 
         rules.setSeries(subseries);
-        if (!"MACDRules".equals(rules.getClass().getSimpleName())) {
+        if (!rules.getIdicatorMainInfo().getReverse()) {
             if (rules.isGoUp() && rules.isEntryContinue() && rules.isShouldEnter()) {
                 addBuy();
                 if (rules.getLastIndexTheBest() == 100) {

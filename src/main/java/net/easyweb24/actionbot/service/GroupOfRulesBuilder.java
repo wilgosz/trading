@@ -5,7 +5,13 @@
  */
 package net.easyweb24.actionbot.service;
 
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import net.easyweb24.actionbot.dto.SimulationResults;
 import net.easyweb24.actionbot.rules.MPRules;
 import org.springframework.stereotype.Service;
 import org.ta4j.core.BarSeries;
@@ -24,6 +30,7 @@ public abstract class GroupOfRulesBuilder {
     private int neutral = 0;
     private int buy = 0;
     private int testDayRange = 1;
+    private Map<String, List> results = new HashMap<>();
     
     public GroupOfRulesBuilder(BarSeries series, List<MPRules> list){
         testGroupRoles(series, list);
@@ -127,12 +134,19 @@ public abstract class GroupOfRulesBuilder {
         this.testDayRange = testTimeRange;
     }
     
+    public Map<String, List> getSimulationResults(){
+        return results;
+    }
+    
     protected void testGroupRoles(BarSeries series, List<MPRules> list) {
 
         int index = series.getEndIndex();
         BarSeries subseries;
+        
 
         subseries = new BaseBarSeries();
+        List buy = new ArrayList();
+        List dates = new ArrayList();
 
         for (int b = 0; b <= (index - getTestTimeRange()); b++) {
             subseries.addBar(series.getBar(b));
@@ -149,9 +163,16 @@ public abstract class GroupOfRulesBuilder {
                 
                 groupAndBuildRule(subseries, rules);
             }
-            if (getBuy() > 7) {
-                System.out.print(subseries.getBar(subseries.getEndIndex()).getSimpleDateName());
-                System.out.println(" - " + getBuy());
+            if (getBuy() > -1) {
+                SimulationResults result = new SimulationResults();
+                result.setBuy(getBuy());
+                result.setSell(getSell());
+                result.setNeutral(getNeutral());
+                result.setEndtime(subseries.getBar(subseries.getEndIndex()).getEndTime()); 
+                buy.add(getBuy());
+                dates.add(subseries.getBar(subseries.getEndIndex()).getEndTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.GERMANY)));
+                results.put("buy", buy);
+                results.put("dates", dates);
             }
         }
     }

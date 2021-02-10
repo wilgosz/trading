@@ -1,4 +1,99 @@
+function simulator_option(obj) {
+    return  {
+        noData: {
+            text: 'Loading...'
+        },
+        tooltip: {
+            fixed: {
+                enabled: true,
+                position: 'topLeft',
+                offsetX: 70,
+                offsetY: 40,
+            }
+        },
+        series: [{
+                name: "Buy",
+                data: obj.buy
+            }],
+        chart: {
+            toolbar: {
+                show: false
+            },
+            height: 150,
+            id: 'simulation',
+            group: 'ind',
+            type: 'area',
+            zoom: {
+                enabled: false
+            },
+            dropShadow: {
+                enabled: true,
+                top: 2,
+                left: 2,
+                blur: 1,
+                opacity: 0.2
+            }
+        },
+        dataLabels: {
+            enabled: false
+        },
+        stroke: {
+            curve: 'straight',
+            width: 1,
+            colors: ["#2255a4"],
+            dashArray: [0, 0]
+        },
 
+        title: {
+            text: 'Symulation',
+            align: 'left',
+            margin: 0,
+            offsetY: 24,
+            offsetX: 36
+        },
+        grid: {
+            row: {
+                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                opacity: 0.5
+            },
+        },
+        xaxis: {
+            type: 'datetime',
+            categories: obj.dates,
+            axisBorder: {
+                show: true,
+                color: '#78909C',
+                offsetX: 0,
+                offsetY: 0
+            },
+            labels: {
+                show: true
+            },
+            tooltip: {
+                enabled: false
+            }
+        },
+        yaxis: {
+            show: true,
+            axisBorder: {
+                show: true,
+                color: '#78909C',
+                offsetX: 0,
+                offsetY: 0
+            },
+            labels: {
+                formatter: (value) => {
+                    return value.toFixed(2)
+                },
+                minWidth: 60,
+                maxWidth: 60
+            }
+        },
+        legend: {
+            show: false
+        }
+    };
+}
 
 function price_option(obj) {
     return  {
@@ -744,6 +839,13 @@ function adx_option(obj) {
             show: false
         }
     };
+}
+
+function symulation_series(obj) {
+    return [{
+            name: "Buy",
+            data: obj.buy
+        }]
 }
 
 function rsi_series(obj) {

@@ -8,9 +8,11 @@ package net.easyweb24.actionbot.controllers;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.easyweb24.actionbot.components.utils.DBToBarSeries;
+import net.easyweb24.actionbot.dto.SimulationResults;
 import net.easyweb24.actionbot.dto.StrategiesDTO;
 import net.easyweb24.actionbot.entity.Strategies;
 import net.easyweb24.actionbot.repository.StrategiesRepository;
@@ -20,12 +22,16 @@ import net.easyweb24.actionbot.rules.MPRules;
 import net.easyweb24.actionbot.rules.RSIRules;
 import net.easyweb24.actionbot.rules.SMARules;
 import net.easyweb24.actionbot.rules.STOCHRules;
+import net.easyweb24.actionbot.service.GroupOfRulesBuilder;
+import net.easyweb24.actionbot.service.StandartRulesGroup;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseBarSeries;
 
@@ -53,10 +59,11 @@ public class StrategiesController {
         return "strategies";
     }
 
-    @GetMapping("/st")
-    public String st() {
+    @GetMapping("/simulator/{symbol}/{strategy_id}")
+    @ResponseBody
+    public Map<String, List> simulator(@PathVariable(name="symbol") String symbol, @PathVariable(name="strategy_id") int strategy_id) {
 
-        Strategies strategies = strategiesRepository.findById(7);
+        Strategies strategies = strategiesRepository.findById(strategy_id);
         StrategiesDTO dto = new StrategiesDTO();
         try {
             BeanUtils.copyProperties(dto, strategies);
@@ -65,15 +72,15 @@ public class StrategiesController {
         } catch (InvocationTargetException ex) {
             Logger.getLogger(HomeController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        BarSeries series = dbToBarSeries.getBars("CEF");
+        BarSeries series = dbToBarSeries.getBars(symbol);
         List<MPRules> list = new ArrayList<>();
         list.add(new STOCHRules(new BaseBarSeries(), dto));
         list.add(new SMARules(new BaseBarSeries(), dto));
         list.add(new RSIRules(new BaseBarSeries(), dto));
         list.add(new MONEYFLOWRules(new BaseBarSeries(), dto));
         list.add(new MACDRules(new BaseBarSeries(), dto));
-        //StandartRulesGroup group = new StandartRulesGroup(series, list, 120);
-        return "st";
+        StandartRulesGroup group = new StandartRulesGroup(series, list, 100);
+        return group.getSimulationResults();
     }
 
 }

@@ -7,6 +7,7 @@ package net.easyweb24.actionbot.rules;
 
 import java.util.List;
 import net.easyweb24.actionbot.dto.StrategiesDTO;
+import net.easyweb24.actionbot.indicators.AbstractMPIndicators;
 import net.easyweb24.actionbot.indicators.MACD;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseStrategy;
@@ -54,5 +55,10 @@ public class MACDRules extends MPRules{
     @Override
     protected void setIndicator(BarSeries series, int strategieId) {
         macd = getIndicatorsService().getMACD(series, strategieId);
+    }
+    
+    @Override
+    public AbstractMPIndicators getIdicatorMainInfo(){
+        return macd ;
     }
 }

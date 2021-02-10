@@ -8,6 +8,7 @@ package net.easyweb24.actionbot.rules;
 import java.util.List;
 import net.easyweb24.actionbot.components.ApplicationContextHolder;
 import net.easyweb24.actionbot.dto.StrategiesDTO;
+import net.easyweb24.actionbot.indicators.AbstractMPIndicators;
 import net.easyweb24.actionbot.service.IndicatorsService;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseStrategy;
@@ -37,6 +38,7 @@ public abstract class MPRules {
     }
 
     public MPRules(BarSeries series, StrategiesDTO strategiesDTO) {
+        
         if (strategiesDTO == null) {
             this.strategiesDTO = new StrategiesDTO();
         } else {
@@ -62,6 +64,8 @@ public abstract class MPRules {
     protected abstract void checkRules();
 
     protected abstract void setIndicator(BarSeries series, int strategieId);
+    
+    public abstract AbstractMPIndicators getIdicatorMainInfo();
 
     /**
      * @return the indicatorsService
@@ -229,10 +233,12 @@ public abstract class MPRules {
     
 
     protected void checkSimplyRules(List<Double> values) {
+        
         double topValue = 0;
-        for (int i = (getEndIndex() - getTimeRange()); i <= getEndIndex(); i++) {
-            //System.out.println(values.get(i));
-            //System.out.println(shouldEnter);
+        setShouldEnter(false);
+        
+        for (int i = (getEndIndex() - getTimeRange()+1); i <= getEndIndex(); i++) {
+            
             if (getEntryStrategie().shouldEnter(i) && !isShouldEnter()) {
                 topValue = 0;
                 setShouldEnter(true);
@@ -240,8 +246,7 @@ public abstract class MPRules {
                 topValue = 0;
                 setShouldEnter(false);
             }
-
-            if (values.get(i) > topValue && getEntryContinueStrategie().shouldEnter(i)) {
+            if(values.get(i) > topValue && getEntryContinueStrategie().shouldEnter(i)) {
                 topValue = values.get(i);
             }
 

@@ -7,11 +7,15 @@
     <body>
         <div  th:replace="parts/preloader :: preloader"></div>
         <div class="main-wrapper" id="main-wrapper">
+            <div th:if="${strategies.id > 0}" class="symulation-over">
+                <div id="chart_symulation"></div>
+            </div>
             <div  th:replace="parts/topbar :: topbar"></div>
             <div  th:replace="parts/left-sidebar :: left-sidebar"></div>
             <div class="page-wrapper">
                 <div  th:replace="parts/breadcrumb :: breadcrumb"></div>
                 <div class="container-fluid">
+
                     <div class="text-center">
                         <a class="btn btn-primary float-left" th:href="@{'/'}"><i class="fas fa-backward"></i> Strong buy companies</a>
                         <span th:text="${'Strategy editor: '+strategies.name}" style="display: inline-block; font-size: 18px; margin-left: 20px; font-weight: bold"></span>
@@ -28,7 +32,7 @@
                                     <option>Choose strategy</option>
                                     <option th:each="str: ${strategies_select}" th:value="${str.id}" th:text="${str.name}" th:selected="${strategies.id==str.id}"></option>
                                 </select>
-                                <a th:if="${strategies.id>0}" class="btn btn-danger" href="javascript:void(0)">Start symulation</a>
+                                <a th:if="${strategies.id>0}" class="btn btn-danger" href="javascript:void(0)" id="start-symulation">Open/Close symulation</a>
                             </div>
                         </div>
 
@@ -51,10 +55,13 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="row" id="my-charts">
+
                         <div class="col-md-6">
                             <div id="chart_price"></div>
                         </div>
+
                         <div class="col-md-6">
                             <div id="chart_bollinger"></div>
                         </div>
@@ -269,14 +276,43 @@
                 }
             });
 
+            var is_simulation_open = false;
+            var symulation_price;
             $("#strategy_save").bind('click', saveStrategy);
             $("#strategies_select").bind('change', changeStrategy);
-            
-            function changeStrategy(){
-                var that = $(this);
-                parent.location.href = "/mp/[[${symbol}]]/"+that.val();
+            $("#start-symulation").bind('click', function () {
+                $('.symulation-over').toggleClass('open');
+                if (!is_simulation_open) {
+                    startSimulation();
+                }
+            });
+            if($('#strategy_id').val() > 0){
+                $(document).ready(startSimulation);
             }
-            
+
+
+            function startSimulation() {
+                $.ajax({
+                    url: "/strategies/simulator/[[${symbol}]]/[[${strategies.id}]]",
+                    success: function (obj) {
+                        if (!is_simulation_open) {
+                            console.log(obj);
+                            symulation_price = new ApexCharts(document.querySelector("#chart_symulation"), simulator_option(obj));
+                            symulation_price.render();
+                            $('.symulation-over').addClass('open');
+                            is_simulation_open = true;
+                        }else{
+                            symulation_price.updateSeries(symulation_series(obj));
+                        }
+                    }
+                });
+            }
+
+            function changeStrategy() {
+                var that = $(this);
+                parent.location.href = "/mp/[[${symbol}]]/" + that.val();
+            }
+
             function saveStrategy() {
 
                 var strategies = {
@@ -313,10 +349,16 @@
                     contentType: "application/json",
                     data: JSON.stringify(indicators),
                     success: function (html) {
-                        show_toastr("The strategy has been saved successfully","success");
-                        setTimeout(function (){
-                           parent.location.href = "/mp/[[${symbol}]]/"+strategies_id; 
-                        }, 3000);
+                        show_toastr("The strategy has been saved successfully", "success");
+                        if (parseInt($("#strategy_id").val()) == 0) {
+                            setTimeout(function () {
+                                parent.location.href = "/mp/[[${symbol}]]/" + strategies_id;
+                            }, 3000);
+                        }else{
+                            if(is_simulation_open){
+                                startSimulation();
+                            }
+                        }
                     }
                 });
             }
@@ -327,14 +369,13 @@
                     type: 'post',
                     data: strategies,
                     success: function (status) {
-                        
+
                         if (status.success && status.new_id > 0) {
                             if (typeof callback == 'function') {
                                 callback(status.new_id);
                             }
                         } else if (status.name_exists) {
-                            console.log(status)
-                            show_toastr("A strategy with that name exists. Please enter a different name","error")
+                            show_toastr("A strategy with that name exists. Please enter a different name", "error")
                         }
                     }
                 });

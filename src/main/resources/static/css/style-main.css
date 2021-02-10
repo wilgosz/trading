@@ -15,3 +15,5 @@
 }
 .my-form .col{flex-grow: 0; padding-left: 2px; padding-right: 2px}
 .my-form select{padding: 2px}
+.symulation-over{position: absolute; top: -175px;  height: 165px; background: white; left:50%; text-align: center; width: 50%; z-index: 100; transition: top 0.4s ease-out; transform: translate(-30%);}
+.symulation-over.open{top:0}
