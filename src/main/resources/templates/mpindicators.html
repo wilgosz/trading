@@ -203,12 +203,28 @@
                     }
                 });
             }
+
+
             //PRICE
             $.ajax({
                 url: "/indicator/price/[[${symbol}]]",
                 success: function (obj) {
                     var chart_price = new ApexCharts(document.querySelector("#chart_price"), price_option(obj));
                     chart_price.render();
+                    $.ajax({
+                        url: "/indicator/support/[[${symbol}]]",
+                        success: function (obj) {
+                            
+                            var support = {}
+                            support.yaxis = [];
+                            for(var i = 0; i<obj.levels.length; i++){
+                                support.yaxis.push({
+                                    y: obj.levels[i],
+                                    borderColor: '#FF0000'})
+                            }
+                            chart_price.updateOptions({annotations: support}, false, true, false);
+                        }
+                    });
 
                 }
             });
@@ -286,7 +302,7 @@
                     startSimulation();
                 }
             });
-            if($('#strategy_id').val() > 0){
+            if ($('#strategy_id').val() > 0) {
                 $(document).ready(startSimulation);
             }
 
@@ -301,7 +317,7 @@
                             symulation_price.render();
                             $('.symulation-over').addClass('open');
                             is_simulation_open = true;
-                        }else{
+                        } else {
                             symulation_price.updateSeries(symulation_series(obj));
                         }
                     }
@@ -354,8 +370,8 @@
                             setTimeout(function () {
                                 parent.location.href = "/mp/[[${symbol}]]/" + strategies_id;
                             }, 3000);
-                        }else{
-                            if(is_simulation_open){
+                        } else {
+                            if (is_simulation_open) {
                                 startSimulation();
                             }
                         }

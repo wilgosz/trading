@@ -47,6 +47,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.ta4j.core.BarSeries;
 import ta4jexamples.loaders.CsvBarsLoader;
 
@@ -235,6 +236,16 @@ public class IndicatorsController {
         map.put("price", price.getClosePriceValues());
         map.put("dates", price.getDates());
         return ResponseEntity.ok().body(map);
+    }
+    
+
+    
+    @ResponseBody
+    @GetMapping("/support/{symbol}")
+    public ResponseEntity<SupportResponse> supportResistance(@PathVariable(name = "symbol") String symbol) {
+        RestTemplate restTemplate = new RestTemplate();
+        SupportResponse  support = restTemplate.getForObject("https://finnhub.io/api/v1/scan/support-resistance?symbol="+symbol+"&resolution=D&token=bs44jfvrh5rbsfggjepg", SupportResponse.class);
+        return ResponseEntity.ok().body(support);
     }
 
     @ResponseBody
