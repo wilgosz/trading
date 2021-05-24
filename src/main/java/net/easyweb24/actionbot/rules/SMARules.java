@@ -6,11 +6,10 @@
 package net.easyweb24.actionbot.rules;
 
 import java.util.List;
-import net.easyweb24.actionbot.components.ApplicationContextHolder;
+import net.easyweb24.actionbot.dto.IndicatorsDTO;
 import net.easyweb24.actionbot.dto.StrategiesDTO;
 import net.easyweb24.actionbot.indicators.AbstractMPIndicators;
 import net.easyweb24.actionbot.indicators.SMA;
-import net.easyweb24.actionbot.service.IndicatorsService;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseStrategy;
 import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
@@ -34,6 +33,7 @@ public class SMARules extends MPRules {
         super(series, strategiesDTO);
     }
 
+    @Override
     protected void buildEntryRule() {
 
         CrossedUpIndicatorRule entryRule = new CrossedUpIndicatorRule(sma.getMacdsma(), 0);
@@ -41,12 +41,14 @@ public class SMARules extends MPRules {
         setEntryStrategie(new BaseStrategy(entryRule, exitRule));
     }
 
+    @Override
     protected void buildEntryRuleContinueInLastIndex() {
         OverIndicatorRule isEntryRuleContinueInLastIndex = new OverIndicatorRule(sma.getMacdsma(), 0);
         UnderIndicatorRule exitRule = new UnderIndicatorRule(sma.getMacdsma(), 0);
         setEntryContinueStrategie(new BaseStrategy(isEntryRuleContinueInLastIndex, exitRule));
     }
 
+    @Override
     protected void checkRules() {
         List<Double> values = sma.getMacdsmaValues();
         checkSimplyRules(values);
@@ -60,5 +62,10 @@ public class SMARules extends MPRules {
     @Override
     public AbstractMPIndicators getIdicatorMainInfo() {
         return sma;
+    }
+
+    @Override
+    protected void setIndicator(BarSeries series, IndicatorsDTO ind2) {
+        sma = getIndicatorsService().getSMA(series, ind2);
     }
 }

@@ -21,28 +21,37 @@ import org.ta4j.core.BaseBarSeries;
  *
  * @author zbigniewwilgosz
  */
-
-
 public abstract class GroupOfRulesBuilder {
-    
+
     private List<MPRules> rulesList;
     private int sell = 0;
     private int neutral = 0;
     private int buy = 0;
     private int testDayRange = 1;
     private Map<String, List> results = new HashMap<>();
-    
-    public GroupOfRulesBuilder(BarSeries series, List<MPRules> list){
+    private SimulationResults result;
+
+    public GroupOfRulesBuilder(BarSeries series, List<MPRules> list) {
         testGroupRoles(series, list);
     }
-    
-    public GroupOfRulesBuilder(BarSeries series, List<MPRules> list, int testDayRange){
+
+    public GroupOfRulesBuilder(BarSeries series, List<MPRules> list, int testDayRange) {
         setTestTimeRange(testDayRange);
         testGroupRoles(series, list);
     }
-    
-    protected abstract void groupAndBuildRule(BarSeries subseries, MPRules rules);
-    
+
+    /**
+     * This Constructor work corectly only with with rules with complete
+     * BarSeries
+     *
+     * @param list
+     */
+    public GroupOfRulesBuilder(List<MPRules> list) {
+        groupRulesForEndIndex(list);
+    }
+
+    protected abstract void groupAndBuildRule(MPRules rules);
+
     /**
      * @return the sell
      */
@@ -56,12 +65,12 @@ public abstract class GroupOfRulesBuilder {
     public void setSell(int sell) {
         this.sell = sell;
     }
-    
+
     /**
-     *  add to sell
+     * add to sell
      */
     public void addSell() {
-        this.sell ++;
+        this.sell++;
     }
 
     /**
@@ -77,12 +86,12 @@ public abstract class GroupOfRulesBuilder {
     public void setNeutral(int neutral) {
         this.neutral = neutral;
     }
-    
+
     /**
      * add to neutral
      */
     public void addNeutral() {
-        this.neutral ++;
+        this.neutral++;
     }
 
     /**
@@ -98,7 +107,7 @@ public abstract class GroupOfRulesBuilder {
     public void setBuy(int buy) {
         this.buy = buy;
     }
-    
+
     /**
      * add to buy
      */
@@ -133,16 +142,36 @@ public abstract class GroupOfRulesBuilder {
     public void setTestTimeRange(int testTimeRange) {
         this.testDayRange = testTimeRange;
     }
-    
-    public Map<String, List> getSimulationResults(){
+
+    public Map<String, List> getSimulationResults() {
         return results;
     }
-    
+
+    public SimulationResults getLastResults() {
+        return result;
+    }
+
+    public void groupRulesForEndIndex(List<MPRules> list) {
+        try {
+            for (MPRules rules : list) {
+                groupAndBuildRule(rules);
+            }
+            result = new SimulationResults();
+            result.setBuy(getBuy());
+            result.setSell(getSell());
+            result.setNeutral(getNeutral());
+            BarSeries series = list.get(0).getIdicatorMainInfo().getSeries();
+            result.setEndtime(series.getBar(series.getEndIndex()).getEndTime());
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
     protected void testGroupRoles(BarSeries series, List<MPRules> list) {
 
+        results = new HashMap<>();
         int index = series.getEndIndex();
         BarSeries subseries;
-        
 
         subseries = new BaseBarSeries();
         List buy = new ArrayList();
@@ -158,17 +187,14 @@ public abstract class GroupOfRulesBuilder {
             setBuy(0);
             setNeutral(0);
             setSell(0);
-            
+
             for (MPRules rules : list) {
-                
-                groupAndBuildRule(subseries, rules);
+
+                rules.setSeries(subseries, rules.getInd2());
+                groupAndBuildRule(rules);
             }
             if (getBuy() > -1) {
-                SimulationResults result = new SimulationResults();
-                result.setBuy(getBuy());
-                result.setSell(getSell());
-                result.setNeutral(getNeutral());
-                result.setEndtime(subseries.getBar(subseries.getEndIndex()).getEndTime()); 
+
                 buy.add(getBuy());
                 dates.add(subseries.getBar(subseries.getEndIndex()).getEndTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.GERMANY)));
                 results.put("buy", buy);
@@ -176,6 +202,5 @@ public abstract class GroupOfRulesBuilder {
             }
         }
     }
-    
-    
+
 }

@@ -55,7 +55,7 @@ public class ScheduledTask {
     //@Scheduled(cron = "0 */2 * * * *", zone = "Europe/Berlin")
     @Scheduled(cron = "0 0 2 * * *", zone = "Europe/Berlin")
     public void getCandlesAndIndicatorsPerDay() {
-        getAllIndicators();
+        //getAllIndicators();
         getCandles();
         saveMpSignals();
     }
@@ -65,7 +65,7 @@ public class ScheduledTask {
     //@Scheduled(cron = "0 */1 * * * *", zone = "Europe/Berlin")
     @Scheduled(cron = "0 0 14-22 ? * MON-FRI", zone = "Europe/Berlin")
     public void getCandlesAndIndicatorsPerHour() {
-        getAllIndicatorsPerHour();
+        //getAllIndicatorsPerHour();
         getCandlesPerHour();
         saveMpSignals();
     }
@@ -77,8 +77,8 @@ public class ScheduledTask {
     private void getCandlesPerHour() {
         List<FinnhubSignalsDTO> symbols; 
         
-        symbols = finnhubSignalsRepository.strongBuyQueryForUpdate();
-        saveOhlc(symbols);
+        //symbols = finnhubSignalsRepository.strongBuyQueryForUpdate();
+        //saveOhlc(symbols);
         symbols = mpSignalsRepository.strongBuyQueryForUpdate();
         saveOhlc(symbols);
     }

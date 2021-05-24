@@ -22,4 +22,7 @@ public interface StrategiesIndicatorsRepository extends JpaRepository < Strategi
     
     @Query(value = "SELECT s.* FROM strategies_indicators s WHERE s.indicators_abbreviation  = ?1 AND s.strategies_id = ?2", nativeQuery = true)
     StrategiesIndicators findIndicatorsByStrategiesAndAbbreviation(String abbreviation, int strategies_id);
+    @Query(value = "SELECT s.* FROM strategies_indicators s WHERE s.strategies_id = ?1 AND active=true", nativeQuery = true)
+    List<StrategiesIndicators> searchByStrategiesIdAndActiveIsTrue(int strategies_id);
+    
 }

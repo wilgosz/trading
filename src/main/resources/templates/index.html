@@ -25,120 +25,63 @@
                     <!-- Start Page Content -->
                     <!-- ============================================================== -->
                     <div th:replace="parts/topmenu :: topmenu"></div>
-                    <div class="row">
-                        <div class="col-sm-12"><h3>M.P. Indicators</h3></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-2" th:each="signal: ${mpsignals}">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <div class="card-title">
-                                            <div class="row">
-                                                <div class="col-md-12" style="max-width: 100%; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                                    <strong th:text="${signal.abbreviation}" style="margin-right: 12px"></strong>
-                                                    <span class="text-dark small" style="text-transform: lowercase;" th:text="${signal.description}"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="card-text">
-                                            <div class="row">
-                                                <div class="col-sm-6"><span class="small text-success m-b-0 p-b-0" th:text="${'buy '}"></span></div>
-                                                <div class="col-sm-6 text-right"><span class="small text-success m-b-0 p-b-0" th:text="${#numbers.formatDecimal(10*signal.buy, 0, 0) + '%'}"></span></div>
-                                            </div>
-                                            <div style="border: 1px #eee solid">
-                                                <div class="bg-success" th:style="${'height:3px; width:' + (10*signal.buy) + '%'}"></div> 
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-sm-6"><span class="small text-warning m-b-0 p-b-0" th:text="${'neutral '}"></span></div>
-                                                <div class="col-sm-6 text-right"><span class="small text-warning m-b-0 p-b-0" th:text="${#numbers.formatDecimal(10*signal.neutral, 0, 0) + '%'}"></span></div>
-                                            </div>
-                                            <div style="border: 1px #eee solid">
-                                                <div class="bg-warning" th:style="${'height:3px; width:' + (10*signal.neutral) + '%'}"></div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-sm-6"><span class="small text-danger m-b-0 p-b-0" th:text="${'sell '}"></span></div>
-                                                <div class="col-sm-6 text-right"><span class="small text-danger m-b-0 p-b-0" th:text="${#numbers.formatDecimal(10*signal.sell, 0, 0) + '%'}"></span></div>
-                                            </div>
-                                            <div style="border: 1px #eee solid">
-                                                <div class="bg-danger" th:style="${'height:3px; width:' + (10*signal.sell) + '%'}"></div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-sm-12"><small style="font-size: 10px; color: #333" th:text="${#temporals.format(signal.updatedatetime, 'dd.MM.yyyy HH:mm')}"></small></div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <a class="btn btn-sm btn-cyan" th:href="${'/companies/' + signal.abbreviation}">
-                                                    Finnhub Detail
-                                                </a>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <a class="btn btn-sm btn-success" th:href="${'/mp/' + signal.abbreviation}">
-                                                    MP Indicators
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                    <div class="row p-b-30">
+                        <div class="col-sm-12">
+                            <h3 class="d-inline">TOP 48 </h3>
+                            <select class="form-control ml-5" style="display: inline-block; width: 20%; float: right" id="strategies_select">
+                                <option value="0">Choose strategy</option>
+                                <option th:each="str: ${strategies}" th:value="${str.id}" th:text="${str.name}" th:selected="${current_strategie_id==str.id}"></option>
+                            </select>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-12"><h3>Finnhub Indicators</h3></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-2" th:each="signal: ${signals}">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <div class="card-title">
-                                            <div class="row">
-                                                <div class="col-md-12" style="max-width: 100%; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                                    <strong th:text="${signal.abbreviation}" style="margin-right: 12px"></strong>
-                                                    <span class="text-dark small" style="text-transform: lowercase;" th:text="${signal.description}"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="card-text">
-                                            <div class="row">
-                                                <div class="col-sm-6"><span class="small text-success m-b-0 p-b-0" th:text="${'buy '}"></span></div>
-                                                <div class="col-sm-6 text-right"><span class="small text-success m-b-0 p-b-0" th:text="${#numbers.formatDecimal(5.88*signal.buy, 0, 0) + '%'}"></span></div>
-                                            </div>
-                                            <div style="border: 1px #eee solid">
-                                                <div class="bg-success" th:style="${'height:3px; width:' + (5.88*signal.buy) + '%'}"></div> 
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-sm-6"><span class="small text-warning m-b-0 p-b-0" th:text="${'neutral '}"></span></div>
-                                                <div class="col-sm-6 text-right"><span class="small text-warning m-b-0 p-b-0" th:text="${#numbers.formatDecimal(5.88*signal.neutral, 0, 0) + '%'}"></span></div>
-                                            </div>
-                                            <div style="border: 1px #eee solid">
-                                                <div class="bg-warning" th:style="${'height:3px; width:' + (5.88*signal.neutral) + '%'}"></div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-sm-6"><span class="small text-danger m-b-0 p-b-0" th:text="${'sell '}"></span></div>
-                                                <div class="col-sm-6 text-right"><span class="small text-danger m-b-0 p-b-0" th:text="${#numbers.formatDecimal(5.88*signal.sell, 0, 0) + '%'}"></span></div>
-                                            </div>
-                                            <div style="border: 1px #eee solid">
-                                                <div class="bg-danger" th:style="${'height:3px; width:' + (5.88*signal.sell) + '%'}"></div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-sm-12"><small style="font-size: 10px; color: #333" th:text="${#temporals.format(signal.updatedatetime, 'dd.MM.yyyy HH:mm')}"></small></div>
-                                            </div>
-                                        </div>
+                        <div class="col-md-2" th:each="signal: ${mpsignals}">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="card-title">
                                         <div class="row">
-                                            <div class="col-md-6">
-                                                <a class="btn btn-sm btn-cyan" th:href="${'/companies/' + signal.abbreviation}">
-                                                    Finnhub Detail
-                                                </a>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <a class="btn btn-sm btn-success" th:href="${'/mp/' + signal.abbreviation}">
-                                                    MP Indicators
-                                                </a>
+                                            <div class="col-md-12" style="max-width: 100%; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                <strong th:text="${signal.abbreviation}" style="margin-right: 12px"></strong>
+                                                <span class="text-dark small" style="text-transform: lowercase;" th:text="${signal.description}"></span>
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="card-text">
+                                        <div class="row">
+                                            <div class="col-sm-6"><span class="small text-success m-b-0 p-b-0" th:text="${'buy '}"></span></div>
+                                            <div class="col-sm-6 text-right"><span class="small text-success m-b-0 p-b-0" th:text="${#numbers.formatDecimal(2.85*signal.buy, 0, 0) + '%'}"></span></div>
+                                        </div>
+                                        <div style="border: 1px #eee solid">
+                                            <div class="bg-success" th:style="${'height:3px; width:' + (2.85*signal.buy) + '%'}"></div> 
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-6"><span class="small text-warning m-b-0 p-b-0" th:text="${'neutral '}"></span></div>
+                                            <div class="col-sm-6 text-right"><span class="small text-warning m-b-0 p-b-0" th:text="${#numbers.formatDecimal(2.85*signal.neutral, 0, 0) + '%'}"></span></div>
+                                        </div>
+                                        <div style="border: 1px #eee solid">
+                                            <div class="bg-warning" th:style="${'height:3px; width:' + (2.85*signal.neutral) + '%'}"></div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-sm-6"><span class="small text-danger m-b-0 p-b-0" th:text="${'sell '}"></span></div>
+                                            <div class="col-sm-6 text-right"><span class="small text-danger m-b-0 p-b-0" th:text="${#numbers.formatDecimal(2.85*signal.sell, 0, 0) + '%'}"></span></div>
+                                        </div>
+                                        <div style="border: 1px #eee solid">
+                                            <div class="bg-danger" th:style="${'height:3px; width:' + (2.85*signal.sell) + '%'}"></div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-12"><small style="font-size: 10px; color: #333" th:text="${#temporals.format(signal.updatedatetime, 'dd.MM.yyyy HH:mm')}"></small></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <a class="btn btn-sm btn-cyan" th:href="${'/mp/' + signal.abbreviation + '/' + current_strategie_id}">
+                                                Indicators detail
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -149,7 +92,11 @@
         </div>
         <div  th:replace="parts/requiredjs :: requiredjs"></div>
         <script>
-
+            $('#strategies_select').change(function () {
+                if ($(this).val() > 0) {
+                    parent.location.href = '/dashboard/' + $(this).val()
+                }
+            });
         </script>
     </body>
 </html>

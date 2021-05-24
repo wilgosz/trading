@@ -6,6 +6,7 @@
 package net.easyweb24.actionbot.rules;
 
 import java.util.List;
+import net.easyweb24.actionbot.dto.IndicatorsDTO;
 import net.easyweb24.actionbot.dto.StrategiesDTO;
 import net.easyweb24.actionbot.indicators.AbstractMPIndicators;
 import net.easyweb24.actionbot.indicators.MACD;
@@ -20,45 +21,58 @@ import org.ta4j.core.trading.rules.UnderIndicatorRule;
  *
  * @author zbigniewwilgosz
  */
-public class MACDRules extends MPRules{
+public class MACDRules extends MPRules {
 
-    
     private MACD macd;
 
     public MACDRules(BarSeries series) {
         super(series);
     }
-    public MACDRules(BarSeries series, StrategiesDTO strategiesDTO){
+
+    public MACDRules(BarSeries series, StrategiesDTO strategiesDTO) {
         super(series, strategiesDTO);
     }
 
+    public MACDRules(BarSeries series, StrategiesDTO strategiesDTO, IndicatorsDTO ind2) {
+        super(series, strategiesDTO, ind2);
+    }
+
+    @Override
     protected void buildEntryRule() {
-        
+
         CrossedUpIndicatorRule entryRule = new CrossedUpIndicatorRule(macd.getMacd(), 0);
         CrossedDownIndicatorRule exitRule = new CrossedDownIndicatorRule(macd.getMacd(), 0);
         setEntryStrategie(new BaseStrategy(entryRule, exitRule));
     }
 
+    @Override
     protected void buildEntryRuleContinueInLastIndex() {
         OverIndicatorRule isEntryRuleContinueInLastIndex = new OverIndicatorRule(macd.getMacd(), 0);
         UnderIndicatorRule exitRule = new UnderIndicatorRule(macd.getMacd(), 0);
         setEntryContinueStrategie(new BaseStrategy(isEntryRuleContinueInLastIndex, exitRule));
     }
 
+    @Override
     protected void checkRules() {
         List<Double> values = macd.getMacdValues();
         checkSimplyRules(values);
-        
 
     }
 
     @Override
     protected void setIndicator(BarSeries series, int strategieId) {
+        macd = null;
         macd = getIndicatorsService().getMACD(series, strategieId);
     }
-    
+
     @Override
-    public AbstractMPIndicators getIdicatorMainInfo(){
-        return macd ;
+    public AbstractMPIndicators getIdicatorMainInfo() {
+        return macd;
+    }
+
+    @Override
+    protected void setIndicator(BarSeries series, IndicatorsDTO ind2) {
+        macd = null;
+        macd = getIndicatorsService().getMACD(series, ind2);
     }
 }

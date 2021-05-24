@@ -14,6 +14,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
@@ -45,6 +47,10 @@ public class MpSignals implements Serializable {
  
     @Column(name = "update_date_time", columnDefinition="DATETIME ON UPDATE CURRENT_TIMESTAMP")
     public LocalDateTime updateDateTime;
+    
+    @JoinColumn(name = "strategies_id", referencedColumnName = "id")
+    @ManyToOne
+    private Strategies strategiesId;
     
     private Integer buy;
     private Integer neutral;
@@ -167,6 +173,20 @@ public class MpSignals implements Serializable {
      */
     public void setSell(Integer sell) {
         this.sell = sell;
+    }
+
+    /**
+     * @return the strategiesId
+     */
+    public Strategies getStrategiesId() {
+        return strategiesId;
+    }
+
+    /**
+     * @param strategiesId the strategiesId to set
+     */
+    public void setStrategiesId(Strategies strategiesId) {
+        this.strategiesId = strategiesId;
     }
     
 }

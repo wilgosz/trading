@@ -26,10 +26,9 @@
                         <div class="col-md-6 pb-3">
                             <div><label>&nbsp;</label></div>
                             <div>
-                                <a class="btn btn-cyan" th:href="${'/companies/' + symbol}">Company detail</a>
                                 <a class="btn btn-success" href="javascript:void(0)">Change company</a>
                                 <select class="form-control" style="display: inline-block; width: auto" id="strategies_select">
-                                    <option>Choose strategy</option>
+                                    <option value="0">Create new strategy</option>
                                     <option th:each="str: ${strategies_select}" th:value="${str.id}" th:text="${str.name}" th:selected="${strategies.id==str.id}"></option>
                                 </select>
                                 <a th:if="${strategies.id>0}" class="btn btn-danger" href="javascript:void(0)" id="start-symulation">Open/Close symulation</a>
@@ -41,13 +40,13 @@
                             <div>
                                 <label style="width: 22%; display: inline-block" class="text-left">Name</label>
                                 <label style="width: 22%; display: inline-block" class="text-left">Time range</label>
-                                <label style="width: 22%; display: inline-block" class="text-left">Support time range</label>
+                                <!--<label style="width: 22%; display: inline-block" class="text-left">Support time range</label>-->
                                 <label style="width: 22%; display: inline-block" class="text-left">&nbsp;</label>
                             </div>
                             <div>
                                 <input type="text" id="strategy_name" th:value="${strategies.name}" class="form-control" style="width: 22%; display: inline-block">
                                 <input type="number" id="strategy_timerange" th:value="${strategies.timeRange}"  class="form-control" style="width: 22%; display: inline-block">
-                                <input type="number" id="strategy_supporttimerange" th:value="${strategies.supportTimeRange}" class="form-control" style="width: 22%; display: inline-block">
+                                <input type="hidden" id="strategy_supporttimerange" th:value="${strategies.supportTimeRange}" class="form-control" style="width: 22%; display: inline-block">
                                 <input type="hidden" id="strategy_id" th:value="${strategies.id}">
 
                                 <a th:if="${strategies.id == 0}" class="btn btn-danger" id="strategy_save" href="#" style="width: 22%; display: inline-block">Create strategy</a>
@@ -82,6 +81,36 @@
                         </div>
                         <div class="col-md-6">
                             <div id="chart_adx"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col-md-4">
+                            <iframe th:src="${'https://widget.finnhub.io/widgets/recommendation?symbol=' + symbol}" style="width: 100%; height: 300px"></iframe>
+                        </div>
+                        <div class="col-md-4">
+                            <iframe th:src="${'https://widget.finnhub.io/widgets/historical-eps?symbol=' + symbol}" style="width: 100%; height: 300px"></iframe>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card" id="company" style="height: 300px; background: #222222">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-sm-9">
+                                            <h5 class="card-title m-b-20" style="color: #A9A9A9" th:text="${'Company ' + (company.name == null?'N/A':company.name)}"></h5>
+                                            <p class="card-text  mt-4">
+                                                <span style="display: inline-block; width: 100px; color: #A9A9A9">Exchange</span><span style="color: white" th:text="${company.exchange}"></span><br>
+                                                <span style="display: inline-block; width: 100px; color: #A9A9A9">Currency</span><span style="color: white" th:text="${company.currency}"></span><br>
+                                                <span style="display: inline-block; width: 100px; color: #A9A9A9">Web url</span><a th:href="${company.weburl}" target="_blank" th:text="${company.weburl}"></a><br>
+                                                <span style="display: inline-block; width: 100px; color: #A9A9A9">Industry</span><span style="color: white" th:text="${company.finnhubIndustry}"></span><br>
+                                                <span style="display: inline-block; width: 100px; color: #A9A9A9">Capitalization</span><span style="color: white" th:text="${company.marketCapitalization}"></span><br>
+                                                <span style="display: inline-block; width: 100px; color: #A9A9A9">Outstanding</span><span style="color: white" th:text="${company.shareOutstanding}"></span><br>
+                                            </p>
+                                        </div>
+                                        <div class="col-sm-3"><img class="card-img" th:src="${company.logo}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Card -->
                         </div>
                     </div>
                 </div>
@@ -124,6 +153,13 @@
                 button2.unbind('click');
                 button2.bind('click', function () {
                     updateIndicator(name, symbol, form, chart, "/indicator/resetindicator", resetFields);
+                });
+
+
+                $('#' + id + ' .charts-form').each(function () {
+                    $(this).unbind('blur').bind('blur', function () {
+                        updateIndicator(name, symbol, form, chart, "/indicator/testindicator");
+                    });
                 });
             }
 
@@ -214,10 +250,10 @@
                     $.ajax({
                         url: "/indicator/support/[[${symbol}]]",
                         success: function (obj) {
-                            
+
                             var support = {}
                             support.yaxis = [];
-                            for(var i = 0; i<obj.levels.length; i++){
+                            for (var i = 0; i < obj.levels.length; i++) {
                                 support.yaxis.push({
                                     y: obj.levels[i],
                                     borderColor: '#FF0000'})
@@ -356,7 +392,7 @@
                     indicators.push(IndicatorsDTO);
                 });
 
-
+                console.log(indicators);
 
                 $.ajax({
                     url: '/mp/updatestrategyindicators',
@@ -366,15 +402,15 @@
                     data: JSON.stringify(indicators),
                     success: function (html) {
                         show_toastr("The strategy has been saved successfully", "success");
-                        if (parseInt($("#strategy_id").val()) == 0) {
-                            setTimeout(function () {
-                                parent.location.href = "/mp/[[${symbol}]]/" + strategies_id;
-                            }, 3000);
-                        } else {
-                            if (is_simulation_open) {
-                                startSimulation();
-                            }
-                        }
+                        //if (parseInt($("#strategy_id").val()) == 0) {
+                        setTimeout(function () {
+                            parent.location.href = "/mp/[[${symbol}]]/" + strategies_id;
+                        }, 1500);
+                        /* } else {
+                         if (is_simulation_open) {
+                         startSimulation();
+                         }
+                         }*/
                     }
                 });
             }
@@ -385,7 +421,8 @@
                     type: 'post',
                     data: strategies,
                     success: function (status) {
-
+                        console.log(strategies);
+                        console.log(status);
                         if (status.success && status.new_id > 0) {
                             if (typeof callback == 'function') {
                                 callback(status.new_id);
@@ -441,17 +478,21 @@
 
             function createSelect(data, className) {
                 html = "";
-                html += "<div class='col'>";
-                html += "<label>" + className + "</label>"
-                html += "<select name='" + className + "' class='charts-form " + className + " little_input'>";
-                html += "<option value='false'>no</option>";
-                html += "<option value='true' "
-                if (data) {
-                    html += "selected='selected'";
+                if (className == 'reverse') {
+                    html += "<input type='hidden' name='" + className + "' value='false' >";
+                } else {
+                    html += "<div class='col'>";
+                    html += "<label>" + className + "</label>"
+                    html += "<select name='" + className + "' class='charts-form " + className + " little_input'>";
+                    html += "<option value='false'>no</option>";
+                    html += "<option value='true' "
+                    if (data) {
+                        html += "selected='selected'";
+                    }
+                    html += ">yes</option>";
+                    html += "</select>";
+                    html += "</div>";
                 }
-                html += ">yes</option>";
-                html += "</select>";
-                html += "</div>";
                 return html;
             }
         </script>

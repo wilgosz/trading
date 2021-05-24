@@ -19,9 +19,13 @@ public class StandartRulesGroup extends GroupOfRulesBuilder {
     public StandartRulesGroup(BarSeries series, List<MPRules> list) {
         super(series, list);
     }
-    
+
     public StandartRulesGroup(BarSeries series, List<MPRules> list, int testDayRange) {
         super(series, list, testDayRange);
+    }
+
+    public StandartRulesGroup(List<MPRules> list) {
+        super(list);
     }
 
     /**
@@ -30,22 +34,58 @@ public class StandartRulesGroup extends GroupOfRulesBuilder {
      * @param rules
      */
     @Override
-    protected void groupAndBuildRule(BarSeries subseries, MPRules rules) {
+    protected void groupAndBuildRule(MPRules rules) {
 
-        rules.setSeries(subseries);
         if (!rules.getIdicatorMainInfo().getReverse()) {
-            if (rules.isGoUp() && rules.isEntryContinue() && rules.isShouldEnter()) {
+            if (rules.isEntryContinue()) {
                 addBuy();
-                if (rules.getLastIndexTheBest() == 100) {
+            } else {
+                addSell();
+            }
+            if (rules.isShouldEnter() && rules.isEntryContinue()) {
+                addBuy();
+                if (rules.isGoUp()) {
                     addBuy();
+                    addBuy();
+                    addBuy();
+                } else {
+                    addNeutral();
+                }
+            } else if (rules.isShouldExit()) {
+                addSell();
+                addSell();
+                addSell();
+                if (!rules.isGoUp()) {
+                    addSell();
+                } else {
+                    addNeutral();
+                }
+            } else if (rules.isGoUp()) {
+                addBuy();
+                addNeutral();
+                addNeutral();
+                addNeutral();
+            } else {
+                addSell();
+                addSell();
+                addSell();
+                addNeutral();
+            }
+
+        } else {
+            if (!rules.isEntryContinue()) {
+                addBuy();
+                addBuy();
+                addBuy();
+                if (rules.isGoUp()) {
+                    addBuy();
+                } else {
+                    addNeutral();
                 }
             } else {
                 addNeutral();
-            }
-        } else {
-            if (!rules.isEntryContinue() && !rules.isGoUp()) {
-                addBuy();
-            } else {
+                addNeutral();
+                addNeutral();
                 addNeutral();
             }
         }

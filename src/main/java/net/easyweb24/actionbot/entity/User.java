@@ -35,6 +35,9 @@ public class User {
     @JsonIgnoreProperties
     @OneToMany(mappedBy = "userId")
     private List<Alerts> alertsList;
+    
+    @OneToMany(mappedBy = "user")
+    private List<Strategies> strategies;
 
     public User() {}
 
@@ -119,5 +122,19 @@ public class User {
             ", password='" + "*********" + '\'' +
             ", roles=" + roles +
             '}';
+    }
+
+    /**
+     * @return the strategies
+     */
+    public List<Strategies> getStrategies() {
+        return strategies;
+    }
+
+    /**
+     * @param strategies the strategies to set
+     */
+    public void setStrategies(List<Strategies> strategies) {
+        this.strategies = strategies;
     }
 }

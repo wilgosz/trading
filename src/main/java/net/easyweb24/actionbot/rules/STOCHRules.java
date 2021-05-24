@@ -6,11 +6,13 @@
 package net.easyweb24.actionbot.rules;
 
 import java.util.List;
+import net.easyweb24.actionbot.dto.IndicatorsDTO;
 import net.easyweb24.actionbot.dto.StrategiesDTO;
 import net.easyweb24.actionbot.indicators.AbstractMPIndicators;
 import net.easyweb24.actionbot.indicators.STOCHASTIC_SLOW;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseStrategy;
+import org.ta4j.core.Rule;
 import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
 import org.ta4j.core.trading.rules.CrossedUpIndicatorRule;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
@@ -32,6 +34,7 @@ public class STOCHRules extends MPRules {
         super(series, strategiesDTO);
     }
 
+    @Override
     protected void buildEntryRule() {
 
         CrossedUpIndicatorRule entryRule = new CrossedUpIndicatorRule(stoch.getStochasticOscillK(), stoch.getBottom_border());
@@ -39,12 +42,16 @@ public class STOCHRules extends MPRules {
         setEntryStrategie(new BaseStrategy(entryRule, exitRule));
     }
 
+    @Override
     protected void buildEntryRuleContinueInLastIndex() {
-        OverIndicatorRule isEntryRuleContinueInLastIndex = new OverIndicatorRule(stoch.getStochasticOscillK(), stoch.getBottom_border());
+        
+        UnderIndicatorRule underTopBorderIndicatorRule = new UnderIndicatorRule(stoch.getStochasticOscillK(), stoch.getTop_border());
+        Rule isEntryRuleContinueInLastIndex = new OverIndicatorRule(stoch.getStochasticOscillK(), stoch.getBottom_border()).and(underTopBorderIndicatorRule);
         UnderIndicatorRule exitRule = new UnderIndicatorRule(stoch.getStochasticOscillK(), stoch.getTop_border());
         setEntryContinueStrategie(new BaseStrategy(isEntryRuleContinueInLastIndex, exitRule));
     }
 
+    @Override
     protected void checkRules() {
         List<Double> values = stoch.getStochasticOscillKValues();
         checkSimplyRules(values);
@@ -59,5 +66,10 @@ public class STOCHRules extends MPRules {
     @Override
     public AbstractMPIndicators getIdicatorMainInfo() {
         return stoch;
+    }
+
+    @Override
+    protected void setIndicator(BarSeries series, IndicatorsDTO ind2) {
+        stoch = getIndicatorsService().getStochasticS(series, ind2);
     }
 }

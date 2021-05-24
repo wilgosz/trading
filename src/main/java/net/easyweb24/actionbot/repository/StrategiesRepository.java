@@ -11,6 +11,7 @@ package net.easyweb24.actionbot.repository;
  */
 import java.util.List;
 import net.easyweb24.actionbot.entity.Strategies;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -19,4 +20,6 @@ import org.springframework.stereotype.Repository;
 public interface StrategiesRepository extends JpaRepository < Strategies, Integer > {
     Strategies findById(int id);
     List<Strategies> findByName(String name);
+    List<Strategies> findByUserId(Long user_id, Sort sort);
+    Strategies findByIdAndUserId(int id, Long user_id);
 }

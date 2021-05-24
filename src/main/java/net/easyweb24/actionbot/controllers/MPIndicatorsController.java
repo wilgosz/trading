@@ -15,6 +15,7 @@ import net.easyweb24.actionbot.dto.StrategiesDTO;
 import net.easyweb24.actionbot.entity.CompanyProfile;
 import net.easyweb24.actionbot.entity.Strategies;
 import net.easyweb24.actionbot.entity.StrategiesIndicators;
+import net.easyweb24.actionbot.entity.User;
 import net.easyweb24.actionbot.repository.CompanyProfileRepository;
 import net.easyweb24.actionbot.repository.StrategiesIndicatorsRepository;
 import net.easyweb24.actionbot.repository.StrategiesRepository;
@@ -30,7 +31,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping("/mp")
-public class MPIndicatorsController {
+public class MPIndicatorsController extends RootAuthController{
 
     private final CompanyProfileRepository companyProfileRepository;
     private final StrategiesRepository strategiesRepository;
@@ -52,7 +53,7 @@ public class MPIndicatorsController {
         StrategiesDTO strategiesDto = new StrategiesDTO();
         if (strategyid != null) {
             strategie_id = strategyid;
-            Strategies strategies = strategiesRepository.findById(strategie_id);
+            Strategies strategies = strategiesRepository.findByIdAndUserId(strategie_id, getUserId());
             if (strategies != null) {
                 try {
                     BeanUtils.copyProperties(strategiesDto, strategies);
@@ -68,8 +69,9 @@ public class MPIndicatorsController {
             company = new CompanyProfile();
         }
         model.addAttribute("title", company.getName());
+        model.addAttribute("company", company);
         model.addAttribute("symbol", symbol);
-        model.addAttribute("strategies_select", strategiesRepository.findAll(Sort.by("name")));
+        model.addAttribute("strategies_select", strategiesRepository.findByUserId(getUserId(), Sort.by("name")));
         model.addAttribute("strategies", strategiesDto);
 
         return "mpindicators";
@@ -120,9 +122,13 @@ public class MPIndicatorsController {
             }
         }
 
+        User user = new User();
+        user.setId(getUserId());
         st.setName(strategies.getName());
         st.setSupportTimeRange(strategies.getSupportTimeRange());
         st.setTimeRange(strategies.getTimeRange());
+        st.setUser(user);
+        
         strategiesRepository.save(st);
 
         

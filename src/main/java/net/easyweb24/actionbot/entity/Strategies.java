@@ -13,6 +13,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -31,21 +33,34 @@ import javax.persistence.Table;
 public class Strategies implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id", nullable = false)
     private Integer id;
+    
     @Column(name = "name", length = 255)
     private String name;
+    
     @Column(name = "time_range")
     private Integer timeRange;
+    
     @Column(name = "support_time_range")
     private Integer supportTimeRange;
+    
     @OneToMany(mappedBy = "strategiesId")
     private List<Alerts> alertsList;
+    
     @OneToMany(mappedBy = "strategiesId")
     private List<StrategiesIndicators> strategiesIndicatorsList;
+    
+    @OneToMany(mappedBy = "strategiesId")
+    private List<MpSignals> mpSignalsList;
+    
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @ManyToOne
+    private User user;
 
     public Strategies() {
     }
@@ -137,6 +152,34 @@ public class Strategies implements Serializable {
      */
     public void setSupportTimeRange(Integer supportTimeRange) {
         this.supportTimeRange = supportTimeRange;
+    }
+
+    /**
+     * @return the user
+     */
+    public User getUser() {
+        return user;
+    }
+
+    /**
+     * @param user the user to set
+     */
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    /**
+     * @return the mpSignalsList
+     */
+    public List<MpSignals> getMpSignalsList() {
+        return mpSignalsList;
+    }
+
+    /**
+     * @param mpSignalsList the mpSignalsList to set
+     */
+    public void setMpSignalsList(List<MpSignals> mpSignalsList) {
+        this.mpSignalsList = mpSignalsList;
     }
     
 }
