@@ -82,7 +82,7 @@ public class StrategiesController extends RootAuthController {
             List<MPRules> list = rulesSevice.getRulesByStrategyId(series, new BaseBarSeries(), strategies);
             StandartRulesGroup group = new StandartRulesGroup(series, list, series.getBarCount() < 200 ? series.getBarCount() - 20 : 200);
             System.out.println("Start saved");
-            //mpSignalsService.saveSignals();
+            mpSignalsService.saveSignals();
             return group.getSimulationResults();
         }
         return new HashMap<String, List>();
