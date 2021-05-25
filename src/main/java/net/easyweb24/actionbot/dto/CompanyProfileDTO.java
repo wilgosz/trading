@@ -24,4 +24,5 @@ public interface CompanyProfileDTO{
     public String getWeburl();
     public String getSignals();
     public boolean getTrending();
+    public boolean getActive();
 }

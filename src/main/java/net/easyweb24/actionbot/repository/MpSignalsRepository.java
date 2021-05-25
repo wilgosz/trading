@@ -23,19 +23,21 @@ public interface MpSignalsRepository extends JpaRepository < MpSignals, Long > {
     MpSignals findByAbbreviationAndStrategiesId(String abbreviation, Strategies strategies);
     
     @Query(value = ""
-            + " SELECT f.*, f.update_date_time as updatedatetime , s.description as description FROM symbols s, mp_signals f, company_profile cp "
+            + " SELECT f.*, f.update_date_time as updatedatetime, f.strategies_id as strategiesid , cp.active, s.description as description FROM symbols s, mp_signals f, company_profile cp "
             + " WHERE s.abbreviation = f.abbreviation "
             + " AND cp.abbreviation = f.abbreviation "
-            + " AND f.strategies_id = ?1"
+            + " AND cp.active = true "
+            + " AND f.strategies_id = ?1 "
             //+ " AND  f.signals = 'strong buy' "
             //+ " AND trending = 1"
             + " ORDER BY buy DESC, sell ASC  LIMIT 48", nativeQuery = true)
     List<FinnhubSignalsDTO> strongBuyQuery(int strategies_id);
     
     @Query(value = ""
-            + " SELECT f.*, f.update_date_time as updatedatetime , s.description as description FROM symbols s, mp_signals f, company_profile cp "
+            + " SELECT f.*, f.update_date_time as updatedatetime, , f.strategies_id as strategiesid, cp.active, s.description as description FROM symbols s, mp_signals f, company_profile cp "
             + " WHERE s.abbreviation = f.abbreviation "
             + " AND cp.abbreviation = f.abbreviation "
+            + " AND cp.active = true "
             //+ " AND trending = 1"
             + " ORDER BY buy DESC, sell ASC  LIMIT 500", nativeQuery = true)
     List<FinnhubSignalsDTO> strongBuyQueryForUpdate();

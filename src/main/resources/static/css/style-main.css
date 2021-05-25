@@ -17,3 +17,66 @@
 .my-form select{padding: 2px}
 .symulation-over{position: absolute; top: -175px;  height: 165px; background: white; left:50%; text-align: center; width: 50%; z-index: 100; transition: top 0.4s ease-out; transform: translate(-30%);}
 .symulation-over.open{top:0}
+.checkbox > input[type=checkbox] {
+  visibility: hidden;
+}
+
+.checkbox_ > input[type=checkbox] {
+  visibility: hidden;
+}
+
+.checkbox_ {
+  position: relative;
+  display: block;
+  width: 80px;
+  height: 28px;
+  margin: 0 0;
+  background: #FFF;
+  border: 1px solid #27a9e3;
+}
+
+.checkbox_:after {
+  position: absolute;
+  display: inline;
+  right: 11px;
+  content: 'no';
+  color: #da542e;
+  font: 11px/28px Arial, sans-serif;
+  font-weight: normal;
+  text-transform: capitalize;
+  z-index: 0;
+}
+
+.checkbox_:before {
+  position: absolute;
+  display: inline;
+  left: 10px;
+  content: 'yes';
+  color: #27a9e3;
+  font: 11px/28px Arial, sans-serif;
+  font-weight: normal;
+  text-transform: capitalize;
+  z-index: 0;
+}
+
+.checkbox_ label {
+  position: absolute;
+  display: block;
+  top: 2px;
+  left: 3px;
+  width: 34px;
+  height: 22px;
+  background: #27a9e3;
+  cursor: pointer;
+  transition: all 0.2s linear;
+  -webkit-transition: all 0.2s linear;
+  -moz-transition: all 0.2s linear;
+  z-index: 1;
+  font: 9px/22px Arial, sans-serif;
+  color: white;
+  text-align: center;
+}
+
+.checkbox_ input[type=checkbox]:checked + label {
+  left: 43px;
+}

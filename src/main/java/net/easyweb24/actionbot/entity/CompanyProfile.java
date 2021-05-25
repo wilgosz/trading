@@ -24,7 +24,8 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "company_profile", indexes = {
-    @Index(name = "company_profile_abbreviation_idx", columnList = "abbreviation", unique = false)
+    @Index(name = "company_profile_abbreviation_idx", columnList = "abbreviation", unique = false),
+    @Index(name = "company_profile_active_idx", columnList = "active", unique = false)
 })
 @NamedQueries({
     @NamedQuery(name = "CompanyProfile.findAll", query = "SELECT c FROM CompanyProfile c")})
@@ -58,6 +59,8 @@ public class CompanyProfile implements Serializable {
     private String logo;
     @Column(name = "finnhub_industry")
     private String finnhubIndustry;
+    
+    private boolean active = true;
     
     
     /**
@@ -254,6 +257,27 @@ public class CompanyProfile implements Serializable {
      */
     public void setAbbreviation(String abbreviation) {
         this.abbreviation = abbreviation;
+    }
+
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
+    
+    /**
+     * @return the active
+     */
+    public boolean getActive() {
+        return active;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
 }

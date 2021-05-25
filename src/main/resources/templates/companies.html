@@ -27,9 +27,12 @@
                                 <th scope="row" th:text="${company.id}"></th>
                                 <td th:text="${company.name}"></td>
                                 <td th:text="${company.abbreviation}"></td>
-                                <td>
-                                    <a class="btn btn-sm btn-cyan" th:href="@{/companies/{abbreviation}(abbreviation = ${company.abbreviation})}">Detail</a>
-                                    <a class="btn btn-sm btn-primary" th:href="@{/mp/{abbreviation}(abbreviation = ${company.abbreviation})}">MP Ind</a>
+                                <td class="text-right">
+                                    <a class="btn btn-sm btn-primary" th:href="@{/mp/{abbreviation}/{current_strategie_id}(abbreviation = ${company.abbreviation}, current_strategie_id=${current_strategie_id})}">MP Ind</a>
+                                    <div class="checkbox_ d-inline-block">
+                                        <input th:id="${'checkbox_'+company.abbreviation}" type="checkbox" value="1" th:checked="${company.active == true}" th:attr="data-aabreviation=${company.abbreviation}">
+                                        <label th:for="${'checkbox_'+company.abbreviation}">active</label>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
@@ -54,15 +57,51 @@
                 changeItemState('[[${param.letter}]]');
             }
             let createDivForCharElement = (block, charToAdd) => {
-                return block + "<li class='page-item'  data-filter='" + charToAdd + "'><a id='" + charToAdd + "' class='page-link' href='/companies?letter="+charToAdd+"'>" + charToAdd + "</a></li>";
+                return block + "<li class='page-item'  data-filter='" + charToAdd + "'><a id='" + charToAdd + "' class='page-link' href='/companies?letter=" + charToAdd + "'>" + charToAdd + "</a></li>";
             }
-            
+
             let changeItemState = character => {
-            const characterElement = $('#alphabet').find('.page-item[data-filter="' + character + '"]');
-            characterElement.addClass('active');
-        }
+                const characterElement = $('#alphabet').find('.page-item[data-filter="' + character + '"]');
+                characterElement.addClass('active');
+            }
 
             createNavigationList();
+            
+            $(".checkbox_ input[type=checkbox]").each(function () {
+                var that = $(this);
+                that.change(function () {
+                    //console.info(that.data("aabreviation"));
+                    setTimeout(function () {
+                        if (!that.is(":checked")) {
+                            if (confirm('Are you sure you want to change the status to inactive?')) {
+                                $.ajax({
+                                    url: "/companies/inactive/"+that.data("aabreviation"),
+                                    type: "delete",
+                                    success : function(){
+                                        parent.location.href = parent.location.href;
+                                    }
+                                });
+                            } else {
+                                that.prop('checked', true);
+                            }
+                        }else{
+                            if (confirm('Are you sure you want to change the status to active?')) {
+                                $.ajax({
+                                    url: "/companies/active/"+that.data("aabreviation"),
+                                    type: "put",
+                                    success : function(){
+                                        parent.location.href = parent.location.href;
+                                    }
+                                });
+                            } else {
+                                that.prop('checked', false);
+                            }
+                        }
+                    }, 300)
+
+                });
+
+            });
         </script>
     </body>
 </html>

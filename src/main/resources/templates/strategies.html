@@ -11,8 +11,9 @@
             <div  th:replace="parts/left-sidebar :: left-sidebar"></div>
             <div class="page-wrapper">
                 <div  th:replace="parts/breadcrumb :: breadcrumb"></div>
-                <div class="container-fluid">
+                <div class="container-fluid" style="position: relative">
                     <div th:replace="parts/topmenu :: topmenu"></div>
+
                     <div class="row">
                         <div class="col-md-6" th:each="strategie : ${strategies}">
                             <div class="card">
@@ -45,17 +46,43 @@
                                     </table>
                                 </div>
                                 <div class="card-body text-right">
-                                    <a th:href="@{/mp/AAPL/}+${strategie.id}" class="btn btn-sm btn-info"><i class="fas fa-edit"></i> Edit</a>
-                                    <a th:href="@{/mp/AAPL/}+${strategie.id}" class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i> Delete</a>
+                                    <a href="javascript:void(0)" id="edit_strategie" th:attr="data-stragie_id=${strategie.id}" class="btn btn-sm btn-info"><i class="fas fa-edit"></i> Edit</a>
+                                    <a href="javascript:void(0)" id="delete_strategie" th:attr="data-stragie_id=${strategie.id}" class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i> Delete</a>
                                 </div>
                             </div>
                         </div>
 
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div id="add-strategy" style="cursor: pointer">
+                                <i class="fas fa-plus" style="width: 40px; height: 40px; background: red; text-align: center; line-height: 40px; border-radius: 50%; color: white; margin-right: 12px; font-size: 22px"></i> Add new strategy
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div  th:replace="parts/footer :: footer"></div>
             </div>
         </div>
         <div  th:replace="parts/requiredjs :: requiredjs"></div>
+        <script>
+            $('#edit_strategie').bind('click', function () {
+                editStrategie($(this).data("stragie_id"));
+            });
+            function editStrategie(strategie_id) {
+                if (localStorage.getItem("abbreviation")) {
+                    parent.location.href = "/mp/" + localStorage.getItem("abbreviation") + "/" + strategie_id;
+                } else {
+                    parent.location.href = "/mp/AAPL/" + strategie_id;
+                }
+            }
+            $('#add-strategy').bind('click', function () {
+                if (localStorage.getItem("abbreviation")) {
+                    parent.location.href = "/mp/" + localStorage.getItem("abbreviation") + "/";
+                } else {
+                    parent.location.href = "/mp/AAPL/";
+                }
+            });
+        </script>
     </body>
 </html>

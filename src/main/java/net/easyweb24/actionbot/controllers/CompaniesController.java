@@ -14,9 +14,11 @@ import net.easyweb24.actionbot.dto.AggregateIndicators;
 import net.easyweb24.actionbot.dto.CompanyProfileDTO;
 import net.easyweb24.actionbot.entity.CompanyNews;
 import net.easyweb24.actionbot.entity.CompanyProfile;
+import net.easyweb24.actionbot.entity.Strategies;
 import net.easyweb24.actionbot.entity.Symbols;
 import net.easyweb24.actionbot.repository.CompanyNewsRepository;
 import net.easyweb24.actionbot.repository.CompanyProfileRepository;
+import net.easyweb24.actionbot.repository.StrategiesRepository;
 import net.easyweb24.actionbot.repository.SymbolsRepository;
 import net.easyweb24.actionbot.service.FinnhubDtoService;
 import net.easyweb24.actionbot.service.FinnhubService;
@@ -25,12 +27,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  *
@@ -38,29 +44,32 @@ import org.springframework.web.bind.annotation.RequestMethod;
  */
 @Controller
 @RequestMapping("/companies")
-public class CompaniesController {
-    
+public class CompaniesController extends RootAuthController {
+
     private final CompanyProfileRepository companyProfileRepository;
     private final SymbolsRepository symbolsRepository;
     private final FinnhubService finnhubService;
     private final FinnhubDtoService finnhubDtoService;
     private final FinnhubComponent finnhubComponent;
     private final CompanyNewsRepository companyNewsRepository;
-    
+    private final StrategiesRepository strategiesRepository;
+
     public CompaniesController(
             CompanyProfileRepository companyProfileRepository,
             SymbolsRepository symbolsRepository,
             FinnhubService finnhubService,
             FinnhubDtoService finnhubDtoService,
             FinnhubComponent finnhubComponent,
-            CompanyNewsRepository companyNewsRepository){
-        
+            CompanyNewsRepository companyNewsRepository,
+            StrategiesRepository strategiesRepository) {
+
         this.companyProfileRepository = companyProfileRepository;
         this.symbolsRepository = symbolsRepository;
         this.finnhubService = finnhubService;
-        this.finnhubDtoService= finnhubDtoService;
+        this.finnhubDtoService = finnhubDtoService;
         this.finnhubComponent = finnhubComponent;
         this.companyNewsRepository = companyNewsRepository;
+        this.strategiesRepository = strategiesRepository;
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -85,6 +94,14 @@ public class CompaniesController {
             page = companyProfileRepository.getAllCompanies(pgbl);
         }
 
+        int current_strategie_id = 0;
+        List<Strategies> strategies = strategiesRepository.findByUserId(getUserId(), Sort.by("id"));
+
+        if (strategies.size() > 0) {
+            current_strategie_id = strategies.get(0).getId();
+        }
+        
+        model.addAttribute("current_strategie_id", current_strategie_id);
         model.addAttribute("companies", page.getContent());
         model.addAttribute("page", page);
         model.addAttribute("title", "Companies");
@@ -149,4 +166,25 @@ public class CompaniesController {
         return "company";
     }
 
+    @DeleteMapping("/inactive/{abbreviation}")
+    @ResponseBody
+    public ResponseEntity<Void> makeCompanyInactive(@PathVariable(name = "abbreviation") String abbreviation) {
+        CompanyProfile company = companyProfileRepository.findByAbbreviation(abbreviation);
+        if (company != null) {
+            company.setActive(false);
+            companyProfileRepository.save(company);
+        }
+        return ResponseEntity.ok().build();
+    }
+    
+    @PutMapping("/active/{abbreviation}")
+    @ResponseBody
+    public ResponseEntity<Void> makeCompanyActive(@PathVariable(name = "abbreviation") String abbreviation) {
+        CompanyProfile company = companyProfileRepository.findByAbbreviation(abbreviation);
+        if (company != null) {
+            company.setActive(true);
+            companyProfileRepository.save(company);
+        }
+        return ResponseEntity.ok().build();
+    }
 }

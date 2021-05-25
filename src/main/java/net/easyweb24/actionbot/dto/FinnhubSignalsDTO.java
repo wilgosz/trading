@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 public interface FinnhubSignalsDTO{
 
     public Integer getId();
+    public Integer getStrategiesid();
+    public boolean getActive();
     public String getAbbreviation();
     public Integer getBuy();
     public Integer getNeutral();

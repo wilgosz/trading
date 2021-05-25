@@ -79,6 +79,12 @@
                                                 Indicators detail
                                             </a>
                                         </div>
+                                        <div class="col-md-6">
+                                            <div class="checkbox_ d-inline-block float-right">
+                                                <input th:id="${'checkbox_'+signal.abbreviation}" type="checkbox" value="1" th:checked="${signal.active == true}" th:attr="data-aabreviation=${signal.abbreviation}">
+                                                <label th:for="${'checkbox_'+signal.abbreviation}">active</label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -96,6 +102,29 @@
                 if ($(this).val() > 0) {
                     parent.location.href = '/dashboard/' + $(this).val()
                 }
+            });
+            $(".checkbox_ input[type=checkbox]").each(function () {
+                var that = $(this);
+                that.change(function () {
+                    //console.info(that.data("aabreviation"));
+                    setTimeout(function () {
+                        if (!that.is(":checked")) {
+                            if (confirm('Are you sure you want to change the status to inactive?')) {
+                                $.ajax({
+                                    url: "/companies/inactive/"+that.data("aabreviation"),
+                                    type: "delete",
+                                    success : function(){
+                                        parent.location.href = "/dashboard/[[${current_strategie_id}]]"
+                                    }
+                                });
+                            } else {
+                                that.prop('checked', true);
+                            }
+                        }
+                    }, 300)
+
+                });
+
             });
         </script>
     </body>
