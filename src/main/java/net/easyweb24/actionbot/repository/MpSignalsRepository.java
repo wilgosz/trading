@@ -39,6 +39,7 @@ public interface MpSignalsRepository extends JpaRepository < MpSignals, Long > {
             + " AND cp.abbreviation = f.abbreviation "
             + " AND cp.active = true "
             //+ " AND trending = 1"
+            + " GROUP BY cp.abbreviation "
             + " ORDER BY buy DESC, sell ASC  LIMIT 500", nativeQuery = true)
     List<FinnhubSignalsDTO> strongBuyQueryForUpdate();
 }
