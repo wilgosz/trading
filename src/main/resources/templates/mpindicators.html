@@ -17,7 +17,7 @@
                 <div class="container-fluid">
 
                     <div class="text-center">
-                        <a class="btn btn-primary float-left" th:href="@{'/'}"><i class="fas fa-backward"></i> Strong buy companies</a>
+                        <a class="btn btn-primary float-left" id="back-to-dashboard" href="javascript:void(0)"><i class="fas fa-backward"></i> Strong buy companies</a>
                         <span th:text="${'Strategy editor: '+strategies.name}" style="display: inline-block; font-size: 18px; margin-left: 20px; font-weight: bold"></span>
                         <a class="btn btn-warning float-right" th:href="@{/strategies}">All strategies <i class="fas fa-forward"></i></a>
                         <div class="clearfix"></div>
@@ -26,7 +26,7 @@
                         <div class="col-md-6 pb-3">
                             <div><label>&nbsp;</label></div>
                             <div>
-                                <a class="btn btn-success" href="javascript:void(0)">Change company</a>
+                                <a class="btn btn-success" th:href="@{/companies/strategy/{current_startegies_id}(current_startegies_id=${strategies.id})}">Change company</a>
                                 <select class="form-control" style="display: inline-block; width: auto" id="strategies_select">
                                     <option value="0">Create new strategy</option>
                                     <option th:each="str: ${strategies_select}" th:value="${str.id}" th:text="${str.name}" th:selected="${strategies.id==str.id}"></option>
@@ -56,7 +56,9 @@
                     </div>
 
                     <div class="row" id="my-charts">
-
+                        <div class="col-12" th:if="${strategies.id > 0 && aggregate != null}">
+                            <div th:replace="parts/progress :: progress"></div>
+                        </div>
                         <div class="col-md-6">
                             <div id="chart_price"></div>
                         </div>
@@ -496,7 +498,18 @@
                 return html;
             }
             if (typeof (Storage) !== "undefined") {
+                var strategies_id = parseInt("[[${strategies.id}]]");
                 localStorage.setItem("abbreviation", "[[${symbol}]]");
+                if(strategies_id > 0){
+                    localStorage.setItem("strategies_id", strategies_id);
+                }
+                $('#back-to-dashboard').bind('click', function(){
+                    if(parseInt(localStorage.getItem("strategies_id")) > 0){
+                        parent.location.href = "/dashboard/"+localStorage.getItem("strategies_id");
+                    }else{
+                        parent.location.href = "/";
+                    }
+                });
             }
         </script>
     </body>

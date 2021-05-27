@@ -12,24 +12,24 @@
                     <span class="page-link">Previous</span>
                 </li>
                 <li class="page-item" th:if="${page.hasPrevious()}">
-                    <a th:href="@{/companies(page=${0},size=${page.size},letter=${param.letter})}" class="page-link">First</a>
+                    <a th:href="@{/companies/strategy/{current_strategie_id}(current_strategie_id=${current_strategie_id}, page=${0},size=${page.size},letter=${param.letter})}" class="page-link">First</a>
                 </li>
                 <li class="page-item" th:if="${page.hasPrevious()}">
-                    <a th:href="@{/companies(page=${page.number-1},size=${page.size},letter=${param.letter})}" class="page-link">Previous</a>
+                    <a th:href="@{/companies/strategy/{current_strategie_id}(current_strategie_id=${current_strategie_id}, page=${page.number-1},size=${page.size},letter=${param.letter})}" class="page-link">Previous</a>
                 </li>
                 <th:block th:each="i: ${#numbers.sequence(0, page.totalPages - 1)}">
                     <th:block th:if="${(page.number-i<5 and i-page.number <=5) or (page.number<5 and i<10)}">
                         <li th:if="${page.number == i}" class="page-item active"><span class="page-link">[[${i}+1]]</span></li>
                         <li th:unless="${page.number == i}" class="page-item">
-                            <a th:href="@{/companies(page=${i},size=${page.size},letter=${param.letter})}" class="page-link">[[${i}+1]]</a>
+                            <a th:href="@{/companies/strategy/{current_strategie_id}(current_strategie_id=${current_strategie_id}, page=${i},size=${page.size},letter=${param.letter})}" class="page-link">[[${i}+1]]</a>
                         </li>
                     </th:block>
                 </th:block>
                 <li th:if="${page.hasNext()}" class="page-item">
-                    <a th:href="@{/companies(page=${page.number+1},size=${page.size},letter=${param.letter})}" class="page-link">Next</a>
+                    <a th:href="@{/companies/strategy/{current_strategie_id}(current_strategie_id=${current_strategie_id}, page=${page.number+1},size=${page.size},letter=${param.letter})}" class="page-link">Next</a>
                 </li>
                 <li th:if="${page.hasNext()}" class="page-item">
-                    <a th:href="@{/companies(page=${page.totalPages - 1},size=${page.size},letter=${param.letter})}" class="page-link">Last</a>
+                    <a th:href="@{/companies/strategy/{current_strategie_id}(current_strategie_id=${current_strategie_id}, page=${page.totalPages - 1},size=${page.size},letter=${param.letter})}" class="page-link">Last</a>
                 </li>
                 <li th:if="${!page.hasNext()}" class="page-item disabled">
                     <span class="page-link">Next</span>
@@ -44,7 +44,7 @@
 
         </nav>
         <nav th:fragment="alphabet">
-            <ul class="pagination justify-content-center" id="alphabet">
+            <ul class="pagination justify-content-center" th:style="${show_letters?'':'display:none'}" id="alphabet">
 
             </ul>
         </nav>

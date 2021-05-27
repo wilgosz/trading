@@ -5,6 +5,8 @@
  */
 package net.easyweb24.actionbot.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -50,12 +52,15 @@ public class Strategies implements Serializable {
     private Integer supportTimeRange;
     
     @OneToMany(mappedBy = "strategiesId")
+    @JsonIgnore
     private List<Alerts> alertsList;
     
     @OneToMany(mappedBy = "strategiesId")
+    @JsonIgnore
     private List<StrategiesIndicators> strategiesIndicatorsList;
     
     @OneToMany(mappedBy = "strategiesId")
+    @JsonIgnore
     private List<MpSignals> mpSignalsList;
     
     @JoinColumn(name = "user_id", referencedColumnName = "id")

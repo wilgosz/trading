@@ -16,8 +16,10 @@ import net.easyweb24.actionbot.components.utils.DBToBarSeries;
 import net.easyweb24.actionbot.dto.IndicatorsDTO;
 import net.easyweb24.actionbot.dto.SimulationResults;
 import net.easyweb24.actionbot.dto.StrategiesDTO;
+import net.easyweb24.actionbot.entity.MpSignals;
 import net.easyweb24.actionbot.entity.Strategies;
 import net.easyweb24.actionbot.entity.StrategiesIndicators;
+import net.easyweb24.actionbot.repository.MpSignalsRepository;
 import net.easyweb24.actionbot.repository.StrategiesIndicatorsRepository;
 import net.easyweb24.actionbot.repository.StrategiesRepository;
 import net.easyweb24.actionbot.rules.ADXRules;
@@ -33,8 +35,11 @@ import net.easyweb24.actionbot.service.RulesSevice;
 import net.easyweb24.actionbot.service.StandartRulesGroup;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,19 +53,22 @@ public class StrategiesController extends RootAuthController {
 
     private final StrategiesRepository strategiesRepository;
     private final DBToBarSeries dbToBarSeries;
-    private final MpSignalsService mpSignalsService;
+    private final StrategiesIndicatorsRepository strategiesIndicatorsRepository;
     private final RulesSevice rulesSevice;
+    private final MpSignalsRepository mpSignalsRepository;
 
     public StrategiesController(
             StrategiesRepository strategiesRepository,
             DBToBarSeries dbToBarSeries,
-            MpSignalsService mpSignalsService,
-            RulesSevice rulesSevice
+            StrategiesIndicatorsRepository strategiesIndicatorsRepository,
+            RulesSevice rulesSevice,
+            MpSignalsRepository mpSignalsRepository
     ) {
         this.strategiesRepository = strategiesRepository;
         this.dbToBarSeries = dbToBarSeries;
-        this.mpSignalsService = mpSignalsService;
+        this.strategiesIndicatorsRepository = strategiesIndicatorsRepository;
         this.rulesSevice = rulesSevice;
+        this.mpSignalsRepository = mpSignalsRepository;
     }
 
     @GetMapping("")
@@ -86,6 +94,22 @@ public class StrategiesController extends RootAuthController {
             return group.getSimulationResults();
         }
         return new HashMap<String, List>();
+    }
+
+    @DeleteMapping("delete/{id}")
+    @ResponseBody
+    public ResponseEntity<Strategies> deleteSrategie(@PathVariable(name = "id") int id) {
+
+        Strategies s = strategiesRepository.findByIdAndUserId(id, getUserId());
+        if (s != null) {
+            strategiesIndicatorsRepository.deleteAll(s.getStrategiesIndicatorsList());
+            mpSignalsRepository.deleteAll(s.getMpSignalsList());
+            //TODO delete action 
+            strategiesRepository.deleteById(id);
+            
+        }
+
+        return ResponseEntity.ok().body(s);
     }
 
 }

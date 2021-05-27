@@ -13,10 +13,12 @@ import java.util.logging.Logger;
 import net.easyweb24.actionbot.dto.IndicatorsDTO;
 import net.easyweb24.actionbot.dto.StrategiesDTO;
 import net.easyweb24.actionbot.entity.CompanyProfile;
+import net.easyweb24.actionbot.entity.MpSignals;
 import net.easyweb24.actionbot.entity.Strategies;
 import net.easyweb24.actionbot.entity.StrategiesIndicators;
 import net.easyweb24.actionbot.entity.User;
 import net.easyweb24.actionbot.repository.CompanyProfileRepository;
+import net.easyweb24.actionbot.repository.MpSignalsRepository;
 import net.easyweb24.actionbot.repository.StrategiesIndicatorsRepository;
 import net.easyweb24.actionbot.repository.StrategiesRepository;
 import org.apache.commons.beanutils.BeanUtils;
@@ -36,15 +38,18 @@ public class MPIndicatorsController extends RootAuthController{
     private final CompanyProfileRepository companyProfileRepository;
     private final StrategiesRepository strategiesRepository;
     private final StrategiesIndicatorsRepository strategiesIndicatorsRepository;
+    private final MpSignalsRepository mpSignalsRepository;
 
     public MPIndicatorsController(
             CompanyProfileRepository companyProfileRepository, 
             StrategiesRepository strategiesRepository, 
-            StrategiesIndicatorsRepository strategiesIndicatorsRepository
+            StrategiesIndicatorsRepository strategiesIndicatorsRepository,
+            MpSignalsRepository mpSignalsRepository
     ) {
         this.companyProfileRepository = companyProfileRepository;
         this.strategiesRepository = strategiesRepository;
         this.strategiesIndicatorsRepository = strategiesIndicatorsRepository;
+        this.mpSignalsRepository = mpSignalsRepository;
     }
 
     @GetMapping(value = {"/{symbol}", "/{symbol}/{strategyid}"})
@@ -54,6 +59,7 @@ public class MPIndicatorsController extends RootAuthController{
         if (strategyid != null) {
             strategie_id = strategyid;
             Strategies strategies = strategiesRepository.findByIdAndUserId(strategie_id, getUserId());
+            
             if (strategies != null) {
                 try {
                     BeanUtils.copyProperties(strategiesDto, strategies);
@@ -62,12 +68,17 @@ public class MPIndicatorsController extends RootAuthController{
                 } catch (InvocationTargetException ex) {
                     Logger.getLogger(MPIndicatorsController.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                MpSignals signal = mpSignalsRepository.findByAbbreviationAndStrategiesId(symbol, strategies);
+                if(signal != null){
+                    model.addAttribute("aggregate", signal);
+                }
             }
         }
         CompanyProfile company = companyProfileRepository.findByAbbreviation(symbol);
         if (company == null) {
             company = new CompanyProfile();
         }
+        
         model.addAttribute("title", company.getName());
         model.addAttribute("company", company);
         model.addAttribute("symbol", symbol);

@@ -9,51 +9,43 @@ and open the template in the editor.
     </head>
     <body>
         <div class="card" th:fragment="progress">
-            <div class="card-body" style="height: 282px;">
-                <h5 class="card-title m-b-0">Aggregate Indicators</h5>
-                <p>Get aggregate signal of multiple technical indicators such as MACD, RSI, Moving Average v.v.</p>
-                <div class="m-t-20">
+            <div class="card-body" style="padding: 0; background: #eeeeee">
+                <div>
                     <div class="d-flex no-block align-items-center">
-                        <span th:text="${#numbers.formatDecimal((5.88)*aggregate.buy, 0, 0) + '% Buy'}"></span>
+                        <span th:text="${#numbers.formatDecimal(100*((0.0 + aggregate.buy)/(aggregate.buy+aggregate.sell+aggregate.neutral)), 0, 0) + '% Buy'}"></span>
                         <div class="ml-auto">
-                            <span th:text="${aggregate.buy} + ' indicators'"></span>
+                            <span th:text="${aggregate.buy} + ' points'"></span>
                         </div>
                     </div>
                     <div class="progress">
-                        <div class="progress-bar progress-bar-striped bg-success" role="progressbar" th:style="${'width:' + ((5.88)*aggregate.buy) + '%'}"></div>
+                        <div class="progress-bar progress-bar-striped bg-success" role="progressbar" th:style="${'width:' + #numbers.formatDecimal(100*((0.0 + aggregate.buy)/(aggregate.buy+aggregate.sell+aggregate.neutral)), 0, 0) + '%'}"></div>
                     </div>
                 </div>
                 <div>
-                    <div class="d-flex no-block align-items-center m-t-25">
-                        <span th:text="${#numbers.formatDecimal(5.88*aggregate.neutral, 0, 0) + '% Neutral'}"></span>
+                    <div class="d-flex no-block align-items-center m-t-10">
+                        <span th:text="${#numbers.formatDecimal(100*((0.0 + aggregate.neutral)/(aggregate.buy+aggregate.sell+aggregate.neutral)), 0, 0) + '% Neutral'}"></span>
                         <div class="ml-auto">
-                            <span th:text="${aggregate.neutral} + ' indicators'"></span>
+                            <span th:text="${aggregate.neutral} + ' points'"></span>
                         </div>
                     </div>
                     <div class="progress">
-                        <div class="progress-bar progress-bar-striped bg-warning" role="progressbar"  th:style="${'width:' + (5.88*aggregate.neutral) + '%'}"></div>
+                        <div class="progress-bar progress-bar-striped bg-warning" role="progressbar"  th:style="${'width:' + #numbers.formatDecimal(100*((0.0 + aggregate.neutral)/(aggregate.buy+aggregate.sell+aggregate.neutral)), 0, 0) + '%'}"></div>
                     </div>
                 </div>
                 <div>
-                    <div class="d-flex no-block align-items-center m-t-25">
-                        <span th:text="${#numbers.formatDecimal(5.88*aggregate.sell, 0, 0) + '% Sell'}"></span>
+                    <div class="d-flex no-block align-items-center m-t-10">
+                        <span th:text="${#numbers.formatDecimal(100*((0.0 + aggregate.sell)/(aggregate.buy+aggregate.sell+aggregate.neutral)), 0, 0) + '% Sell'}"></span>
                         <div class="ml-auto">
-                            <span th:text="${aggregate.sell} + ' indicators'"></span>
+                            <span th:text="${aggregate.sell} + ' points'"></span>
                         </div>
                     </div>
                     <div class="progress">
-                        <div class="progress-bar progress-bar-striped bg-danger" role="progressbar"  th:style="${'width:' + (5.88*aggregate.sell) + '%'}"></div>
+                        <div class="progress-bar progress-bar-striped bg-danger" role="progressbar"  th:style="${'width:' + #numbers.formatDecimal(100*((0.0 + aggregate.sell)/(aggregate.buy+aggregate.sell+aggregate.neutral)), 0, 0) + '%'}"></div>
                     </div>
                 </div>
                 <div>
-                    <div class="d-flex no-block align-items-center m-t-25">
-                        <span th:text="${'ADX ' + #numbers.formatDecimal(aggregate.adx == null ? 0 : aggregate.adx, 2, 2)}"></span>
-                        <div class="ml-auto">
-                            <span th:text="${'Tranding ' + (aggregate.trending?'YES':'NO')}"></span>
-                        </div>
-                    </div>
-                    <div class="progress">
-                        <div class="progress-bar progress-bar-striped bg-info" role="progressbar"  th:style="${'width:' + (aggregate.adx) + '%'}"></div>
+                    <div class="d-flex no-block align-items-center m-t-10">
+                        <span th:text="${'Last update' + #temporals.format(aggregate.updateDateTime, 'dd.MM.yyyy HH:mm')}"></span>
                     </div>
                 </div>
             </div>

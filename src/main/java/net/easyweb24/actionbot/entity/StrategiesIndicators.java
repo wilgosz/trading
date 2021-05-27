@@ -5,10 +5,13 @@
  */
 package net.easyweb24.actionbot.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -27,16 +30,7 @@ import javax.persistence.Table;
 @Table(name = "strategies_indicators", indexes = {
     @Index(name = "strategies_indicators_abbr_idx", columnList = "indicators_abbreviation", unique = false)
 })
-@NamedQueries({
-    @NamedQuery(name = "StrategiesIndicators.findAll", query = "SELECT s FROM StrategiesIndicators s"),
-    @NamedQuery(name = "StrategiesIndicators.findById", query = "SELECT s FROM StrategiesIndicators s WHERE s.id = :id"),
-    @NamedQuery(name = "StrategiesIndicators.findByIndicatorsAbbreviation", query = "SELECT s FROM StrategiesIndicators s WHERE s.indicatorsAbbreviation = :indicatorsAbbreviation"),
-    @NamedQuery(name = "StrategiesIndicators.findByPeriodShort", query = "SELECT s FROM StrategiesIndicators s WHERE s.periodShort = :periodShort"),
-    @NamedQuery(name = "StrategiesIndicators.findByPeriodLong", query = "SELECT s FROM StrategiesIndicators s WHERE s.periodLong = :periodLong"),
-    @NamedQuery(name = "StrategiesIndicators.findByPeriod", query = "SELECT s FROM StrategiesIndicators s WHERE s.period = :period"),
-    @NamedQuery(name = "StrategiesIndicators.findByTopBorder", query = "SELECT s FROM StrategiesIndicators s WHERE s.topBorder = :topBorder"),
-    @NamedQuery(name = "StrategiesIndicators.findByBottomBorder", query = "SELECT s FROM StrategiesIndicators s WHERE s.bottomBorder = :bottomBorder"),
-    @NamedQuery(name = "StrategiesIndicators.findByTimeRange", query = "SELECT s FROM StrategiesIndicators s WHERE s.timeRange = :timeRange")})
+
 public class StrategiesIndicators implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -63,8 +57,10 @@ public class StrategiesIndicators implements Serializable {
     private Boolean active = false;
     @Column(name = "reverse")
     private Boolean reverse = false;
+    
+    
     @JoinColumn(name = "strategies_id", referencedColumnName = "id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Strategies strategiesId;
 
     public StrategiesIndicators() {

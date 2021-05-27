@@ -22,7 +22,8 @@ public interface CompanyProfileDTO{
     public Float getShareOutstanding();
     public String getTicker();
     public String getWeburl();
-    public String getSignals();
-    public boolean getTrending();
+    public Integer getBuy();
+    public Integer getNeutral();
+    public Integer getSell();
     public boolean getActive();
 }

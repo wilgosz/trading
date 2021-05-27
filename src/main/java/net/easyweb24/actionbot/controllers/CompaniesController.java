@@ -8,6 +8,7 @@ package net.easyweb24.actionbot.controllers;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
+import java.util.Optional;
 import javax.servlet.ServletRequest;
 import net.easyweb24.actionbot.components.FinnhubComponent;
 import net.easyweb24.actionbot.dto.AggregateIndicators;
@@ -72,12 +73,30 @@ public class CompaniesController extends RootAuthController {
         this.strategiesRepository = strategiesRepository;
     }
 
-    @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String symbols_from_db(Model model, ServletRequest request) throws ParseException, IOException {
+    @RequestMapping(value = {"", "/strategy/{id}"}, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String symbols_from_db(@PathVariable(name = "id", required = false) Integer id,  Model model, ServletRequest request) throws ParseException, IOException {
 
         Page<CompanyProfileDTO> page;
         int pagenumber = 0;
         int pagesize = 20;
+        Strategies current_strategie = null;
+        int current_strategie_id = 0;
+        boolean show_letters = true;
+        
+        List<Strategies> strategies = strategiesRepository.findByUserId(getUserId(), Sort.by("id"));
+
+        if (id == null) {
+            if (strategies.size() > 0) {
+                current_strategie = strategies.get(0);
+            }
+        }else{
+            current_strategie = strategiesRepository.findByIdAndUserId(id, getUserId());
+        }
+        if(current_strategie != null){
+            current_strategie_id = current_strategie.getId();
+            
+        }
+        
 
         if (request.getParameter("page") != null && !request.getParameter("page").equals("")) {
             pagenumber = Integer.parseInt(request.getParameter("page"));
@@ -89,22 +108,22 @@ public class CompaniesController extends RootAuthController {
 
         Pageable pgbl = PageRequest.of(pagenumber, pagesize, Sort.by("name"));
         if (request.getParameter("letter") != null && !request.getParameter("letter").equals("")) {
-            page = companyProfileRepository.getAllCompaniesDescriptionStartingWith(request.getParameter("letter"), pgbl);
+            page = companyProfileRepository.getAllCompaniesDescriptionStartingWith(request.getParameter("letter"), current_strategie_id, pgbl);
+            if(request.getParameter("letter").length() > 1){
+                show_letters = false;
+            }
         } else {
-            page = companyProfileRepository.getAllCompanies(pgbl);
+            page = companyProfileRepository.getAllCompanies(current_strategie_id, pgbl);
         }
-
-        int current_strategie_id = 0;
-        List<Strategies> strategies = strategiesRepository.findByUserId(getUserId(), Sort.by("id"));
-
-        if (strategies.size() > 0) {
-            current_strategie_id = strategies.get(0).getId();
-        }
+        
+        
         
         model.addAttribute("current_strategie_id", current_strategie_id);
         model.addAttribute("companies", page.getContent());
         model.addAttribute("page", page);
+        model.addAttribute("show_letters", show_letters);
         model.addAttribute("title", "Companies");
+        model.addAttribute("strategies", strategies);
         return "companies";
     }
 

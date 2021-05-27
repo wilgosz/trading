@@ -22,25 +22,25 @@ import net.easyweb24.actionbot.dto.CompanyProfileDTO;
 public interface CompanyProfileRepository extends JpaRepository < CompanyProfile, Long > {
     CompanyProfile findByAbbreviation(String abbreviation);
     
-    @Query(value = "SELECT c.*, fs.signals, fs.trending "
+    @Query(value = "SELECT c.*, fs.buy, fs.neutral, fs.sell "
             + " FROM company_profile c "
-            + " LEFT JOIN finnhub_signals fs ON c.abbreviation = fs.abbreviation ",
+            + " LEFT JOIN mp_signals fs ON c.abbreviation = fs.abbreviation AND fs.strategies_id = ?1",
             countQuery = "SELECT COUNT(*) "
             + " FROM company_profile c "
-            + " LEFT JOIN finnhub_signals fs ON c.abbreviation = fs.abbreviation ",
+            + " LEFT JOIN mp_signals fs ON c.abbreviation = fs.abbreviation AND fs.strategies_id = ?1 ",
             nativeQuery = true)
-    Page<CompanyProfileDTO> getAllCompanies(Pageable pageable);
+    Page<CompanyProfileDTO> getAllCompanies(int strategies_id, Pageable pageable);
     
     
-    @Query(value = "SELECT c.*, fs.signals, fs.trending "
+    @Query(value = "SELECT c.*,  fs.buy, fs.neutral, fs.sell "
             + " FROM company_profile c "
-            + " LEFT JOIN finnhub_signals fs ON c.abbreviation = fs.abbreviation "
-            + " WHERE c.name LIKE ?1%",
+            + " LEFT JOIN mp_signals fs ON c.abbreviation = fs.abbreviation AND fs.strategies_id = ?2 "
+            + " WHERE (c.name LIKE ?1% OR c.abbreviation LIKE ?1%)",
             countQuery = "SELECT COUNT(*) "
             + " FROM company_profile c "
-            + " LEFT JOIN finnhub_signals fs ON c.abbreviation = fs.abbreviation "
-            + " WHERE c.name LIKE ?1%",
+            + " LEFT JOIN mp_signals fs ON c.abbreviation = fs.abbreviation AND fs.strategies_id = ?2 "
+            + " WHERE c.name LIKE ?1% OR c.abbreviation LIKE ?1%",
             nativeQuery = true)
-    Page<CompanyProfileDTO> getAllCompaniesDescriptionStartingWith(String name, Pageable pageable);
+    Page<CompanyProfileDTO> getAllCompaniesDescriptionStartingWith(String name, int strategies_id, Pageable pageable);
     
 }

@@ -49,25 +49,28 @@
                                     <div class="card-text">
                                         <div class="row">
                                             <div class="col-sm-6"><span class="small text-success m-b-0 p-b-0" th:text="${'buy '}"></span></div>
-                                            <div class="col-sm-6 text-right"><span class="small text-success m-b-0 p-b-0" th:text="${#numbers.formatDecimal(2.85*signal.buy, 0, 0) + '%'}"></span></div>
+                                            <div class="col-sm-6 text-right"><span class="small text-success m-b-0 p-b-0" 
+                                                                th:text="${#numbers.formatDecimal(100*((0.0 + signal.buy)/(signal.buy+signal.sell+signal.neutral)), 0, 0) + '%'}"></span></div>
                                         </div>
                                         <div style="border: 1px #eee solid">
-                                            <div class="bg-success" th:style="${'height:3px; width:' + (2.85*signal.buy) + '%'}"></div> 
+                                            <div class="bg-success" th:style="${'height:3px; width:' + #numbers.formatDecimal(100*((0.0 + signal.buy)/(signal.buy+signal.sell+signal.neutral)), 0, 0) + '%'}"></div> 
                                         </div>
                                         <div class="row">
                                             <div class="col-sm-6"><span class="small text-warning m-b-0 p-b-0" th:text="${'neutral '}"></span></div>
-                                            <div class="col-sm-6 text-right"><span class="small text-warning m-b-0 p-b-0" th:text="${#numbers.formatDecimal(2.85*signal.neutral, 0, 0) + '%'}"></span></div>
+                                            <div class="col-sm-6 text-right"><span class="small text-warning m-b-0 p-b-0" 
+                                                                 th:text="${#numbers.formatDecimal(100*((0.0 + signal.neutral)/(signal.buy+signal.sell+signal.neutral)), 0, 0) + '%'}"></span></div>
                                         </div>
                                         <div style="border: 1px #eee solid">
-                                            <div class="bg-warning" th:style="${'height:3px; width:' + (2.85*signal.neutral) + '%'}"></div>
+                                            <div class="bg-warning" th:style="${'height:3px; width:' + #numbers.formatDecimal(100*((0.0 + signal.neutral)/(signal.buy+signal.sell+signal.neutral)), 0, 0) + '%'}"></div>
                                         </div>
 
                                         <div class="row">
                                             <div class="col-sm-6"><span class="small text-danger m-b-0 p-b-0" th:text="${'sell '}"></span></div>
-                                            <div class="col-sm-6 text-right"><span class="small text-danger m-b-0 p-b-0" th:text="${#numbers.formatDecimal(2.85*signal.sell, 0, 0) + '%'}"></span></div>
+                                            <div class="col-sm-6 text-right"><span class="small text-danger m-b-0 p-b-0" 
+                                                                 th:text="${#numbers.formatDecimal(100*((0.0 + signal.sell)/(signal.buy+signal.sell+signal.neutral)), 0, 0) + '%'}"></span></div>
                                         </div>
                                         <div style="border: 1px #eee solid">
-                                            <div class="bg-danger" th:style="${'height:3px; width:' + (2.85*signal.sell) + '%'}"></div>
+                                            <div class="bg-danger" th:style="${'height:3px; width:' + #numbers.formatDecimal(100*((0.0 + signal.sell)/(signal.buy+signal.sell+signal.neutral)), 0, 0) + '%'}"></div>
                                         </div>
                                         <div class="row">
                                             <div class="col-sm-12"><small style="font-size: 10px; color: #333" th:text="${#temporals.format(signal.updatedatetime, 'dd.MM.yyyy HH:mm')}"></small></div>
@@ -126,6 +129,12 @@
                 });
 
             });
+            var strategies_id = parseInt("[[${current_strategie_id}]]");
+            if (typeof (Storage) !== "undefined") {
+                if(strategies_id > 0){
+                    localStorage.setItem("strategies_id", strategies_id);
+                }
+            }
         </script>
     </body>
 </html>

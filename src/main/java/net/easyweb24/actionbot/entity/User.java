@@ -5,6 +5,7 @@
  */
 package net.easyweb24.actionbot.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import javax.persistence.*;
 import java.util.Collection;
@@ -34,9 +35,11 @@ public class User {
     
     @JsonIgnoreProperties
     @OneToMany(mappedBy = "userId")
+    @JsonIgnore
     private List<Alerts> alertsList;
     
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List<Strategies> strategies;
 
     public User() {}
