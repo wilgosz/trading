@@ -73,8 +73,8 @@ public class CompaniesController extends RootAuthController {
         this.strategiesRepository = strategiesRepository;
     }
 
-    @RequestMapping(value = {"", "/strategy/{id}"}, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String symbols_from_db(@PathVariable(name = "id", required = false) Integer id,  Model model, ServletRequest request) throws ParseException, IOException {
+    @RequestMapping(value = {"", "/strategy/{id}"}, method = RequestMethod.GET)
+    public String symbols_from_db(@PathVariable(name = "id", required = false) Integer id, Model model, ServletRequest request) throws ParseException, IOException {
 
         Page<CompanyProfileDTO> page;
         int pagenumber = 0;
@@ -82,21 +82,20 @@ public class CompaniesController extends RootAuthController {
         Strategies current_strategie = null;
         int current_strategie_id = 0;
         boolean show_letters = true;
-        
+
         List<Strategies> strategies = strategiesRepository.findByUserId(getUserId(), Sort.by("id"));
 
         if (id == null) {
             if (strategies.size() > 0) {
                 current_strategie = strategies.get(0);
             }
-        }else{
+        } else {
             current_strategie = strategiesRepository.findByIdAndUserId(id, getUserId());
         }
-        if(current_strategie != null){
+        if (current_strategie != null) {
             current_strategie_id = current_strategie.getId();
-            
+
         }
-        
 
         if (request.getParameter("page") != null && !request.getParameter("page").equals("")) {
             pagenumber = Integer.parseInt(request.getParameter("page"));
@@ -109,15 +108,13 @@ public class CompaniesController extends RootAuthController {
         Pageable pgbl = PageRequest.of(pagenumber, pagesize, Sort.by("name"));
         if (request.getParameter("letter") != null && !request.getParameter("letter").equals("")) {
             page = companyProfileRepository.getAllCompaniesDescriptionStartingWith(request.getParameter("letter"), current_strategie_id, pgbl);
-            if(request.getParameter("letter").length() > 1){
+            if (request.getParameter("letter").length() > 1) {
                 show_letters = false;
             }
         } else {
             page = companyProfileRepository.getAllCompanies(current_strategie_id, pgbl);
         }
-        
-        
-        
+
         model.addAttribute("current_strategie_id", current_strategie_id);
         model.addAttribute("companies", page.getContent());
         model.addAttribute("page", page);
@@ -185,6 +182,27 @@ public class CompaniesController extends RootAuthController {
         return "company";
     }
 
+    @RequestMapping(value = "/inactive", method = RequestMethod.GET)
+    public String getInactiveCompanies(Model model) {
+        Strategies current_strategie = null;
+        int current_strategie_id = 0;
+
+        List<Strategies> strategies = strategiesRepository.findByUserId(getUserId(), Sort.by("id"));
+
+        if (strategies.size() > 0) {
+            current_strategie = strategies.get(0);
+            current_strategie_id = current_strategie.getId();
+        }
+        List<CompanyProfileDTO> inactive = companyProfileRepository.getInactiveComapnies(current_strategie_id);
+
+        model.addAttribute("current_strategie_id", current_strategie_id);
+        model.addAttribute("companies", inactive);
+        model.addAttribute("title", "Inactive Companies");
+        model.addAttribute("strategies", strategies);
+
+        return "comapnies_inactive";
+    }
+
     @DeleteMapping("/inactive/{abbreviation}")
     @ResponseBody
     public ResponseEntity<Void> makeCompanyInactive(@PathVariable(name = "abbreviation") String abbreviation) {
@@ -195,7 +213,7 @@ public class CompaniesController extends RootAuthController {
         }
         return ResponseEntity.ok().build();
     }
-    
+
     @PutMapping("/active/{abbreviation}")
     @ResponseBody
     public ResponseEntity<Void> makeCompanyActive(@PathVariable(name = "abbreviation") String abbreviation) {

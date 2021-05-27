@@ -43,4 +43,11 @@ public interface CompanyProfileRepository extends JpaRepository < CompanyProfile
             nativeQuery = true)
     Page<CompanyProfileDTO> getAllCompaniesDescriptionStartingWith(String name, int strategies_id, Pageable pageable);
     
+    @Query(value = "SELECT c.*,  fs.buy, fs.neutral, fs.sell "
+            + " FROM company_profile c "
+            + " LEFT JOIN mp_signals fs ON c.abbreviation = fs.abbreviation AND fs.strategies_id = ?1 "
+            + " WHERE c.active = false", 
+            nativeQuery = true)
+    List<CompanyProfileDTO> getInactiveComapnies(int strategies_id);
+    
 }
