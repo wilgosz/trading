@@ -28,4 +28,7 @@ public interface OHLCRepository extends JpaRepository < OHLC, Long > {
     @Query(value = "SELECT * FROM ohlc WHERE abbreviation = ?1 AND date >?2 ORDER BY date", nativeQuery = true)
     List<OHLC> getOHLCFromLastYear(String abbreviation, String from);
     
+    @Query(value = "SELECT * FROM ohlc WHERE abbreviation = ?1 ORDER BY date DESC LIMIT 1", nativeQuery = true)
+    OHLC getLastRecord(String abbreviation);
+    
 }

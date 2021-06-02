@@ -13,12 +13,15 @@ import javax.servlet.ServletRequest;
 import net.easyweb24.actionbot.components.FinnhubComponent;
 import net.easyweb24.actionbot.dto.AggregateIndicators;
 import net.easyweb24.actionbot.dto.CompanyProfileDTO;
+import net.easyweb24.actionbot.dto.CompanyRememberedDTO;
 import net.easyweb24.actionbot.entity.CompanyNews;
 import net.easyweb24.actionbot.entity.CompanyProfile;
+import net.easyweb24.actionbot.entity.RememberedComapnies;
 import net.easyweb24.actionbot.entity.Strategies;
 import net.easyweb24.actionbot.entity.Symbols;
 import net.easyweb24.actionbot.repository.CompanyNewsRepository;
 import net.easyweb24.actionbot.repository.CompanyProfileRepository;
+import net.easyweb24.actionbot.repository.RememberedCompaniesRepository;
 import net.easyweb24.actionbot.repository.StrategiesRepository;
 import net.easyweb24.actionbot.repository.SymbolsRepository;
 import net.easyweb24.actionbot.service.FinnhubDtoService;
@@ -54,6 +57,7 @@ public class CompaniesController extends RootAuthController {
     private final FinnhubComponent finnhubComponent;
     private final CompanyNewsRepository companyNewsRepository;
     private final StrategiesRepository strategiesRepository;
+    private final RememberedCompaniesRepository rememberedCompaniesRepository;
 
     public CompaniesController(
             CompanyProfileRepository companyProfileRepository,
@@ -62,7 +66,8 @@ public class CompaniesController extends RootAuthController {
             FinnhubDtoService finnhubDtoService,
             FinnhubComponent finnhubComponent,
             CompanyNewsRepository companyNewsRepository,
-            StrategiesRepository strategiesRepository) {
+            StrategiesRepository strategiesRepository,
+            RememberedCompaniesRepository rememberedCompaniesRepository) {
 
         this.companyProfileRepository = companyProfileRepository;
         this.symbolsRepository = symbolsRepository;
@@ -71,6 +76,7 @@ public class CompaniesController extends RootAuthController {
         this.finnhubComponent = finnhubComponent;
         this.companyNewsRepository = companyNewsRepository;
         this.strategiesRepository = strategiesRepository;
+        this.rememberedCompaniesRepository = rememberedCompaniesRepository;
     }
 
     @RequestMapping(value = {"", "/strategy/{id}"}, method = RequestMethod.GET)
@@ -223,5 +229,35 @@ public class CompaniesController extends RootAuthController {
             companyProfileRepository.save(company);
         }
         return ResponseEntity.ok().build();
+    }
+    
+    @GetMapping("/watched")
+    public String getWatchedCompanies(Model model){
+        List<CompanyRememberedDTO> remembered = rememberedCompaniesRepository.getAllWitchDetail(getUserId());
+        model.addAttribute("companies", remembered);
+        return "comapnies_watched";
+    }
+    @PutMapping("/watched/{id}")
+    @ResponseBody
+    public ResponseEntity<RememberedComapnies> changeWatchToInactive(@PathVariable Integer id){
+        RememberedComapnies remembered = rememberedCompaniesRepository.findByIdAndUserId(id, getUserId());
+        if(remembered != null){
+            remembered.setActive(false);
+            if(remembered.getProfit() == null ){
+                remembered.setProfit(0.0); 
+            }
+            rememberedCompaniesRepository.save(remembered);
+        }
+        return ResponseEntity.ok().body(remembered);
+    }
+    @DeleteMapping("/watched/{id}")
+    @ResponseBody
+    public ResponseEntity<RememberedComapnies> deleteWatch(@PathVariable Integer id){
+        RememberedComapnies remembered = rememberedCompaniesRepository.findByIdAndUserId(id, getUserId());
+        if(remembered != null){
+            
+            rememberedCompaniesRepository.delete(remembered);
+        }
+        return ResponseEntity.ok().body(remembered);
     }
 }

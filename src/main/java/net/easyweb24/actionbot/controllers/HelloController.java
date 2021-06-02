@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import net.easyweb24.actionbot.components.utils.DBToBarSeries;
 import net.easyweb24.actionbot.entity.MpSignals;
 import net.easyweb24.actionbot.entity.MpSignalsArchive;
+import net.easyweb24.actionbot.entity.RememberedComapnies;
 import net.easyweb24.actionbot.entity.Strategies;
 import net.easyweb24.actionbot.entity.Symbols;
 import net.easyweb24.actionbot.entity.User;
@@ -38,6 +39,7 @@ import net.easyweb24.actionbot.rules.RSIRules;
 import net.easyweb24.actionbot.rules.SMARules;
 import net.easyweb24.actionbot.rules.STOCHRules;
 import net.easyweb24.actionbot.service.MpSignalsService;
+import net.easyweb24.actionbot.service.RememberedCompaniesService;
 import net.easyweb24.actionbot.utils.FileDownloader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -58,6 +60,8 @@ public class HelloController {
 
     @Autowired
     private MpSignalsService mpSignalsService;
+    @Autowired
+    private RememberedCompaniesService rememberedCompaniesService;
 
     @RequestMapping("/")
     @ResponseBody
@@ -91,6 +95,13 @@ public class HelloController {
         
         mpSignalsService.saveSignals();
         return ResponseEntity.ok().body("TEST");
+    }
+    
+    @GetMapping("/remember")
+    @ResponseBody
+    public ResponseEntity<List<RememberedComapnies>> getRememberList(){
+        List<RememberedComapnies> list = rememberedCompaniesService.addTicks();
+        return ResponseEntity.ok().body(list);
     }
 
 }

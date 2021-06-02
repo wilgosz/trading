@@ -32,6 +32,7 @@
                                     <option th:each="str: ${strategies_select}" th:value="${str.id}" th:text="${str.name}" th:selected="${strategies.id==str.id}"></option>
                                 </select>
                                 <a th:if="${strategies.id>0}" class="btn btn-danger" href="javascript:void(0)" id="start-symulation">Open/Close symulation</a>
+                                <a th:if="${strategies.id>0}" class="btn btn-cyan disabled" href="javascript:void(0)" id="company-remember"> Loading ...</a>
                             </div>
                         </div>
 
@@ -86,14 +87,16 @@
                         </div>
                     </div>
                     <div class="row">
-
-                        <div class="col-md-4">
-                            <iframe th:src="${'https://widget.finnhub.io/widgets/recommendation?symbol=' + symbol}" style="width: 100%; height: 300px"></iframe>
+                        <div class="col-md-3">
+                            <iframe frameborder="0" height="300" style="width: 100%; height: 300px" th:src="${'https://widget.finnhub.io/widgets/stocks/chart?symbol=' + symbol + '&watermarkColor=%231db954&backgroundColor=%23222222&textColor=white&resolution=60&from=' + from + '&to=' + to}"></iframe>
                         </div>
-                        <div class="col-md-4">
-                            <iframe th:src="${'https://widget.finnhub.io/widgets/historical-eps?symbol=' + symbol}" style="width: 100%; height: 300px"></iframe>
+                        <div class="col-md-3">
+                            <iframe frameborder="0" th:src="${'https://widget.finnhub.io/widgets/recommendation?symbol=' + symbol}" style="width: 100%; height: 300px"></iframe>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
+                            <iframe frameborder="0" th:src="${'https://widget.finnhub.io/widgets/historical-eps?symbol=' + symbol}" style="width: 100%; height: 300px"></iframe>
+                        </div>
+                        <div class="col-md-3">
                             <div class="card" id="company" style="height: 300px; background: #222222">
                                 <div class="card-body">
                                     <div class="row">
@@ -511,6 +514,53 @@
                     }
                 });
             }
+            $('#company-remember').bind('click', function(){
+                var that = $(this);
+                if(that.data("action") == 'create'){
+                    $.ajax({
+                        url: "/mp/remember",
+                        type: 'POST',
+                        data:{
+                           abbreviation: "[[${symbol}]]",
+                           start_price: "[[${ohlc.c}]]"
+                        },
+                        success: function(data){
+                            if(data){
+                                parent.location.href = parent.location.href; 
+                            }
+                        }
+                    });
+                }else{
+                    $.ajax({
+                        url: "/mp/remember",
+                        type: 'PUT',
+                        data:{
+                           abbreviation: "[[${symbol}]]"
+                        },
+                        success: function(data){
+                            if(data){
+                                parent.location.href = parent.location.href; 
+                            }
+                        }
+                    });
+                }
+            });
+            $.ajax({
+                url: "/mp/remember",
+                data : {
+                   abbreviation: "[[${symbol}]]" 
+                },
+                success: function (data) {
+                    $('#company-remember').removeClass("disabled");
+                        if(data){
+                            $('#company-remember').text('Stop watching the Company');
+                            $('#company-remember').data('action', 'update');
+                        }else{
+                            $('#company-remember').text('Start watching the Company');
+                            $('#company-remember').data('action', 'create');
+                        }
+                    }
+            });
         </script>
     </body>
 </html>

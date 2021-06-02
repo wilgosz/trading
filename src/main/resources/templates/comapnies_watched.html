@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html dir="ltr"  xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+    <div th:replace="parts/head :: head"></div>
+
+    <body>
+        <div  th:replace="parts/preloader :: preloader"></div>
+        <div class="main-wrapper" id="main-wrapper">
+            <div  th:replace="parts/topbar :: topbar"></div>
+            <div  th:replace="parts/left-sidebar :: left-sidebar"></div>
+            <div class="page-wrapper">
+                <div  th:replace="parts/breadcrumb :: breadcrumb"></div>
+                <div class="container-fluid">
+                    <div th:replace="parts/topmenu :: topmenu"></div>
+                    <table class="table table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Abbreviation</th>
+                                <th scope="col">Start price</th>
+                                <th scope="col">Start date</th>
+                                <th scope="col">Profit</th>
+                                <th scope="col" class="text-right">Detail</th>
+                                <th scope="col" class="text-right">Stop watching</th>
+                                <th scope="col" class="text-right">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="company: ${companies}">
+                                <th scope="row" th:text="${company.rid}"></th>
+                                <td th:text="${company.name}"></td>
+                                <td th:text="${company.abbreviation}"></td>
+                                <td th:text="${company.startPrice + ' EUR'}"></td>
+                                <td th:text="${company.date}"></td>
+                                <td th:text="${company.profit != null?company.profit:0 + '%'}">0%</td>
+                                <td class="text-right">
+                                    <div th:if="${company.buy != null}" class="d-flex align-items-end" style="height: 28px; width: 28px;margin-right: 6px; border: 1px solid #27a9e3; background: white">
+                                        <span th:style="${'display: inline-block; height: '+ #numbers.formatDecimal(100*((0.0 + company.buy)/(company.buy+company.sell+company.neutral)), 0, 0) +'%;  box-sizing: border-box;'}" class="bg-success flex-grow-1"></span>
+                                        <span th:style="${'display: inline-block; height: '+ #numbers.formatDecimal(100*((0.0 + company.neutral)/(company.buy+company.sell+company.neutral)), 0, 0) +'%;  box-sizing: border-box;'}" class="bg-warning flex-grow-1"></span>
+                                        <span th:style="${'display: inline-block; height: '+ #numbers.formatDecimal(100*((0.0 + company.sell)/(company.buy+company.sell+company.neutral)), 0, 0) +'%;  box-sizing: border-box;'}" class="bg-danger flex-grow-1"></span>
+                                    </div>
+
+                                    <a class="btn btn-sm btn-primary" style="margin-right: 6px" href="javascript:void(0)">Process detail</a>
+                                </td>
+                                <td class="text-right">
+                                    <div class="checkbox_ d-inline-block" th:if="${company.activeWatch == true}">
+                                        <input th:id="${'checkbox_'+company.abbreviation}" type="checkbox" value="1" th:checked="${company.activeWatch == true}" th:attr="data-rid=${company.rid}">
+                                        <label th:for="${'checkbox_'+company.abbreviation}">active</label>
+                                    </div>
+                                    <div class="d-inline-block" th:if="${company.activeWatch == false}">
+                                        suspended
+                                    </div>
+                                </td>
+                                <td class="text-right">
+                                    <a th:if="${company.activeWatch == false}" class="btn btn-sm btn-danger remove-watch"  th:attr="data-rid=${company.rid}"  style="margin-right: 6px" href="javascript:void(0)">Delete</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div  th:replace="parts/footer :: footer"></div>
+            </div>
+        </div>
+        <div  th:replace="parts/requiredjs :: requiredjs"></div>
+        <script type="text/javascript">
+            $('.checkbox_ input[type=checkbox]').change(function () {
+                var that = $(this);
+                setTimeout(function () {
+                    if (!that.is(":checked")) {
+                        if (confirm('Are you sure you want to change the status to inactive?')) {
+                            $.ajax({
+                                url: "/companies/watched/" + that.data("rid"),
+                                type: "put",
+                                success: function () {
+                                    parent.location.href = parent.location.href;
+                                }
+                            });
+                        } else {
+                            that.prop('checked', true);
+                        }
+                    }
+                }, 300);
+                console.log(that.data("rid"));
+            });
+            $('.remove-watch').click(function () {
+                var that = $(this);
+                setTimeout(function () {
+                    if (!that.is(":checked")) {
+                        if (confirm('Are you sure you want to remove this item?')) {
+                            $.ajax({
+                                url: "/companies/watched/" + that.data("rid"),
+                                type: "delete",
+                                success: function () {
+                                    parent.location.href = parent.location.href;
+                                }
+                            });
+                        } else {
+                            that.prop('checked', true);
+                        }
+                    }
+                }, 300);
+                console.log(that.data("rid"));
+            });
+        </script>
+    </body>
+</html>

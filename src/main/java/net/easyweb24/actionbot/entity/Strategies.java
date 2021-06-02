@@ -186,5 +186,4 @@ public class Strategies implements Serializable {
     public void setMpSignalsList(List<MpSignals> mpSignalsList) {
         this.mpSignalsList = mpSignalsList;
     }
-    
 }
