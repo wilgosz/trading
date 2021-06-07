@@ -47,6 +47,10 @@ public class RememberedComapniesData implements Serializable {
     @Column(name = "date", columnDefinition="DATETIME")
     private LocalDateTime date;
     
+    private Integer sell;
+    private Integer neutral;
+    private Integer buy;
+    
 
     public RememberedComapniesData() {
     }
@@ -127,6 +131,48 @@ public class RememberedComapniesData implements Serializable {
      */
     public void setDate(LocalDateTime date) {
         this.date = date;
+    }
+
+    /**
+     * @return the sell
+     */
+    public Integer getSell() {
+        return sell;
+    }
+
+    /**
+     * @param sell the sell to set
+     */
+    public void setSell(Integer sell) {
+        this.sell = sell;
+    }
+
+    /**
+     * @return the neutral
+     */
+    public Integer getNeutral() {
+        return neutral;
+    }
+
+    /**
+     * @param neutral the neutral to set
+     */
+    public void setNeutral(Integer neutral) {
+        this.neutral = neutral;
+    }
+
+    /**
+     * @return the buy
+     */
+    public Integer getBuy() {
+        return buy;
+    }
+
+    /**
+     * @param buy the buy to set
+     */
+    public void setBuy(Integer buy) {
+        this.buy = buy;
     }
 
     

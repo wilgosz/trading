@@ -5,26 +5,66 @@
  */
 package net.easyweb24.actionbot.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import net.easyweb24.actionbot.entity.MpSignals;
+import net.easyweb24.actionbot.entity.OHLC;
 import net.easyweb24.actionbot.entity.RememberedComapnies;
 import net.easyweb24.actionbot.entity.RememberedComapniesData;
+import net.easyweb24.actionbot.entity.Strategies;
+import net.easyweb24.actionbot.repository.MpSignalsRepository;
+import net.easyweb24.actionbot.repository.OHLCRepository;
+import net.easyweb24.actionbot.repository.RememberedCompaniesDataRepository;
 import net.easyweb24.actionbot.repository.RememberedCompaniesRepository;
+import net.easyweb24.actionbot.repository.StrategiesRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class RememberedCompaniesService {
 
-    public final RememberedCompaniesRepository rememberedComapniesCompaniesRepository;
+    public final RememberedCompaniesRepository rememberedComapniesRepository;
+    public final RememberedCompaniesDataRepository rememberedCompaniesDataRepository;
+    public final OHLCRepository oHLCRepository;
+    public final MpSignalsRepository mpSignalsRepository;
+    public final StrategiesRepository strategiesRepository;
 
-    public RememberedCompaniesService(RememberedCompaniesRepository rememberedComapniesCompaniesRepository) {
-        this.rememberedComapniesCompaniesRepository = rememberedComapniesCompaniesRepository;
+    public RememberedCompaniesService(
+            RememberedCompaniesRepository rememberedComapniesRepository,
+            RememberedCompaniesDataRepository rememberedCompaniesDataRepository,
+            OHLCRepository oHLCRepository,
+            MpSignalsRepository mpSignalsRepository,
+            StrategiesRepository strategiesRepository) {
+        this.rememberedComapniesRepository = rememberedComapniesRepository;
+        this.rememberedCompaniesDataRepository = rememberedCompaniesDataRepository;
+        this.oHLCRepository = oHLCRepository;
+        this.mpSignalsRepository = mpSignalsRepository;
+        this.strategiesRepository = strategiesRepository;
     }
     
     @Transactional
     public List<RememberedComapnies> addTicks(){
-        List<RememberedComapnies> list = rememberedComapniesCompaniesRepository.findByActiveTrue();
+        List<RememberedComapnies> list = rememberedComapniesRepository.findByActiveTrue();
+        for(RememberedComapnies companies: list){
+            RememberedComapniesData data = new RememberedComapniesData();
+            OHLC ohlc = oHLCRepository.getLastRecord(companies.getAbbreviation());
+            List<Strategies> strategies = strategiesRepository.findByUserId(companies.getUserId(), Sort.by("id"));
+            data.setRememberedComapniesId(companies);
+            data.setPrice(ohlc.getC());
+            data.setDate(LocalDateTime.now());
+            if(strategies.size()>0){
+               Strategies strategie = strategies.get(0);
+               MpSignals signal = mpSignalsRepository.findByAbbreviationAndStrategiesId(companies.getAbbreviation(), strategie);
+               if(signal != null){
+                   data.setBuy(signal.getBuy());
+                   data.setNeutral(signal.getNeutral());
+                   data.setSell(signal.getSell());
+               }
+               rememberedCompaniesDataRepository.save(data);
+            }
+        }
         return list;
     } 
 }

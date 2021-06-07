@@ -19,7 +19,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface MpSignalsRepository extends JpaRepository < MpSignals, Long > {
-    MpSignals findByAbbreviation(String abbreviation);
+    List<MpSignals> findByAbbreviation(String abbreviation);
     MpSignals findByAbbreviationAndStrategiesId(String abbreviation, Strategies strategies);
     
     @Query(value = ""

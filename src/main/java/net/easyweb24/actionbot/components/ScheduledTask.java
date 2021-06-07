@@ -20,6 +20,7 @@ import net.easyweb24.actionbot.repository.SymbolsRepository;
 import net.easyweb24.actionbot.service.FinnhubDtoService;
 import net.easyweb24.actionbot.service.FinnhubService;
 import net.easyweb24.actionbot.service.MpSignalsService;
+import net.easyweb24.actionbot.service.RememberedCompaniesService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -37,19 +38,22 @@ public class ScheduledTask {
     private final FinnhubDtoService finnhubDtoService;
     private final FinnhubSignalsRepository finnhubSignalsRepository;
     private final MpSignalsRepository mpSignalsRepository;
+    private final RememberedCompaniesService rememberedCompaniesService;
 
     public ScheduledTask(
             SymbolsRepository symbolsRepository,
             MpSignalsService mpSignalsService,
             FinnhubDtoService finnhubDtoService,
             FinnhubSignalsRepository finnhubSignalsRepository,
-            MpSignalsRepository mpSignalsRepository
+            MpSignalsRepository mpSignalsRepository,
+            RememberedCompaniesService rememberedCompaniesService
     ) {
         this.symbolsRepository = symbolsRepository;
         this.finnhubDtoService = finnhubDtoService;
         this.mpSignalsService = mpSignalsService;
         this.finnhubSignalsRepository = finnhubSignalsRepository;
         this.mpSignalsRepository = mpSignalsRepository;
+        this.rememberedCompaniesService = rememberedCompaniesService;
     }
 
     //@Scheduled(cron = "0 */2 * * * *", zone = "Europe/Berlin")
@@ -58,6 +62,7 @@ public class ScheduledTask {
         //getAllIndicators();
         getCandles();
         saveMpSignals();
+        addRememberedTicks();
     }
 
     
@@ -68,10 +73,15 @@ public class ScheduledTask {
         //getAllIndicatorsPerHour();
         getCandlesPerHour();
         saveMpSignals();
+        addRememberedTicks();
     }
     
     private void saveMpSignals(){
         mpSignalsService.saveSignals();
+    }
+    
+    private void addRememberedTicks(){
+        rememberedCompaniesService.addTicks();
     }
 
     private void getCandlesPerHour() {
