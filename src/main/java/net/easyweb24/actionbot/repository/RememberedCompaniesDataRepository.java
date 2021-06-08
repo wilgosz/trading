@@ -5,11 +5,13 @@
  */
 package net.easyweb24.actionbot.repository;
 
+import java.util.List;
+import net.easyweb24.actionbot.entity.RememberedComapnies;
 import net.easyweb24.actionbot.entity.RememberedComapniesData;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RememberedCompaniesDataRepository  extends JpaRepository< RememberedComapniesData, Integer>{
-    
+    public List<RememberedComapniesData> findByRememberedComapniesId(RememberedComapnies companies);
 }

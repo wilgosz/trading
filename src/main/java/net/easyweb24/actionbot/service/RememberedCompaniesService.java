@@ -63,7 +63,13 @@ public class RememberedCompaniesService {
                    data.setSell(signal.getSell());
                }
                rememberedCompaniesDataRepository.save(data);
+            }else{
+               //rememberedCompaniesDataRepository.deleteAll(rememberedCompaniesDataRepository.findByRememberedComapniesId(companies));
+               //rememberedComapniesRepository.delete(companies);
+               companies.setActive(Boolean.FALSE);
+               rememberedComapniesRepository.save(companies);
             }
+            
         }
         return list;
     } 
