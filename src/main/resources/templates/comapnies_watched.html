@@ -34,29 +34,33 @@
                                 <td th:text="${company.abbreviation}"></td>
                                 <td th:text="${company.startPrice + ' EUR'}"></td>
                                 <td th:text="${company.date}"></td>
-                                <td th:text="${company.profit != null?company.profit:0 + '%'}">0%</td>
-                                <td class="text-right">
-                                    <div th:if="${company.buy != null}" class="d-flex align-items-end" style="height: 28px; width: 28px;margin-right: 6px; border: 1px solid #27a9e3; background: white">
-                                        <span th:style="${'display: inline-block; height: '+ #numbers.formatDecimal(100*((0.0 + company.buy)/(company.buy+company.sell+company.neutral)), 0, 0) +'%;  box-sizing: border-box;'}" class="bg-success flex-grow-1"></span>
-                                        <span th:style="${'display: inline-block; height: '+ #numbers.formatDecimal(100*((0.0 + company.neutral)/(company.buy+company.sell+company.neutral)), 0, 0) +'%;  box-sizing: border-box;'}" class="bg-warning flex-grow-1"></span>
-                                        <span th:style="${'display: inline-block; height: '+ #numbers.formatDecimal(100*((0.0 + company.sell)/(company.buy+company.sell+company.neutral)), 0, 0) +'%;  box-sizing: border-box;'}" class="bg-danger flex-grow-1"></span>
-                                    </div>
+                                <td>
+                                    <i th:if="${company.profit != null && company.profit < 0}" style="font-size: 18px" class="text-danger m-r-10 mdi mdi-menu-down-outline"></i> 
+                                    <i th:if="${company.profit != null && company.profit > 0}" style="font-size: 18px" class="text-success m-r-10 mdi mdi-menu-up-outline"></i> 
+                                    <i th:if="${company.profit == null || company.profit == 0}" style="font-size: 18px" class="m-r-10 mdi mdi-minus"></i>
+                                    <span th:text="${company.profit != null?#numbers.formatDecimal(company.profit,0,0) + '%': 0 + '%'}"></span></td>
+                        <td class="text-right">
+                            <div th:if="${company.buy != null}" class="d-flex align-items-end" style="height: 28px; width: 28px;margin-right: 6px; border: 1px solid #27a9e3; background: white">
+                                <span th:style="${'display: inline-block; height: '+ #numbers.formatDecimal(100*((0.0 + company.buy)/(company.buy+company.sell+company.neutral)), 0, 0) +'%;  box-sizing: border-box;'}" class="bg-success flex-grow-1"></span>
+                                <span th:style="${'display: inline-block; height: '+ #numbers.formatDecimal(100*((0.0 + company.neutral)/(company.buy+company.sell+company.neutral)), 0, 0) +'%;  box-sizing: border-box;'}" class="bg-warning flex-grow-1"></span>
+                                <span th:style="${'display: inline-block; height: '+ #numbers.formatDecimal(100*((0.0 + company.sell)/(company.buy+company.sell+company.neutral)), 0, 0) +'%;  box-sizing: border-box;'}" class="bg-danger flex-grow-1"></span>
+                            </div>
 
-                                    <a class="btn btn-sm btn-primary" style="margin-right: 6px" href="javascript:void(0)">Process detail</a>
-                                </td>
-                                <td class="text-right">
-                                    <div class="checkbox_ d-inline-block" th:if="${company.activeWatch == true}">
-                                        <input th:id="${'checkbox_'+company.abbreviation}" type="checkbox" value="1" th:checked="${company.activeWatch == true}" th:attr="data-rid=${company.rid}">
-                                        <label th:for="${'checkbox_'+company.abbreviation}">active</label>
-                                    </div>
-                                    <div class="d-inline-block" th:if="${company.activeWatch == false}">
-                                        suspended
-                                    </div>
-                                </td>
-                                <td class="text-right">
-                                    <a th:if="${company.activeWatch == false}" class="btn btn-sm btn-danger remove-watch"  th:attr="data-rid=${company.rid}"  style="margin-right: 6px" href="javascript:void(0)">Delete</a>
-                                </td>
-                            </tr>
+                            <a th:href="@{/companies/watched/{id}(id=${company.rid})}" class="btn btn-sm btn-primary" style="margin-right: 6px" href="javascript:void(0)">Process detail</a>
+                        </td>
+                        <td class="text-right">
+                            <div class="checkbox_ d-inline-block" th:if="${company.activeWatch == true}">
+                                <input th:id="${'checkbox_'+company.abbreviation}" type="checkbox" value="1" th:checked="${company.activeWatch == true}" th:attr="data-rid=${company.rid}">
+                                <label th:for="${'checkbox_'+company.abbreviation}">active</label>
+                            </div>
+                            <div class="d-inline-block" th:if="${company.activeWatch == false}">
+                                suspended
+                            </div>
+                        </td>
+                        <td class="text-right">
+                            <a th:if="${company.activeWatch == false}" class="btn btn-sm btn-danger remove-watch"  th:attr="data-rid=${company.rid}"  style="margin-right: 6px" href="javascript:void(0)">Delete</a>
+                        </td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>

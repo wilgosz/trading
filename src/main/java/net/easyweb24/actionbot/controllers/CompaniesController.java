@@ -7,6 +7,7 @@ package net.easyweb24.actionbot.controllers;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.servlet.ServletRequest;
@@ -17,10 +18,12 @@ import net.easyweb24.actionbot.dto.CompanyRememberedDTO;
 import net.easyweb24.actionbot.entity.CompanyNews;
 import net.easyweb24.actionbot.entity.CompanyProfile;
 import net.easyweb24.actionbot.entity.RememberedComapnies;
+import net.easyweb24.actionbot.entity.RememberedComapniesData;
 import net.easyweb24.actionbot.entity.Strategies;
 import net.easyweb24.actionbot.entity.Symbols;
 import net.easyweb24.actionbot.repository.CompanyNewsRepository;
 import net.easyweb24.actionbot.repository.CompanyProfileRepository;
+import net.easyweb24.actionbot.repository.RememberedCompaniesDataRepository;
 import net.easyweb24.actionbot.repository.RememberedCompaniesRepository;
 import net.easyweb24.actionbot.repository.StrategiesRepository;
 import net.easyweb24.actionbot.repository.SymbolsRepository;
@@ -58,6 +61,7 @@ public class CompaniesController extends RootAuthController {
     private final CompanyNewsRepository companyNewsRepository;
     private final StrategiesRepository strategiesRepository;
     private final RememberedCompaniesRepository rememberedCompaniesRepository;
+    private final RememberedCompaniesDataRepository rememberedCompaniesDataRepository;
 
     public CompaniesController(
             CompanyProfileRepository companyProfileRepository,
@@ -67,7 +71,8 @@ public class CompaniesController extends RootAuthController {
             FinnhubComponent finnhubComponent,
             CompanyNewsRepository companyNewsRepository,
             StrategiesRepository strategiesRepository,
-            RememberedCompaniesRepository rememberedCompaniesRepository) {
+            RememberedCompaniesRepository rememberedCompaniesRepository,
+            RememberedCompaniesDataRepository rememberedCompaniesDataRepository) {
 
         this.companyProfileRepository = companyProfileRepository;
         this.symbolsRepository = symbolsRepository;
@@ -77,6 +82,7 @@ public class CompaniesController extends RootAuthController {
         this.companyNewsRepository = companyNewsRepository;
         this.strategiesRepository = strategiesRepository;
         this.rememberedCompaniesRepository = rememberedCompaniesRepository;
+        this.rememberedCompaniesDataRepository = rememberedCompaniesDataRepository;
     }
 
     @RequestMapping(value = {"", "/strategy/{id}"}, method = RequestMethod.GET)
@@ -230,32 +236,49 @@ public class CompaniesController extends RootAuthController {
         }
         return ResponseEntity.ok().build();
     }
-    
+
     @GetMapping("/watched")
-    public String getWatchedCompanies(Model model){
+    public String getWatchedCompanies(Model model) {
         List<CompanyRememberedDTO> remembered = rememberedCompaniesRepository.getAllWitchDetail(getUserId());
         model.addAttribute("companies", remembered);
         return "comapnies_watched";
     }
+
+    @GetMapping("/watched/{id}")
+    public String getWatchedCompany(@PathVariable int id, Model model) {
+        List<RememberedComapniesData> data = new ArrayList<>();
+        RememberedComapnies companies = rememberedCompaniesRepository.findByIdAndUserId(id, getUserId());
+        CompanyRememberedDTO rcompany = rememberedCompaniesRepository.getOneWitchDetail(getUserId(), id);
+        Double maxProfit = rememberedCompaniesDataRepository.getMaxProfit(id);
+        if (companies != null) {
+            data = rememberedCompaniesDataRepository.findByRememberedComapniesId(companies, Sort.by("id").descending());
+        }
+        model.addAttribute("company", rcompany);
+        model.addAttribute("data", data);
+        model.addAttribute("maxProfit", maxProfit);
+        return "company_watched";
+    }
+
     @PutMapping("/watched/{id}")
     @ResponseBody
-    public ResponseEntity<RememberedComapnies> changeWatchToInactive(@PathVariable Integer id){
+    public ResponseEntity<RememberedComapnies> changeWatchToInactive(@PathVariable Integer id) {
         RememberedComapnies remembered = rememberedCompaniesRepository.findByIdAndUserId(id, getUserId());
-        if(remembered != null){
+        if (remembered != null) {
             remembered.setActive(false);
-            if(remembered.getProfit() == null ){
-                remembered.setProfit(0.0); 
+            if (remembered.getProfit() == null) {
+                remembered.setProfit(0.0);
             }
             rememberedCompaniesRepository.save(remembered);
         }
         return ResponseEntity.ok().body(remembered);
     }
+
     @DeleteMapping("/watched/{id}")
     @ResponseBody
-    public ResponseEntity<RememberedComapnies> deleteWatch(@PathVariable Integer id){
+    public ResponseEntity<RememberedComapnies> deleteWatch(@PathVariable Integer id) {
         RememberedComapnies remembered = rememberedCompaniesRepository.findByIdAndUserId(id, getUserId());
-        if(remembered != null){
-            
+        if (remembered != null) {
+
             rememberedCompaniesRepository.delete(remembered);
         }
         return ResponseEntity.ok().body(remembered);

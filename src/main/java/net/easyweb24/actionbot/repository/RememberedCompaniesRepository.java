@@ -35,4 +35,16 @@ public interface RememberedCompaniesRepository extends JpaRepository< Remembered
             + " "
             + "ORDER BY rc.active DESC, rc.date DESC)", nativeQuery = true)
     public List<CompanyRememberedDTO> getAllWitchDetail(Long user_id);
+    
+    @Query(value = ""
+            + "(SELECT c.*, rc.date, rc.start_price as startPrice, rc.profit, rc.active as activeWatch, rc.id as rid "
+            + "FROM "
+            + "company_profile c, "
+            + "remembered_companies rc  "
+            + "WHERE c.abbreviation = rc.abbreviation "
+            + "AND rc.user_id = ?1 "
+            + "AND rc.id = ?2 "
+            + " "
+            + "ORDER BY rc.active DESC, rc.date DESC)", nativeQuery = true)
+    public CompanyRememberedDTO getOneWitchDetail(Long user_id, Integer remembered_company_id);
 }

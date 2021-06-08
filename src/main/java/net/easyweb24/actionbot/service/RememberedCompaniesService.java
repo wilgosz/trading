@@ -56,6 +56,8 @@ public class RememberedCompaniesService {
             data.setDate(LocalDateTime.now());
             if(strategies.size()>0){
                Strategies strategie = strategies.get(0);
+               double profit = getProfit(companies.getStartPrice(), ohlc.getC());
+               data.setProfit(profit);
                MpSignals signal = mpSignalsRepository.findByAbbreviationAndStrategiesId(companies.getAbbreviation(), strategie);
                if(signal != null){
                    data.setBuy(signal.getBuy());
@@ -63,6 +65,9 @@ public class RememberedCompaniesService {
                    data.setSell(signal.getSell());
                }
                rememberedCompaniesDataRepository.save(data);
+               
+               companies.setProfit(profit);
+               rememberedComapniesRepository.save(companies);
             }else{
                //rememberedCompaniesDataRepository.deleteAll(rememberedCompaniesDataRepository.findByRememberedComapniesId(companies));
                //rememberedComapniesRepository.delete(companies);
@@ -72,5 +77,18 @@ public class RememberedCompaniesService {
             
         }
         return list;
-    } 
+    }
+    
+    private double getProfit(double old_price, double new_price){
+        
+        double profit = 0.0;
+        
+        if(old_price < new_price){
+            profit = (( new_price - old_price )/old_price)*100;
+        }else if(old_price > new_price){
+            profit = -((( old_price - new_price )/old_price)*100);
+        }
+        
+        return profit;
+    }
 }

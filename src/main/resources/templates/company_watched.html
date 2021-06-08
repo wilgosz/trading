@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html dir="ltr"  xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+    <div th:replace="parts/head :: head"></div>
+
+    <body>
+        <div  th:replace="parts/preloader :: preloader"></div>
+        <div class="main-wrapper" id="main-wrapper">
+            <div  th:replace="parts/topbar :: topbar"></div>
+            <div  th:replace="parts/left-sidebar :: left-sidebar"></div>
+            <div class="page-wrapper">
+                <div  th:replace="parts/breadcrumb :: breadcrumb"></div>
+                <div class="container-fluid">
+                    <div th:replace="parts/topmenu :: topmenu"></div>
+
+
+                    <th:block th:if="${company == null}">
+                        <div class="row">
+                            <div class="col m-b-20">
+                                <a href="/companies/watched" class="btn btn-cyan"><i class="fas fa-backward"></i> Back to watched companies</a>
+                            </div>
+                            <div class="col">
+                                <span style="font-size: 24px; line-height: 35px">Data not available</span>
+                            </div>
+                        </div>
+                    </th:block>
+                    <th:block th:if="${company != null}">
+                        <div class="row">
+                            <div class="col m-b-20">
+                                <a href="/companies/watched" class="btn btn-cyan"><i class="fas fa-backward"></i> Back to watched companies</a>
+                            </div>
+                            <div class="col">
+                                <span th:text="${company.name}" style="font-size: 24px; line-height: 35px"></span>
+                            </div>
+                            <div class="col"  style="line-height: 35px">
+                                Current profit: <span th:text="${#numbers.formatDecimal(company.profit,0,2)+'%'}" style="font-size: 18px; line-height: 35px" th:classappend="${maxProfit<0?'text-danger':''}"></span>
+                            </div>
+                            <div class="col"  style="line-height: 35px">
+                                Max profit: <span th:text="${#numbers.formatDecimal(maxProfit,0,2) + '%'}"  style="font-size: 18px; line-height: 35px" th:classappend="${maxProfit<0?'text-danger':''}"></span>
+                            </div>
+                        </div>
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Time</th>
+                                    <th scope="col"></th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col"></th>
+                                    <th scope="col">Profit</th>
+                                    <th scope="col">Indicators</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="d,iter: ${data}">
+                                    <td th:text="${d.date + ' ' + iter.size }"></td>
+                                    <td class="text-right">
+                            <th:block th:if="${iter.index < (iter.size-1)}">
+                                <i th:if="${data[iter.index].price < data[iter.index+1].price}" style="font-size: 18px" class="text-danger m-r-10 mdi mdi-menu-down-outline"></i>
+                                <i th:if="${data[iter.index].price > data[iter.index+1].price}" style="font-size: 18px" class="text-danger m-r-10 mdi mdi-menu-up-outline"></i>
+                                <i th:if="${data[iter.index].price == data[iter.index+1].price}" style="font-size: 18px" class="m-r-10 mdi mdi-minus"></i>
+                            </th:block>
+                            <th:block th:if="${iter.index == (iter.size-1)}">
+                                <i style="font-size: 18px" class="m-r-10 mdi mdi-minus"></i>
+                            </th:block>
+                                    </td>
+                                    <td th:text="${d.price}"></td>
+                                    <td class="text-right">
+                                        <i th:if="${d.profit != null && d.profit < 0}" style="font-size: 18px" class="text-danger m-r-10 mdi mdi-menu-down-outline"></i> 
+                                        <i th:if="${d.profit != null && d.profit > 0}" style="font-size: 18px" class="text-success m-r-10 mdi mdi-menu-up-outline"></i> 
+                                        <i th:if="${d.profit == null || d.profit == 0}" style="font-size: 18px" class="m-r-10 mdi mdi-minus"></i>
+                                    </td>
+                                    <td th:text="${d.profit != null?#numbers.formatDecimal(d.profit,0,2) +'%': '0.00%'}"></td>
+                                    <td>
+                                        <div th:if="${d.buy != null}" class="d-flex align-items-end" style="height: 28px; width: 100px;margin-right: 6px; border: 1px solid #27a9e3; background: white">
+                                            <span th:style="${'display: inline-block; height: '+ #numbers.formatDecimal(100*((0.0 + d.buy)/(d.buy+d.sell+d.neutral)), 0, 0) +'%;  box-sizing: border-box;'}" class="bg-success flex-grow-1"></span>
+                                            <span th:style="${'display: inline-block; height: '+ #numbers.formatDecimal(100*((0.0 + d.neutral)/(d.buy+d.sell+d.neutral)), 0, 0) +'%;  box-sizing: border-box;'}" class="bg-warning flex-grow-1"></span>
+                                            <span th:style="${'display: inline-block; height: '+ #numbers.formatDecimal(100*((0.0 + d.sell)/(d.buy+d.sell+d.neutral)), 0, 0) +'%;  box-sizing: border-box;'}" class="bg-danger flex-grow-1"></span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </th:block>
+
+
+                </div>
+                <div  th:replace="parts/footer :: footer"></div>
+            </div>
+        </div>
+        <div  th:replace="parts/requiredjs :: requiredjs"></div>
+    </body>
+</html>

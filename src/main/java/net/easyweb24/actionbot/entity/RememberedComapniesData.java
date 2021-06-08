@@ -47,6 +47,9 @@ public class RememberedComapniesData implements Serializable {
     @Column(name = "date", columnDefinition="DATETIME")
     private LocalDateTime date;
     
+    @Column(name = "profit")
+    private Double profit;
+    
     private Integer sell;
     private Integer neutral;
     private Integer buy;
@@ -173,6 +176,20 @@ public class RememberedComapniesData implements Serializable {
      */
     public void setBuy(Integer buy) {
         this.buy = buy;
+    }
+
+    /**
+     * @return the profit
+     */
+    public Double getProfit() {
+        return profit;
+    }
+
+    /**
+     * @param profit the profit to set
+     */
+    public void setProfit(Double profit) {
+        this.profit = profit;
     }
 
     
