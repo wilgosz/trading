@@ -34,10 +34,10 @@
                                 <span th:text="${company.name}" style="font-size: 24px; line-height: 35px"></span>
                             </div>
                             <div class="col"  style="line-height: 35px">
-                                Current profit: <span th:text="${#numbers.formatDecimal(company.profit,0,2)+'%'}" style="font-size: 18px; line-height: 35px" th:classappend="${maxProfit<0?'text-danger':''}"></span>
+                                Current profit: <span th:text="${company.profit != null?#numbers.formatDecimal(company.profit,0,2)+'%':'0.00%'}" style="font-size: 18px; line-height: 35px" th:classappend="${maxProfit<0?'text-danger':''}"></span>
                             </div>
                             <div class="col"  style="line-height: 35px">
-                                Max profit: <span th:text="${#numbers.formatDecimal(maxProfit,0,2) + '%'}"  style="font-size: 18px; line-height: 35px" th:classappend="${maxProfit<0?'text-danger':''}"></span>
+                                Max profit: <span th:text="${maxProfit != null?#numbers.formatDecimal(maxProfit,0,2) + '%':'0.00%'}"  style="font-size: 18px; line-height: 35px" th:classappend="${maxProfit<0?'text-danger':''}"></span>
                             </div>
                         </div>
                         <table class="table table-striped table-sm">
@@ -57,7 +57,7 @@
                                     <td class="text-right">
                             <th:block th:if="${iter.index < (iter.size-1)}">
                                 <i th:if="${data[iter.index].price < data[iter.index+1].price}" style="font-size: 18px" class="text-danger m-r-10 mdi mdi-menu-down-outline"></i>
-                                <i th:if="${data[iter.index].price > data[iter.index+1].price}" style="font-size: 18px" class="text-danger m-r-10 mdi mdi-menu-up-outline"></i>
+                                <i th:if="${data[iter.index].price > data[iter.index+1].price}" style="font-size: 18px" class="text-success m-r-10 mdi mdi-menu-up-outline"></i>
                                 <i th:if="${data[iter.index].price == data[iter.index+1].price}" style="font-size: 18px" class="m-r-10 mdi mdi-minus"></i>
                             </th:block>
                             <th:block th:if="${iter.index == (iter.size-1)}">
