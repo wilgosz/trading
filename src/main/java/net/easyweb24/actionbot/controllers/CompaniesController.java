@@ -36,6 +36,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -275,10 +276,12 @@ public class CompaniesController extends RootAuthController {
 
     @DeleteMapping("/watched/{id}")
     @ResponseBody
+    @Transactional
     public ResponseEntity<RememberedComapnies> deleteWatch(@PathVariable Integer id) {
         RememberedComapnies remembered = rememberedCompaniesRepository.findByIdAndUserId(id, getUserId());
         if (remembered != null) {
-
+            List<RememberedComapniesData> data = remembered.getRememberedComapniesList();
+            rememberedCompaniesDataRepository.deleteAll(data);
             rememberedCompaniesRepository.delete(remembered);
         }
         return ResponseEntity.ok().body(remembered);
