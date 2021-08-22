@@ -48,9 +48,12 @@ public class MpSignalsService {
         MpSignals signal;
 
         for (Strategies strategies : allstrategies) {
+            
+            
             List<MpSignals> record = new ArrayList<>();
             int count = 0;
             for (Symbols symbol : symbols) {
+                try{
                 count++;
                 System.out.println(count + ". ");
                 System.out.println(symbol.getAbbreviation());
@@ -74,6 +77,9 @@ public class MpSignalsService {
 
                 if (count > 100) {
                     //break;
+                }
+                }catch(NullPointerException ex){
+                    System.err.println(symbol.getAbbreviation()+" "+ex.getMessage());
                 }
             }
             System.err.println("Before Save");
